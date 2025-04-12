@@ -125,8 +125,6 @@ import Foundation
       Issue.record("unexpected identifier type")
     }
 
-
-
     #expect(ged.submitterRecordsMap["@U1@"]!.notes.count == 2)
     switch (ged.submitterRecordsMap["@U1@"]!.notes[0]) {
     case .Note(let note):
@@ -163,5 +161,84 @@ import Foundation
     // 0: Note
     // 1: SNote N1
     #expect(ged.submitterRecordsMap["@U1@"]!.notes.count == 2)
+
+    // Shared notes loading
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.text == "Shared note 1")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.mimeType == "text/plain")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.lang == "en-US")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation.count == 2)
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[0].text == "Shared note 1")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[0].mimeType == "text/plain")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[0].lang == "en-GB")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[1].text == "Shared note 1")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[1].mimeType == "text/plain")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[1].lang == "en-CA")
+
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation.count == 2)
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[0].xref == "@S1@")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[0].page == "1")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[1].xref == "@S2@")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[1].page == "2")
+
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.identifiers.count == 6)
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.identifiers[0]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "1")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.identifiers[1]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "10")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.identifiers[2]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "6efbee0b-96a1-43ea-83c8-828ec71c54d7"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.identifiers[3]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "4094d92a-5525-44ec-973d-6c527aa5535a"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.identifiers[4]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "123")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.identifiers[5]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "456")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.changeDate?.date.date == "27 MAR 2022")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.changeDate?.date.time == "08:56")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.changeDate?.notes.count == 2)
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.changeDate?.notes[0]) {
+    case .Note(let note):
+      #expect(note.text == "Change date note 1")
+    default:
+      Issue.record("unexpected note type")
+    }
+    switch (ged.sharedNoteRecordsMap["@N1@"]!.changeDate?.notes[1]) {
+    case .Note(let note):
+      #expect(note.text == "Change date note 2")
+    default:
+      Issue.record("unexpected note type")
+    }
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.creationDate?.date.date == "27 MAR 2022")
+    #expect(ged.sharedNoteRecordsMap["@N1@"]!.creationDate?.date.time == "08:55")
+    #expect(ged.sharedNoteRecordsMap["@N2@"]!.text == "Shared note 2")
   }
 }
