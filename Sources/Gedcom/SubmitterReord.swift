@@ -27,6 +27,7 @@ public class Submitter : RecordProtocol {
   var www: [URL] = []
   var multimediaLinks: [MultimediaLink] = []
   var languages: [String] = []
+  var identifiers: [IdentifierStructure] = []
   var notes: [NoteStructure] = []
   var changeDate: ChangeDate?
   var creationDate: CreationDate?
@@ -56,6 +57,9 @@ public class Submitter : RecordProtocol {
     "WWW" : \Submitter.www,
     "OBJE" : \Submitter.multimediaLinks,
     "LANG" : \Submitter.languages,
+    "REFN" : \Submitter.identifiers,
+    "UID" : \Submitter.identifiers,
+    "EXID" : \Submitter.identifiers,
     "NOTE" : \Submitter.notes,
     "SNOTE" : \Submitter.notes,
     "CHAN" : \Submitter.changeDate,
@@ -80,6 +84,8 @@ public class Submitter : RecordProtocol {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Submitter, AddressStructure?> {
         mutableSelf[keyPath: wkp] = try AddressStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<Submitter, [IdentifierStructure]> {
+        mutableSelf[keyPath: wkp].append(try IdentifierStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Submitter, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Submitter, [MultimediaLink]> {

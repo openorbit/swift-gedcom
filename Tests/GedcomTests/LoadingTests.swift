@@ -76,6 +76,57 @@ import Foundation
     #expect(ged.submitterRecordsMap["@U1@"]!.multimediaLinks[1].crop!.height == nil)
     #expect(ged.submitterRecordsMap["@U1@"]!.multimediaLinks[1].title == "Title")
     #expect(ged.submitterRecordsMap["@U1@"]!.languages == ["en-US", "en-GB"])
+    #expect(ged.submitterRecordsMap["@U1@"]!.identifiers.count == 6)
+    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[0]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "1")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[0]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "1")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[1]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "10")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[2]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == "24132fe0-26f6-4f87-9924-389a4f40f0ec")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[3]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == "b451c8df-5550-473b-a55c-ed31e65c60c8")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[4]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "123")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[5]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "456")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+
+
+
     #expect(ged.submitterRecordsMap["@U1@"]!.notes.count == 2)
     switch (ged.submitterRecordsMap["@U1@"]!.notes[0]) {
     case .Note(let note):
