@@ -77,6 +77,10 @@ public class EXID : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+
+    //if type == nil {
+    //   Emit warning about EXID without type being deprecated
+    //}
   }
 
   public var exid: String = ""
