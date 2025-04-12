@@ -100,13 +100,13 @@ import Foundation
     }
     switch (ged.submitterRecordsMap["@U1@"]!.identifiers[2]) {
     case .Uuid(let uid):
-      #expect(uid.uid == "24132fe0-26f6-4f87-9924-389a4f40f0ec")
+      #expect(uid.uid == UUID(uuidString: "24132fe0-26f6-4f87-9924-389a4f40f0ec"))
     default:
       Issue.record("unexpected identifier type")
     }
     switch (ged.submitterRecordsMap["@U1@"]!.identifiers[3]) {
     case .Uuid(let uid):
-      #expect(uid.uid == "b451c8df-5550-473b-a55c-ed31e65c60c8")
+      #expect(uid.uid == UUID(uuidString: "b451c8df-5550-473b-a55c-ed31e65c60c8"))
     default:
       Issue.record("unexpected identifier type")
     }

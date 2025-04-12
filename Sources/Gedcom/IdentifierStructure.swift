@@ -15,6 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+import Foundation
 
  //n REFN <Special>                           {1:1}  g7:REFN
  //  +1 TYPE <Text>                           {0:1}  g7:TYPE
@@ -47,10 +48,10 @@ public class REFN : RecordProtocol {
 // n UID <Special>                            {1:1}  g7:UID
 
 public class UID : RecordProtocol {
-  public var uid: String = ""
+  public var uid: UUID
 
   required init(record: Record) throws {
-    self.uid = record.line.value ?? ""
+    self.uid = UUID(uuidString: record.line.value ?? "") ?? UUID()
   }
 }
 
