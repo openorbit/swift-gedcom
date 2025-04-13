@@ -354,7 +354,6 @@ public class Source : RecordProtocol {
     "OBJE" : \Source.multimediaLinks,
     "CHAN" : \Source.changeDate,
     "CREA" : \Source.creationDate
-
   ]
 
   required init(record: Record) throws {
