@@ -430,5 +430,94 @@ import Foundation
 
     #expect(ged.sourceRecordsMap["@S2@"]!.title == "Source Two")
 
+
+    // Repositories
+    /*
+     TODO: Fix test when continuation lines are supported
+        2 CONT 15 East South Temple Street
+        2 CONT Salt Lake City, UT 84150 USA
+    */
+    #expect(ged.repositoryRecordsMap["@R1@"]!.name == "Repository 1")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.address == "Family History Department")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.adr1 == "Family History Department")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.adr2 == "15 East South Temple Street")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.adr3 == "Salt Lake City, UT 84150 USA")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.city == "Salt Lake City")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.state == "UT")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.postalCode == "84150")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.address!.country == "USA")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.phoneNumbers
+            == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+    #expect(ged.repositoryRecordsMap["@R1@"]!.emails
+            == ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"])
+    #expect(ged.repositoryRecordsMap["@R1@"]!.faxNumbers
+            == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+    #expect(ged.repositoryRecordsMap["@R1@"]!.www
+            == ["http://gedcom.io", "http://gedcom.info"])
+    #expect(ged.repositoryRecordsMap["@R1@"]!.notes.count == 2)
+    switch ged.repositoryRecordsMap["@R1@"]!.notes[0] {
+    case .Note(let note):
+      #expect(note.text == "Note text")
+    default:
+      Issue.record("unexpected note type")
+    }
+    switch ged.repositoryRecordsMap["@R1@"]!.notes[1] {
+    case .SNote(let note):
+      #expect(note.xref == "@N1@")
+    default:
+      Issue.record("unexpected note type")
+    }
+
+    #expect(ged.repositoryRecordsMap["@R1@"]!.identifiers.count == 6)
+    switch (ged.repositoryRecordsMap["@R1@"]!.identifiers[0]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "1")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.repositoryRecordsMap["@R1@"]!.identifiers[1]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "10")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.repositoryRecordsMap["@R1@"]!.identifiers[2]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "efa7885b-c806-4590-9f1b-247797e4c96d"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.repositoryRecordsMap["@R1@"]!.identifiers[3]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "d530f6ab-cfd4-44cd-ab2c-e40bddb76bf8"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.repositoryRecordsMap["@R1@"]!.identifiers[4]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "123")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.repositoryRecordsMap["@R1@"]!.identifiers[5]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "456")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+
+    #expect(ged.repositoryRecordsMap["@R1@"]!.changeDate != nil)
+    #expect(ged.repositoryRecordsMap["@R1@"]!.changeDate!.date.date == "27 MAR 2022")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.changeDate!.date.time == "08:56")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.changeDate!.notes.count == 2)
+    #expect(ged.repositoryRecordsMap["@R1@"]!.creationDate != nil)
+    #expect(ged.repositoryRecordsMap["@R1@"]!.creationDate!.date.date == "27 MAR 2022")
+    #expect(ged.repositoryRecordsMap["@R1@"]!.creationDate!.date.time == "08:55")
+
+    #expect(ged.repositoryRecordsMap["@R2@"]!.name == "Repository 2")
   }
 }
