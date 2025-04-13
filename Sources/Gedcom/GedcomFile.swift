@@ -176,8 +176,6 @@ class GedcomFile {
       } else if let wkp = kp as? WritableKeyPath<GedcomFile, [Submitter]> {
         mutableSelf[keyPath: wkp].append(try Submitter(record: record))
         assert(record.line.xref != nil)
-
-        print("submitter xref: \(record.line.xref)")
         if let xref = record.line.xref {
           submitterRecordsMap[xref] = mutableSelf[keyPath: wkp].last!
         }

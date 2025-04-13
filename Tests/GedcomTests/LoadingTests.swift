@@ -84,13 +84,6 @@ import Foundation
     default:
       Issue.record("unexpected identifier type")
     }
-    switch (ged.submitterRecordsMap["@U1@"]!.identifiers[0]) {
-    case .Refn(let refn):
-      #expect(refn.refn == "1")
-      #expect(refn.type == "User-generated identifier")
-    default:
-      Issue.record("unexpected identifier type")
-    }
     switch (ged.submitterRecordsMap["@U1@"]!.identifiers[1]) {
     case .Refn(let refn):
       #expect(refn.refn == "10")
@@ -131,14 +124,14 @@ import Foundation
       #expect(note.text == "American English")
       #expect(note.mimeType == "text/plain")
       #expect(note.lang == "en-US")
-      #expect(note.translation.count == 1)
-      #expect(note.translation[0].text == "British English")
-      #expect(note.translation[0].lang == "en-GB")
-      #expect(note.citation.count == 2)
-      #expect(note.citation[0].xref == "@S1@")
-      #expect(note.citation[0].page == "1")
-      #expect(note.citation[1].xref == "@S2@")
-      #expect(note.citation[1].page == "2")
+      #expect(note.translations.count == 1)
+      #expect(note.translations[0].text == "British English")
+      #expect(note.translations[0].lang == "en-GB")
+      #expect(note.citations.count == 2)
+      #expect(note.citations[0].xref == "@S1@")
+      #expect(note.citations[0].page == "1")
+      #expect(note.citations[1].xref == "@S2@")
+      #expect(note.citations[1].page == "2")
     default:
       Issue.record("unexpected note type")
     }
@@ -240,5 +233,202 @@ import Foundation
     #expect(ged.sharedNoteRecordsMap["@N1@"]!.creationDate?.date.date == "27 MAR 2022")
     #expect(ged.sharedNoteRecordsMap["@N1@"]!.creationDate?.date.time == "08:55")
     #expect(ged.sharedNoteRecordsMap["@N2@"]!.text == "Shared note 2")
+
+
+    // Sources
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events.count == 2)
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].eventTypes
+            == ["BIRT", "DEAT"])
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].period!.date
+            == "FROM 1701 TO 1800")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].period!.phrase
+            == "18th century")
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.place
+            == ["Some City", "Some County", "Some State", "Some Country"])
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.form
+            == ["City", "County", "State", "Country"])
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.lang == "en-US")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.translations.count == 2)
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.translations.count == 2)
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.translations[0].place
+            == ["Some City", "Some County", "Some State", "Some Country"])
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.translations[0].lang
+            == "en-GB")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place?.translations[1].place
+            == ["Some City", "Some County", "Some State", "Some Country"])
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.translations[1].lang
+            == "en")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.map!.lat == 18.150944)
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.map!.lon == 168.150944)
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.exids.count == 2)
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.exids[0].exid == "123")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.exids[0].type == "http://example.com")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.exids[1].exid == "456")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.exids[1].type == "http://example.com")
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.notes.count ==  2)
+    switch ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.notes[0] {
+    case .Note(let note):
+      #expect(note.text == "American English")
+      #expect(note.mimeType == "text/plain")
+      #expect(note.lang == "en-US")
+      #expect(note.translations.count == 1)
+      #expect(note.translations[0].text == "British English")
+      #expect(note.translations[0].lang == "en-GB")
+      #expect(note.citations.count == 2)
+      #expect(note.citations[0].xref == "@S1@")
+      #expect(note.citations[0].page == "1")
+      #expect(note.citations[1].xref == "@S2@")
+      #expect(note.citations[1].page == "2")
+    default:
+      Issue.record("unexpected note type")
+    }
+    switch ged.sourceRecordsMap["@S1@"]!.data!.events[0].place!.notes[1] {
+    case .SNote(let snote):
+      #expect(snote.xref == "@N1@")
+    default:
+      Issue.record("unexpected note type")
+    }
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.events[1].eventTypes == ["MARR"])
+    //2 EVEN MARR
+    //  3 DATE FROM 1701 TO 1800
+    //    4 PHRASE 18th century
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.agency ==  "Agency name")
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.data!.notes.count ==  2)
+    switch ged.sourceRecordsMap["@S1@"]!.data!.notes[0] {
+    case .Note(let note):
+      #expect(note.text == "American English")
+      #expect(note.mimeType == "text/plain")
+      #expect(note.lang == "en-US")
+      #expect(note.translations.count == 1)
+      #expect(note.translations[0].text == "British English")
+      #expect(note.translations[0].lang == "en-GB")
+      #expect(note.citations.count == 2)
+      #expect(note.citations[0].xref == "@S1@")
+      #expect(note.citations[0].page == "1")
+      #expect(note.citations[1].xref == "@S2@")
+      #expect(note.citations[1].page == "2")
+    default:
+      Issue.record("unexpected note type")
+    }
+
+    switch ged.sourceRecordsMap["@S1@"]!.data!.notes[1] {
+    case .SNote(let snote):
+      #expect(snote.xref == "@N1@")
+    default:
+      Issue.record("unexpected note type")
+    }
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.author == "Author")
+    #expect(ged.sourceRecordsMap["@S1@"]!.title == "Title")
+    #expect(ged.sourceRecordsMap["@S1@"]!.abbreviation == "Abbreviation")
+    #expect(ged.sourceRecordsMap["@S1@"]!.publication == "Publication info")
+    #expect(ged.sourceRecordsMap["@S1@"]!.text?.text == "Source text")
+    #expect(ged.sourceRecordsMap["@S1@"]!.text?.mimeType == "text/plain")
+    #expect(ged.sourceRecordsMap["@S1@"]!.text?.lang == "en-US")
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation.count == 2)
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].xref == "@R1@")
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].notes.count == 2)
+    switch ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].notes[0] {
+    case .Note(let note):
+      #expect(note.text == "Note text")
+    default:
+      Issue.record("unexpected note type")
+    }
+    switch ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].notes[1] {
+    case .SNote(let note):
+      #expect(note.xref == "@N1@")
+    default:
+      Issue.record("unexpected note type")
+    }
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers.count == 1)
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers[0].callNumber == "Call number")
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers[0].medium!.medium == "BOOK")
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers[0].medium!.phrase == "Booklet")
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[1].xref == "@R2@")
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[1].callNumbers.count == 10)
+
+    for (c, ex) in zip(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[1].callNumbers,
+                       ["VIDEO", "CARD", "FICHE", "FILM", "MAGAZINE", "MANUSCRIPT", "MAP", "NEWSPAPER", "PHOTO", "TOMBSTONE"]) {
+      #expect(c.callNumber == "Call number")
+      #expect(c.medium!.medium == ex)
+    }
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.identifiers.count == 6)
+    switch (ged.sourceRecordsMap["@S1@"]!.identifiers[0]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "1")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sourceRecordsMap["@S1@"]!.identifiers[1]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "10")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sourceRecordsMap["@S1@"]!.identifiers[2]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "f065a3e8-5c03-4b4a-a89d-6c5e71430a8d"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sourceRecordsMap["@S1@"]!.identifiers[3]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "9441c3f3-74df-42b4-bbc1-fed42fd7f536"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sourceRecordsMap["@S1@"]!.identifiers[4]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "123")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.sourceRecordsMap["@S1@"]!.identifiers[5]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "456")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.multimediaLinks.count == 2)
+    #expect(ged.sourceRecordsMap["@S1@"]!.multimediaLinks[0].xref == "@O1@")
+    #expect(ged.sourceRecordsMap["@S1@"]!.multimediaLinks[1].xref == "@O2@")
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.notes.count == 2)
+    switch ged.sourceRecordsMap["@S1@"]!.notes[0] {
+    case .Note(let note):
+      #expect(note.text == "Note text")
+    default:
+      Issue.record("unexpected note type")
+    }
+    switch ged.sourceRecordsMap["@S1@"]!.notes[1] {
+    case .SNote(let note):
+      #expect(note.xref == "@N1@")
+    default:
+      Issue.record("unexpected note type")
+    }
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.changeDate != nil)
+    #expect(ged.sourceRecordsMap["@S1@"]!.changeDate!.date.date == "27 MAR 2022")
+    #expect(ged.sourceRecordsMap["@S1@"]!.changeDate!.date.time == "08:56")
+    #expect(ged.sourceRecordsMap["@S1@"]!.changeDate!.notes.count == 2)
+
+    #expect(ged.sourceRecordsMap["@S1@"]!.creationDate != nil)
+    #expect(ged.sourceRecordsMap["@S1@"]!.creationDate!.date.date == "27 MAR 2022")
+    #expect(ged.sourceRecordsMap["@S1@"]!.creationDate!.date.time == "08:55")
+
+    #expect(ged.sourceRecordsMap["@S2@"]!.title == "Source Two")
+
   }
 }

@@ -49,8 +49,8 @@ public class Note : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "MIME" : \Note.mimeType,
     "LANG" : \Note.lang,
-    "TRAN" : \Note.translation,
-    "SOUR" : \Note.citation,
+    "TRAN" : \Note.translations,
+    "SOUR" : \Note.citations,
  ]
 
   required init(record: Record) throws {
@@ -77,8 +77,8 @@ public class Note : RecordProtocol {
   public var text: String = ""
   public var mimeType: String?
   public var lang: String?
-  public var translation: [Translation] = []
-  public var citation: [SourceCitation] = []
+  public var translations: [Translation] = []
+  public var citations: [SourceCitation] = []
 }
 
 public class SNoteRef : RecordProtocol {
