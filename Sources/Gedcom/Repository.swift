@@ -17,23 +17,6 @@
 //
 
 public class Repository : RecordProtocol {
-  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    :
-  ]
-
-  required init(record: Record) throws {
-    for child in record.children {
-      guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
-        continue
-      }
-      print("\(child.line.tag)")
-
-      if let wkp = kp as? WritableKeyPath<Repository, [String]?> {
-      }
-    }
-
-  }
   /*
    n @XREF:REPO@ REPO {1:1} g7:record-REPO
    +1 NAME <Text> {1:1} g7:NAME
@@ -47,5 +30,62 @@ public class Repository : RecordProtocol {
    +1 <<CHANGE_DATE>> {0:1}
    +1 <<CREATION_DATE>> {0:1}
    */
+  public var xref: String
+  public var name: String = ""
+  public var address: AddressStructure?
+  public var phoneNumbers: [String] = []
+  public var emails: [String] = []
+  public var faxNumbers: [String] = []
+  public var www: [String] = []
+  public var notes: [NoteStructure] = []
+  public var identifiers: [IdentifierStructure] = []
+  public var changeDate: ChangeDate?
+  public var creationDate: CreationDate?
+
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "NAME" : \Repository.name,
+    "ADDR" : \Repository.address,
+    "PHON" : \Repository.phoneNumbers,
+    "EMAIL" : \Repository.emails,
+    "FAX" : \Repository.faxNumbers,
+    "WWW" : \Repository.www,
+    "NOTE" : \Repository.notes,
+    "SNOTE" : \Repository.notes,
+    "REFN" : \Repository.identifiers,
+    "UID" : \Repository.identifiers,
+    "EXID" : \Repository.identifiers,
+    "CHAN" : \Repository.changeDate,
+    "CREA" : \Repository.creationDate
+  ]
+
+  required init(record: Record) throws {
+    self.xref = record.line.xref!
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      print("\(child.line.tag)")
+
+      if let wkp = kp as? WritableKeyPath<Repository, String> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<Repository, [String]> {
+        mutableSelf[keyPath: wkp].append(child.line.value ?? "")
+      } else if let wkp = kp as? WritableKeyPath<Repository, AddressStructure?> {
+        mutableSelf[keyPath: wkp] = try AddressStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<Repository, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Repository, [IdentifierStructure]> {
+        mutableSelf[keyPath: wkp].append(try IdentifierStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Repository, ChangeDate?> {
+        mutableSelf[keyPath: wkp] = try ChangeDate(record: child)
+      } else if let wkp = kp as? WritableKeyPath<Repository, CreationDate?> {
+        mutableSelf[keyPath: wkp] = try CreationDate(record: child)
+      }
+    }
+  }
 }
 
