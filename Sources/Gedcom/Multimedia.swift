@@ -80,12 +80,19 @@ public class MultimediaLink  : RecordProtocol {
   }
 }
 
-public class Multimedia  : RecordProtocol {
+public class FileTranslation : RecordProtocol {
+  public var path: String = ""
+  public var form: String = ""
+
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    :
+    "FORM" : \FileTranslation.form,
   ]
 
   required init(record: Record) throws {
+    self.path = record.line.value ?? ""
+    var mutableSelf = self
+
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
         //  throw GedcomError.badRecord
@@ -93,13 +100,76 @@ public class Multimedia  : RecordProtocol {
       }
       print("\(child.line.tag)")
 
-      if let wkp = kp as? WritableKeyPath<Multimedia, [String]?> {
+      if let wkp = kp as? WritableKeyPath<FileTranslation, String> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+}
 
+public class MultimediaFileForm : RecordProtocol {
+  public var form: String
+  public var medium: Medium?
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "MEDI" : \MultimediaFileForm.medium,
+  ]
+
+  required init(record: Record) throws {
+    self.form = record.line.value ?? ""
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      print("\(child.line.tag)")
+
+      if let wkp = kp as? WritableKeyPath<MultimediaFileForm, Medium?> {
+        mutableSelf[keyPath: wkp] = try Medium(record: child)
+      }
+    }
+  }
+}
+public class MultimediaFile : RecordProtocol {
+  public var path: String
+  // TODO: Should have cardinality 1
+  public var form: MultimediaFileForm?
+  public var title: String?
+  public var translations: [FileTranslation] = []
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "FORM" : \MultimediaFile.form,
+    "TITL" : \MultimediaFile.title,
+    "TRAN" : \MultimediaFile.translations,
+  ]
+
+  required init(record: Record) throws {
+    self.path = record.line.value ?? ""
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      print("\(child.line.tag)")
+
+      if let wkp = kp as? WritableKeyPath<MultimediaFile, String> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<MultimediaFile, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value
+      } else if let wkp = kp as? WritableKeyPath<MultimediaFile, MultimediaFileForm?> {
+        mutableSelf[keyPath: wkp] = try MultimediaFileForm(record: child)
+      } else if let wkp = kp as? WritableKeyPath<MultimediaFile,  [FileTranslation]> {
+        mutableSelf[keyPath: wkp].append(try FileTranslation(record: child))
+      }
+    }
   }
 
 
+}
+public class Multimedia  : RecordProtocol {
   /*
    n @XREF:OBJE@ OBJE {1:1} g7:record-OBJE
    +1 RESN <List:Enum> {0:1} g7:RESN
@@ -116,4 +186,59 @@ public class Multimedia  : RecordProtocol {
    +1 <<CHANGE_DATE>> {0:1}
    +1 <<CREATION_DATE>> {0:1}
    */
+  public var xref: String
+  public var restrictions: [Restriction] = []
+
+  public var files: [MultimediaFile] = []
+
+  public var citations: [SourceCitation] = []
+  public var notes: [NoteStructure] = []
+  public var identifiers: [IdentifierStructure] = []
+  public var changeDate: ChangeDate?
+  public var creationDate: CreationDate?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "RESN" : \Multimedia.restrictions,
+    "FILE" : \Multimedia.files,
+    "SOUR" : \Multimedia.citations,
+    "NOTE" : \Multimedia.notes,
+    "SNOTE" : \Multimedia.notes,
+    "REFN" : \Multimedia.identifiers,
+    "UID" : \Multimedia.identifiers,
+    "EXID" : \Multimedia.identifiers,
+    "CHAN" : \Multimedia.changeDate,
+    "CREA" : \Multimedia.creationDate
+  ]
+
+  required init(record: Record) throws {
+    self.xref = record.line.xref!
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      print("\(child.line.tag)")
+
+      if let wkp = kp as? WritableKeyPath<Multimedia, [String]> {
+        mutableSelf[keyPath: wkp].append(child.line.value ?? "")
+      } else if let wkp = kp as? WritableKeyPath<Multimedia, [Restriction]> {
+        let strings : [String] = (child.line.value?.components(separatedBy: ",").map({$0.trimmingCharacters(in: .whitespacesAndNewlines)})) ?? []
+        mutableSelf[keyPath: wkp] = strings.map({Restriction(rawValue: $0)!})
+      } else if let wkp = kp as? WritableKeyPath<Multimedia, [MultimediaFile]> {
+        mutableSelf[keyPath: wkp].append(try MultimediaFile(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Multimedia, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Multimedia, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Multimedia, [IdentifierStructure]> {
+        mutableSelf[keyPath: wkp].append(try IdentifierStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Multimedia, ChangeDate?> {
+        mutableSelf[keyPath: wkp] = try ChangeDate(record: child)
+      } else if let wkp = kp as? WritableKeyPath<Multimedia, CreationDate?> {
+        mutableSelf[keyPath: wkp] = try CreationDate(record: child)
+      }
+    }
+  }
 }

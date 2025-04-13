@@ -519,5 +519,169 @@ import Foundation
     #expect(ged.repositoryRecordsMap["@R1@"]!.creationDate!.date.time == "08:55")
 
     #expect(ged.repositoryRecordsMap["@R2@"]!.name == "Repository 2")
+
+
+    // Multimedia objects
+    #expect(ged.multimediaRecordsMap["@O1@"]!.restrictions == [.CONFIDENTIAL, .LOCKED])
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files.count == 2)
+    // In the GDZ the path is not a file url, otherwise a file: url
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].path == "path/to/file1")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.form == "text/plain")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.medium?.medium == "OTHER")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.medium?.phrase == "Transcript")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].path == "media/original.mp3")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form!.form == "audio/mp3")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form!.medium?.medium == "AUDIO")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].title == "Object title")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations.count == 2)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations[0].path == "media/derived.oga")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations[0].form == "audio/ogg")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations[1].path == "media/transcript.vtt")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations[1].form == "text/vtt")
+
+    #expect(ged.multimediaRecordsMap["@O1@"]!.identifiers.count == 6)
+    switch (ged.multimediaRecordsMap["@O1@"]!.identifiers[0]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "1")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.multimediaRecordsMap["@O1@"]!.identifiers[1]) {
+    case .Refn(let refn):
+      #expect(refn.refn == "10")
+      #expect(refn.type == "User-generated identifier")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.multimediaRecordsMap["@O1@"]!.identifiers[2]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "69ebdd0e-c78c-4b81-873f-dc8ac30a48b9"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.multimediaRecordsMap["@O1@"]!.identifiers[3]) {
+    case .Uuid(let uid):
+      #expect(uid.uid == UUID(uuidString: "79cae8c4-e673-4e4f-bc5d-13b02d931302"))
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.multimediaRecordsMap["@O1@"]!.identifiers[4]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "123")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    switch (ged.multimediaRecordsMap["@O1@"]!.identifiers[5]) {
+    case .Exid(let exid):
+      #expect(exid.exid == "456")
+      #expect(exid.type == "http://example.com")
+    default:
+      Issue.record("unexpected identifier type")
+    }
+    #expect(ged.multimediaRecordsMap["@O1@"]!.notes.count == 2)
+    switch (ged.multimediaRecordsMap["@O1@"]!.notes[0]) {
+    case .Note(let note):
+      #expect(note.text == "American English")
+      #expect(note.mimeType == "text/plain")
+      #expect(note.lang == "en-US")
+      #expect(note.translations.count == 2)
+      #expect(note.translations[0].text == "British English")
+      #expect(note.translations[0].lang == "en-GB")
+      #expect(note.translations[1].text == "Canadian English")
+      #expect(note.translations[1].lang == "en-CA")
+      #expect(note.citations.count == 2)
+      #expect(note.citations[0].xref == "@S1@")
+      #expect(note.citations[0].page == "1")
+      #expect(note.citations[1].xref == "@S2@")
+      #expect(note.citations[1].page == "2")
+    default:
+      Issue.record("unexpected note type")
+    }
+    switch (ged.multimediaRecordsMap["@O1@"]!.notes[1]) {
+    case .SNote(let note):
+      #expect(note.xref == "@N1@")
+    default:
+      Issue.record("unexpected snote type")
+    }
+
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations.count == 2)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].page == "1")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.date?.date == "28 MAR 2022")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.date?.time == "10:29")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.date?.phrase == "Morning")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.text.count == 2)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.text[0].text == "Text 1")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.text[0].mimeType == "text/plain")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.text[0].lang == "en-US")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.text[1].text == "Text 2")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.text[1].mimeType == "text/plain")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].data?.text[1].lang == "en-US")
+
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].events.count == 1)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].events[0].event == "BIRT")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].events[0].phrase == "Event phrase")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].events[0].role!.role == "OTHER")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].events[0].role!.phrase == "Role phrase")
+
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].quality == 0)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links.count == 2)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[0].xref == "@O1@")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[0].crop!.top == 0)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[0].crop!.left == 0)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[0].crop!.height == 100)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[0].crop!.width == 100)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[0].title == "Title")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[1].xref == "@O1@")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[1].crop!.top == 100)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[1].crop!.left == 100)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].links[1].title == "Title")
+
+
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[0].notes.count == 2)
+    switch (ged.multimediaRecordsMap["@O1@"]!.citations[0].notes[0]) {
+    case .Note(let note):
+      #expect(note.text == "American English")
+      #expect(note.mimeType == "text/plain")
+      #expect(note.lang == "en-US")
+      #expect(note.translations.count == 1)
+      #expect(note.translations[0].text == "British English")
+      #expect(note.translations[0].lang == "en-GB")
+      #expect(note.citations.count == 2)
+      #expect(note.citations[0].xref == "@S1@")
+      #expect(note.citations[0].page == "1")
+      #expect(note.citations[1].xref == "@S2@")
+      #expect(note.citations[1].page == "2")
+    default:
+      Issue.record("unexpected note type")
+    }
+    switch (ged.multimediaRecordsMap["@O1@"]!.citations[0].notes[1]) {
+    case .SNote(let note):
+      #expect(note.xref == "@N1@")
+    default:
+      Issue.record("unexpected snote type")
+    }
+
+    #expect(ged.multimediaRecordsMap["@O1@"]!.changeDate != nil)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.changeDate!.date.date == "27 MAR 2022")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.changeDate!.date.time == "08:56")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.changeDate!.notes.count == 2)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.creationDate != nil)
+    #expect(ged.multimediaRecordsMap["@O1@"]!.creationDate!.date.date == "27 MAR 2022")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.creationDate!.date.time == "08:55")
+
+
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[1].xref == "@S1@")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.citations[1].page == "2")
+/*
+    0 @O2@ OBJE
+     1 RESN PRIVACY
+     1 FILE http://host.example.com/path/to/file2
+      2 FORM text/plain
+        3 MEDI ELECTRONIC
+     */
+    // Individual records
+    // Family records
   }
 }

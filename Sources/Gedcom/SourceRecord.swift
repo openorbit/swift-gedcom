@@ -35,7 +35,7 @@
 */
 public class SourceCitationData : RecordProtocol {
   var date: DateValue?
-  var text: Translation?
+  var text: [Translation] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \SourceCitationData.date,
@@ -51,28 +51,81 @@ public class SourceCitationData : RecordProtocol {
       }
       if let wkp = kp as? WritableKeyPath<SourceCitationData, DateValue?> {
         mutableSelf[keyPath: wkp] = try DateValue(record: child)
-      } else if let wkp = kp as? WritableKeyPath<SourceCitationData,Translation?> {
-        mutableSelf[keyPath: wkp] = try Translation(record: child)
+      } else if let wkp = kp as? WritableKeyPath<SourceCitationData,[Translation]> {
+        mutableSelf[keyPath: wkp].append(try Translation(record: child))
       }
     }
   }
 
 }
+public class SourceEventRole : RecordProtocol {
+  var role: String
+  var phrase: String?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "PHRASE" : \SourceEventRole.phrase,
+  ]
+
+  required init(record: Record) throws {
+    self.role = record.line.value ?? ""
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      if let wkp = kp as? WritableKeyPath<SourceEventRole, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+
+}
+
+public class SourceEventData : RecordProtocol {
+  var event: String
+  var phrase: String?
+  var role: SourceEventRole?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "PHRASE" : \SourceEventData.phrase,
+    "ROLE" : \SourceEventData.role,
+  ]
+
+  required init(record: Record) throws {
+    self.event = record.line.value ?? ""
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      if let wkp = kp as? WritableKeyPath<SourceEventData, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<SourceEventData, SourceEventRole?> {
+        mutableSelf[keyPath: wkp] = try SourceEventRole(record: child)
+      }
+    }
+  }
+}
+
 public class SourceCitation : RecordProtocol {
   var xref: String
   var page: String?
   var data: SourceCitationData?
+  var events: [SourceEventData] = []
   var quality: Int?
+  var links: [MultimediaLink] = []
   var notes: [NoteStructure] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PAGE" : \SourceCitation.page,
 
     "DATA" : \SourceCitation.data,
-    //"EVEN" : \SourceCitation.page,
+    "EVEN" : \SourceCitation.events,
 
     "QUAY" : \SourceCitation.quality,
-    //"OBJE" : \SourceCitation.page, // Multimedia
+    "OBJE" : \SourceCitation.links,
 
     "NOTE" : \SourceCitation.notes,
     "SNOTE" : \SourceCitation.notes,
@@ -90,8 +143,14 @@ public class SourceCitation : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       } else if let wkp = kp as? WritableKeyPath<SourceCitation, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<SourceCitation, Int?> {
+        mutableSelf[keyPath: wkp] = Int(child.line.value ?? "0")
       } else if let wkp = kp as? WritableKeyPath<SourceCitation, SourceCitationData?> {
         mutableSelf[keyPath: wkp] = try SourceCitationData(record: child)
+      } else if let wkp = kp as? WritableKeyPath<SourceCitation, [SourceEventData]> {
+        mutableSelf[keyPath: wkp].append(try SourceEventData(record: child))
+      } else if let wkp = kp as? WritableKeyPath<SourceCitation, [MultimediaLink]> {
+        mutableSelf[keyPath: wkp].append(try MultimediaLink(record: child))
       } else if let wkp = kp as? WritableKeyPath<SourceCitation, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
       }
