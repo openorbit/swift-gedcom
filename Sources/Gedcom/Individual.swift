@@ -469,7 +469,7 @@ public class Pedigree : RecordProtocol {
   var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    "PHRASE" : \NameType.phrase,
+    "PHRASE" : \Pedigree.phrase,
   ]
 
   required init(record: Record) throws {
@@ -483,18 +483,44 @@ public class Pedigree : RecordProtocol {
       }
       print("\(child.line.tag)")
 
-      if let wkp = kp as? WritableKeyPath<Pedigree, String> {
+      if let wkp = kp as? WritableKeyPath<Pedigree, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
   }
 }
 
-public enum ChildStatus : String {
+public enum ChildStatusKind : String {
   case CHALLENGED
   case DISPROVEN
   case PROVEN
 }
+
+public class ChildStatus : RecordProtocol {
+  public var kind: ChildStatusKind
+  public var phrase: String?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "PHRASE" : \ChildStatus.phrase,
+  ]
+
+  required init(record: Record) throws {
+    self.kind = ChildStatusKind(rawValue: record.line.value ?? "") ?? .CHALLENGED
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      print("\(child.line.tag)")
+
+      if let wkp = kp as? WritableKeyPath<ChildStatus, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+}
+
 public class FamilyChild : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PEDI" : \FamilyChild.pedigree,
@@ -524,10 +550,9 @@ public class FamilyChild : RecordProtocol {
       } else if let wkp = kp as? WritableKeyPath<FamilyChild, Pedigree?> {
         mutableSelf[keyPath: wkp] = try Pedigree(record: child)
       } else if let wkp = kp as? WritableKeyPath<FamilyChild, ChildStatus?> {
-        mutableSelf[keyPath: wkp] = ChildStatus(rawValue: child.line.value ?? "")
+        mutableSelf[keyPath: wkp] = try ChildStatus(record: child)
       }
     }
-
   }
 }
 public class FamilySpouse : RecordProtocol {
@@ -732,8 +757,8 @@ public class Individual : RecordProtocol {
     "ASSO" : \Individual.associations,
 
     "ALIA" : \Individual.aliases,
-    "ANCI" : \Individual.ancestorIntrest,
-    "DESI" : \Individual.decenantIntrest,
+    "ANCI" : \Individual.ancestorInterest,
+    "DESI" : \Individual.decendantInterest,
 
     "REFN" : \Individual.identifiers,
     "UID" : \Individual.identifiers,
@@ -764,8 +789,8 @@ public class Individual : RecordProtocol {
   public var submitters: [String] = []
   public var associations: [AssoiciationStructure] = []
   public var aliases: [PhraseRef] = []
-  public var ancestorIntrest: [String] = []
-  public var decenantIntrest: [String] = []
+  public var ancestorInterest: [String] = []
+  public var decendantInterest: [String] = []
 
   public var identifiers: [IdentifierStructure] = []
   public var notes: [NoteStructure] = []

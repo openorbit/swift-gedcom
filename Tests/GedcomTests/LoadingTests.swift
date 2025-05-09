@@ -949,68 +949,138 @@ import Foundation
       2 FAMC @VOID@
       1 SLGC
       2 FAMC @F2@
-      1 FAMC @VOID@
-      2 PEDI OTHER
-      3 PHRASE Other type
-      2 STAT CHALLENGED
-      3 PHRASE Phrase
-      1 FAMC @VOID@
-      2 PEDI FOSTER
-      1 FAMC @VOID@
-      2 PEDI SEALING
-      1 FAMC @F2@
-      2 PEDI ADOPTED
-      2 STAT PROVEN
-      1 FAMC @F2@
-      2 PEDI BIRTH
-      2 STAT DISPROVEN
-      1 FAMS @VOID@
-      2 NOTE Note text
-      2 SNOTE @N1@
-      1 FAMS @F1@
-      1 SUBM @U1@
-      1 SUBM @U2@
-      1 ASSO @VOID@
-      2 PHRASE Mr Stockdale
-      2 ROLE FRIEND
-      1 ASSO @VOID@
-      2 ROLE NGHBR
-      1 ASSO @VOID@
-      2 ROLE FATH
-      1 ASSO @VOID@
-      2 ROLE GODP
-      1 ASSO @VOID@
-      2 ROLE HUSB
-      1 ASSO @VOID@
-      2 ROLE MOTH
-      1 ASSO @VOID@
-      2 ROLE MULTIPLE
-      1 ASSO @VOID@
-      2 ROLE SPOU
-      1 ASSO @VOID@
-      2 ROLE WIFE
-      1 ALIA @VOID@
-      1 ALIA @I3@
-      2 PHRASE Alias
-      1 ANCI @U1@
-      1 ANCI @VOID@
-      1 DESI @U1@
-      1 DESI @VOID@
-      1 REFN 1
-      2 TYPE User-generated identifier
-      1 REFN 10
-      2 TYPE User-generated identifier
-      1 UID 3d75b5eb-36e9-40b3-b79f-f088b5c18595
-      1 UID cb49c361-7124-447e-b587-4c6d36e51825
-      1 EXID 123
-      2 TYPE http://example.com
-      1 EXID 456
-      2 TYPE http://example.com
-
-      1 NOTE me@example.com is an example email address.
-      2 CONT @@me and @I are example social media handles.
-      2 CONT @@@@@ has four @ characters where only the first is escaped.
       */
+
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies.count == 5)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[0].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[0].pedigree?.kind == .OTHER)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[0].pedigree?.phrase == "Other type")
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[0].status?.kind == .CHALLENGED)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[0].status?.phrase == "Phrase")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[1].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[1].pedigree?.kind == .FOSTER)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[2].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[2].pedigree?.kind == .SEALING)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[3].xref == "@F2@")
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[3].pedigree?.kind == .ADOPTED)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[3].status?.kind == .PROVEN)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[4].xref == "@F2@")
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[4].pedigree?.kind == .BIRTH)
+      #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[4].status?.kind == .DISPROVEN)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.spouseFamilies.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.spouseFamilies[0].xref == "@VOID@")
+      switch ged.individualRecordsMap["@I1@"]?.spouseFamilies[0].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad note in individual fams")
+      }
+      switch ged.individualRecordsMap["@I1@"]?.spouseFamilies[0].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad note in individual fams")
+      }
+
+      #expect(ged.individualRecordsMap["@I1@"]?.spouseFamilies[1].xref == "@F1@")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.submitters.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.submitters[0] == "@U1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.submitters[1] == "@U2@")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations.count == 9)
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[0].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[0].phrase == "Mr Stockdale")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[0].role?.kind == .FRIEND)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[1].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[1].role?.kind == .NGHBR)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[2].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[2].role?.kind == .FATH)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[3].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[3].role?.kind == .GODP)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[4].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[4].role?.kind == .HUSB)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[5].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[5].role?.kind == .MOTH)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[6].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[6].role?.kind == .MULTIPLE)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[7].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[7].role?.kind == .SPOU)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[8].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.associations[8].role?.kind == .WIFE)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.aliases.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.aliases[0].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.aliases[1].xref == "@I3@")
+      #expect(ged.individualRecordsMap["@I1@"]?.aliases[1].phrase == "Alias")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.ancestorInterest.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.ancestorInterest[0] == "@U1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.ancestorInterest[1] == "@VOID@")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.decendantInterest.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.decendantInterest[0] == "@U1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.decendantInterest[1] == "@VOID@")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.identifiers.count == 6)
+      switch ged.individualRecordsMap["@I1@"]?.identifiers[0] {
+      case .Refn(let ident):
+        #expect(ident.refn == "1")
+        #expect(ident.type == "User-generated identifier")
+      default:
+        Issue.record("bad identifier in individual")
+      }
+
+      switch ged.individualRecordsMap["@I1@"]?.identifiers[1] {
+      case .Refn(let ident):
+        #expect(ident.refn == "10")
+        #expect(ident.type == "User-generated identifier")
+      default:
+        Issue.record("bad identifier in individual")
+      }
+
+      switch ged.individualRecordsMap["@I1@"]?.identifiers[2] {
+      case .Uuid(let ident):
+        #expect(ident.uid == UUID(uuidString: "3d75b5eb-36e9-40b3-b79f-f088b5c18595")!)
+      default:
+        Issue.record("bad identifier in individual")
+      }
+
+      switch ged.individualRecordsMap["@I1@"]?.identifiers[3] {
+      case .Uuid(let ident):
+        #expect(ident.uid == UUID(uuidString: "cb49c361-7124-447e-b587-4c6d36e51825")!)
+      default:
+        Issue.record("bad identifier in individual")
+      }
+
+      switch ged.individualRecordsMap["@I1@"]?.identifiers[4] {
+      case .Exid(let ident):
+        #expect(ident.exid == "123")
+        #expect(ident.type == "http://example.com")
+      default:
+        Issue.record("bad identifier in individual")
+      }
+
+      switch ged.individualRecordsMap["@I1@"]?.identifiers[5] {
+      case .Exid(let ident):
+        #expect(ident.exid == "456")
+        #expect(ident.type == "http://example.com")
+
+      default:
+        Issue.record("bad identifier in individual")
+      }
+
+
       #expect(ged.individualRecordsMap["@I1@"]?.notes.count == 2)
       switch ged.individualRecordsMap["@I1@"]?.notes[0] {
       case .Note(let n):
