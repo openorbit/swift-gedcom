@@ -254,14 +254,31 @@ REPO @<XREF:REPO>@                       {1:1}  g7:REPO
         +3 PHRASE <Text>
 */
 
+public enum MediumKind : String {
+  case AUDIO //  An audio recording
+  case BOOK  // A bound book
+  case CARD  // A card or file entry
+  case ELECTRONIC // A digital artifact
+  case FICHE  // Microfiche
+  case FILM // Microfilm
+  case MAGAZINE  // Printed periodical
+  case MANUSCRIPT // Written pages
+  case MAP  // Cartographic map
+  case NEWSPAPER  // Printed newspaper
+  case PHOTO  // Photograph
+  case TOMBSTONE  // Burial marker or related memorial
+  case VIDEO  // Motion picture recording
+  case OTHER  // A value not listed here; should have a PHRASE substructure
+}
+
 public class Medium : RecordProtocol {
-  var medium: String
+  var kind: MediumKind
   var phrase: String?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \Medium.phrase,
   ]
   required init(record: Record) throws {
-    medium = record.line.value ?? ""
+    kind = MediumKind(rawValue: record.line.value ?? "OTHER") ?? .OTHER
     var mutableSelf = self
 
     for child in record.children {

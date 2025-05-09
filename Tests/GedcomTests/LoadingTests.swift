@@ -347,16 +347,16 @@ import Foundation
     }
     #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers.count == 1)
     #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers[0].callNumber == "Call number")
-    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers[0].medium!.medium == "BOOK")
+    #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers[0].medium!.kind == .BOOK)
     #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[0].callNumbers[0].medium!.phrase == "Booklet")
 
     #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[1].xref == "@R2@")
     #expect(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[1].callNumbers.count == 10)
 
     for (c, ex) in zip(ged.sourceRecordsMap["@S1@"]!.sourceRepoCitation[1].callNumbers,
-                       ["VIDEO", "CARD", "FICHE", "FILM", "MAGAZINE", "MANUSCRIPT", "MAP", "NEWSPAPER", "PHOTO", "TOMBSTONE"]) {
+                       [MediumKind.VIDEO, MediumKind.CARD, MediumKind.FICHE, MediumKind.FILM, MediumKind.MAGAZINE, MediumKind.MANUSCRIPT, MediumKind.MAP, MediumKind.NEWSPAPER, MediumKind.PHOTO, MediumKind.TOMBSTONE]) {
       #expect(c.callNumber == "Call number")
-      #expect(c.medium!.medium == ex)
+      #expect(c.medium!.kind == ex)
     }
 
     #expect(ged.sourceRecordsMap["@S1@"]!.identifiers.count == 6)
@@ -527,11 +527,11 @@ import Foundation
     // In the GDZ the path is not a file url, otherwise a file: url
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].path == "path/to/file1")
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.form == "text/plain")
-    #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.medium?.medium == "OTHER")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.medium?.kind == .OTHER)
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.medium?.phrase == "Transcript")
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].path == "media/original.mp3")
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form!.form == "audio/mp3")
-    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form!.medium?.medium == "AUDIO")
+    #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form!.medium?.kind == .AUDIO)
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].title == "Object title")
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations.count == 2)
     #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations[0].path == "media/derived.oga")
