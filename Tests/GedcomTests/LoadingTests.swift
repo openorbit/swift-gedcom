@@ -674,14 +674,15 @@ import Foundation
 
     #expect(ged.multimediaRecordsMap["@O1@"]!.citations[1].xref == "@S1@")
     #expect(ged.multimediaRecordsMap["@O1@"]!.citations[1].page == "2")
-/*
-    0 @O2@ OBJE
-     1 RESN PRIVACY
-     1 FILE http://host.example.com/path/to/file2
-      2 FORM text/plain
-        3 MEDI ELECTRONIC
-     */
+
+    #expect(ged.multimediaRecordsMap["@O2@"]!.restrictions == [.PRIVACY])
+    #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].path == "http://host.example.com/path/to/file2")
+    #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].form?.form == "text/plain")
+    #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].form?.medium?.kind == .ELECTRONIC)
+
     // Individual records
+
+
     // Family records
   }
 }
