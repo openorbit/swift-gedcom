@@ -635,7 +635,7 @@ public enum Sex : String {
 public class Individual : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "RESN" : \Individual.resn,
-    "NAME" : \Individual.name,
+    "NAME" : \Individual.names,
     "SEX" : \Individual.sex,
 
     "CAST": \Individual.individualAttributes,
@@ -710,7 +710,7 @@ public class Individual : RecordProtocol {
 
   ]
   public var resn: [String] = []
-  public var name: PersonalName?
+  public var names: [PersonalName] = []
   public var sex: Sex?
 
   public var individualAttributes: [String] = []// TODO
@@ -750,6 +750,8 @@ public class Individual : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       } else if let wkp = kp as? WritableKeyPath<Individual, Sex?> {
         mutableSelf[keyPath: wkp] = Sex(rawValue: child.line.value ?? "") ?? .unknown
+      } else if let wkp = kp as? WritableKeyPath<Individual, [PersonalName]> {
+        mutableSelf[keyPath: wkp].append(try PersonalName(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [FamilyChild]> {
         mutableSelf[keyPath: wkp].append(try FamilyChild(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [FamilySpouse]> {
