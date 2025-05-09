@@ -23,4 +23,5 @@ enum GedcomError : Error {
   case badLevel(Int)
   case badArchive
   case badRecord
+  case badRestriction
 }

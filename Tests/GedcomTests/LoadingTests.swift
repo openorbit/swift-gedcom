@@ -710,11 +710,14 @@ import Foundation
 
     // Individual records
     @Test func individuals() async throws {
+
+      #expect(ged.individualRecordsMap["@I1@"]?.restrictions == [.CONFIDENTIAL, .LOCKED])
+      #expect(ged.individualRecordsMap["@I1@"]?.names.count == 4)
+
       /*
-       ged.individualRecordsMap["@I1@"]
 
       0 @I1@ INDI
-      1 RESN CONFIDENTIAL, LOCKED
+
       1 NAME Lt. Cmndr. Joseph "John" /de Allen/ jr.
       2 TYPE OTHER
       3 PHRASE Name type phrase
@@ -740,13 +743,19 @@ import Foundation
       2 SOUR @S1@
       3 PAGE 1
       2 SOUR @S2@
-      1 NAME John /Doe/
-      2 TYPE BIRTH
-      1 NAME Aka
-      2 TYPE AKA
-      1 NAME Immigrant Name
-      2 TYPE IMMIGRANT
-      1 SEX M
+*/
+      #expect(ged.individualRecordsMap["@I1@"]?.names[1].name == "John /Doe/")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[1].type?.kind == .BIRTH)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.names[2].name == "Aka")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[2].type?.kind == .AKA)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.names[3].name == "Immigrant Name")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[3].type?.kind == .IMMIGRANT)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.sex == .male)
+
+/*
       1 CAST Caste
       2 TYPE Caste type
       1 DSCR Description
@@ -988,17 +997,29 @@ import Foundation
       2 PAGE 1
       2 QUAY 3
       1 SOUR @S2@
-      1 OBJE @O1@
-      1 OBJE @O2@
-      1 CHAN
-      2 DATE 27 MAR 2022
-      3 TIME 08:56
-      2 NOTE Change date note 1
-      2 NOTE Change date note 2
-      1 CREA
-      2 DATE 27 MAR 2022
-      3 TIME 08:55
-       */
+      */
+      #expect(ged.individualRecordsMap["@I1@"]?.multimediaLinks.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.multimediaLinks[0].xref == "@O1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.multimediaLinks[1].xref == "@O2@")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.changeDate?.date.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.changeDate?.date.time == "08:56")
+      switch ged.individualRecordsMap["@I1@"]?.changeDate?.notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Change date note 1")
+      default :
+        Issue.record("bad note in individual change date")
+      }
+      switch ged.individualRecordsMap["@I1@"]?.changeDate?.notes[1] {
+      case .Note(let n):
+        #expect(n.text == "Change date note 2")
+      default :
+        Issue.record("bad note in individual change date")
+      }
+
+
+      #expect(ged.individualRecordsMap["@I1@"]?.creationDate?.date.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.creationDate?.date.time == "08:55")
 
       #expect(ged.individualRecordsMap["@I2@"]?.names[0].name == "Maiden Name")
       #expect(ged.individualRecordsMap["@I2@"]?.names[0].type?.kind == .MAIDEN)

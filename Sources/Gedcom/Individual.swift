@@ -634,7 +634,7 @@ public enum Sex : String {
 
 public class Individual : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    "RESN" : \Individual.resn,
+    "RESN" : \Individual.restrictions,
     "NAME" : \Individual.names,
     "SEX" : \Individual.sex,
 
@@ -709,7 +709,7 @@ public class Individual : RecordProtocol {
     "CREA" : \Individual.creationDate
 
   ]
-  public var resn: [String] = []
+  public var restrictions: [Restriction] = []
   public var names: [PersonalName] = []
   public var sex: Sex?
 
@@ -748,6 +748,10 @@ public class Individual : RecordProtocol {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Individual, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<Individual, [Restriction]> {
+        // TODO: This may crash on bad restrictions
+        let strings : [String] = (child.line.value?.components(separatedBy: ",").map({$0.trimmingCharacters(in: .whitespacesAndNewlines)})) ?? []
+        mutableSelf[keyPath: wkp] = strings.map({Restriction(rawValue: $0)!})
       } else if let wkp = kp as? WritableKeyPath<Individual, Sex?> {
         mutableSelf[keyPath: wkp] = Sex(rawValue: child.line.value ?? "") ?? .unknown
       } else if let wkp = kp as? WritableKeyPath<Individual, [PersonalName]> {
