@@ -22,6 +22,8 @@ public class Family : RecordProtocol {
   ]
 
   required init(record: Record) throws {
+    var mutableSelf = self
+
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
         //  throw GedcomError.badRecord
@@ -29,14 +31,15 @@ public class Family : RecordProtocol {
       }
       print("\(child.line.tag)")
 
-      if let wkp = kp as? WritableKeyPath<Family, [String]?> {
+      if let wkp = kp as? WritableKeyPath<Family, [String]> {
+        mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Family, Individual?> {
       } else if let wkp = kp as? WritableKeyPath<Family, [Individual]> {
       }
     }
   }
 
-  public var resn: [String]?
+  public var resn: [String] = []
   // public var familyAttributes: []
   // public var familyEvents: []
   // public var nonEvents: []
