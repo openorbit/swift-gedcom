@@ -625,6 +625,12 @@ public class PhraseRef : RecordProtocol {
   }
 }
 
+public enum Sex : String {
+  case male = "M"
+  case female = "F"
+  case other = "X"
+  case unknown = "U"
+}
 
 public class Individual : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -705,7 +711,7 @@ public class Individual : RecordProtocol {
   ]
   public var resn: [String] = []
   public var name: PersonalName?
-  public var sex: String?
+  public var sex: Sex?
 
   public var individualAttributes: [String] = []// TODO
   public var individualEvents: [String] = []// TODO
@@ -742,6 +748,8 @@ public class Individual : RecordProtocol {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Individual, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<Individual, Sex?> {
+        mutableSelf[keyPath: wkp] = Sex(rawValue: child.line.value ?? "") ?? .unknown
       } else if let wkp = kp as? WritableKeyPath<Individual, [FamilyChild]> {
         mutableSelf[keyPath: wkp].append(try FamilyChild(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [FamilySpouse]> {
@@ -750,6 +758,18 @@ public class Individual : RecordProtocol {
         mutableSelf[keyPath: wkp].append(try AssoiciationStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [PhraseRef]> {
         mutableSelf[keyPath: wkp].append(try PhraseRef(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Individual, [IdentifierStructure]> {
+        mutableSelf[keyPath: wkp].append(try IdentifierStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Individual, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Individual, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Individual, [MultimediaLink]> {
+        mutableSelf[keyPath: wkp].append(try MultimediaLink(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Individual, CreationDate?> {
+        mutableSelf[keyPath: wkp] = try CreationDate(record: child)
+      } else if let wkp = kp as? WritableKeyPath<Individual, ChangeDate?> {
+        mutableSelf[keyPath: wkp] = try ChangeDate(record: child)
       }
     }
   }
