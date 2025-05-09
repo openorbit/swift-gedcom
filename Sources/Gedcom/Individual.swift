@@ -161,14 +161,14 @@ public class NameType : RecordProtocol {
       }
       print("\(child.line.tag)")
 
-      if let wkp = kp as? WritableKeyPath<NameType, String> {
+      if let wkp = kp as? WritableKeyPath<NameType, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
   }
 }
 
-public enum PersonalNamePiece {
+public enum PersonalNamePiece : Equatable {
   case NPFX(String)
   case GIVN(String)
   case NICK(String)
@@ -205,7 +205,22 @@ public class PersonalNameTranslation  : RecordProtocol {
       if let wkp = kp as? WritableKeyPath<PersonalNameTranslation, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       } else if let wkp = kp as? WritableKeyPath<PersonalNameTranslation, [PersonalNamePiece]> {
-        //mutableSelf[keyPath: wkp].append(child.line.value ?? "")
+        switch (child.line.tag) {
+        case "NPFX":
+          mutableSelf[keyPath: wkp].append(.NPFX(child.line.value ?? ""))
+        case "GIVN":
+          mutableSelf[keyPath: wkp].append(.GIVN(child.line.value ?? ""))
+        case "NICK":
+          mutableSelf[keyPath: wkp].append(.NICK(child.line.value ?? ""))
+        case "SPFX":
+          mutableSelf[keyPath: wkp].append(.SPFX(child.line.value ?? ""))
+        case "SURN":
+          mutableSelf[keyPath: wkp].append(.SURN(child.line.value ?? ""))
+        case "NSFX":
+          mutableSelf[keyPath: wkp].append(.NSFX(child.line.value ?? ""))
+        default:
+          throw GedcomError.badNamePiece
+        }
       }
     }
   }
@@ -217,6 +232,7 @@ public class PersonalName  : RecordProtocol {
   public var name: String
   public var type: NameType? // TODO: Substructure with phrase
   public var namePieces : [PersonalNamePiece] = []
+  public var translations : [PersonalNameTranslation] = []
   public var notes: [NoteStructure] = []
   public var citations: [SourceCitation] = []
 
@@ -228,6 +244,7 @@ public class PersonalName  : RecordProtocol {
     "SPFX" : \PersonalName.namePieces,
     "SURN" : \PersonalName.namePieces,
     "NSFX" : \PersonalName.namePieces,
+    "TRAN" : \PersonalName.translations,
     "NOTE" : \PersonalName.notes,
     "SNOTE" : \PersonalName.notes,
     "SOUR" : \PersonalName.citations,
@@ -246,6 +263,29 @@ public class PersonalName  : RecordProtocol {
 
       if let wkp = kp as? WritableKeyPath<PersonalName, [String]?> {
       } else if let wkp = kp as? WritableKeyPath<PersonalName, String?> {
+      } else if let wkp = kp as? WritableKeyPath<PersonalName, [PersonalNamePiece]> {
+        switch (child.line.tag) {
+        case "NPFX":
+          mutableSelf[keyPath: wkp].append(.NPFX(child.line.value ?? ""))
+        case "GIVN":
+          mutableSelf[keyPath: wkp].append(.GIVN(child.line.value ?? ""))
+        case "NICK":
+          mutableSelf[keyPath: wkp].append(.NICK(child.line.value ?? ""))
+        case "SPFX":
+          mutableSelf[keyPath: wkp].append(.SPFX(child.line.value ?? ""))
+        case "SURN":
+          mutableSelf[keyPath: wkp].append(.SURN(child.line.value ?? ""))
+        case "NSFX":
+          mutableSelf[keyPath: wkp].append(.NSFX(child.line.value ?? ""))
+        default:
+          throw GedcomError.badNamePiece
+        }
+      } else if let wkp = kp as? WritableKeyPath<PersonalName, [PersonalNameTranslation]> {
+        mutableSelf[keyPath: wkp].append(try PersonalNameTranslation(record: child))
+      } else if let wkp = kp as? WritableKeyPath<PersonalName, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<PersonalName, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       } else if let wkp = kp as? WritableKeyPath<PersonalName, NameType?> {
         mutableSelf[keyPath: wkp] = try NameType(record: child)
       }
