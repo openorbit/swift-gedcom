@@ -55,7 +55,7 @@ import Foundation
     @Test func submitterRecords() async throws {
       #expect(ged.submitterRecordsMap["@U1@"]!.name == "GEDCOM Steering Committee")
 
-      #expect(ged.submitterRecordsMap["@U1@"]!.address?.address == "Family History Department")
+      #expect(ged.submitterRecordsMap["@U1@"]!.address?.address == "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")
       #expect(ged.submitterRecordsMap["@U1@"]!.address?.adr1 == "Family History Department")
       #expect(ged.submitterRecordsMap["@U1@"]!.address?.adr2 == "15 East South Temple Street")
       #expect(ged.submitterRecordsMap["@U1@"]!.address?.adr3 == "Salt Lake City, UT 84150 USA")
@@ -453,13 +453,8 @@ import Foundation
     @Test func repositories() async throws {
 
       // Repositories
-      /*
-       TODO: Fix test when continuation lines are supported
-       2 CONT 15 East South Temple Street
-       2 CONT Salt Lake City, UT 84150 USA
-       */
       #expect(ged.repositoryRecordsMap["@R1@"]!.name == "Repository 1")
-      #expect(ged.repositoryRecordsMap["@R1@"]!.address!.address == "Family History Department")
+      #expect(ged.repositoryRecordsMap["@R1@"]!.address!.address == "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")
       #expect(ged.repositoryRecordsMap["@R1@"]!.address!.adr1 == "Family History Department")
       #expect(ged.repositoryRecordsMap["@R1@"]!.address!.adr2 == "15 East South Temple Street")
       #expect(ged.repositoryRecordsMap["@R1@"]!.address!.adr3 == "Salt Lake City, UT 84150 USA")
@@ -714,36 +709,58 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.restrictions == [.CONFIDENTIAL, .LOCKED])
       #expect(ged.individualRecordsMap["@I1@"]?.names.count == 4)
 
-      /*
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].name == "Lt. Cmndr. Joseph \"John\" /de Allen/ jr.")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].type?.kind == .OTHER)
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].type?.phrase == "Name type phrase")
 
-      0 @I1@ INDI
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].namePieces.count == 6)
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].namePieces[0] == .NPFX("Lt. Cmndr."))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].namePieces[1] == .GIVN("Joseph"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].namePieces[2] == .NICK("John"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].namePieces[3] == .SPFX("de"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].namePieces[4] == .SURN("Allen"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].namePieces[5] == .NSFX("jr."))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].name == "npfx John /spfx Doe/ nsfx")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].lang == "en-GB")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].namePieces[0] == .NPFX("npfx"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].namePieces[1] == .GIVN("John"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].namePieces[2] == .NICK("John"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].namePieces[3] == .SPFX("spfx"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].namePieces[4] == .SURN("Doe"))
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[0].namePieces[5] == .NSFX("nsfx"))
 
-      1 NAME Lt. Cmndr. Joseph "John" /de Allen/ jr.
-      2 TYPE OTHER
-      3 PHRASE Name type phrase
-      2 NPFX Lt. Cmndr.
-      2 GIVN Joseph
-      2 NICK John
-      2 SPFX de
-      2 SURN Allen
-      2 NSFX jr.
-      2 TRAN npfx John /spfx Doe/ nsfx
-      3 LANG en-GB
-      3 NPFX npfx
-      3 GIVN John
-      3 NICK John
-      3 SPFX spfx
-      3 SURN Doe
-      3 NSFX nsfx
-      2 TRAN John /Doe/
-      3 LANG en-CA
-      2 NOTE Note text
-      2 SNOTE @N1@
-      2 SNOTE @VOID@
-      2 SOUR @S1@
-      3 PAGE 1
-      2 SOUR @S2@
-*/
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[1].name == "John /Doe/")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].translations[1].lang == "en-CA")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].notes.count == 3)
+      switch ged.individualRecordsMap["@I1@"]?.names[0].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+        break
+      default:
+        Issue.record("bad note in individual name")
+      }
+      switch ged.individualRecordsMap["@I1@"]?.names[0].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+        break
+      default:
+        Issue.record("bad note in individual name")
+      }
+      switch ged.individualRecordsMap["@I1@"]?.names[0].notes[2] {
+      case .SNote(let n):
+        #expect(n.xref == "@VOID@")
+        break
+      default:
+        Issue.record("bad note in individual name")
+      }
+
+
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].citations.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].citations[0].xref == "@S1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].citations[0].page == "1")
+      #expect(ged.individualRecordsMap["@I1@"]?.names[0].citations[1].xref == "@S2@")
+
       #expect(ged.individualRecordsMap["@I1@"]?.names[1].name == "John /Doe/")
       #expect(ged.individualRecordsMap["@I1@"]?.names[1].type?.kind == .BIRTH)
 
@@ -989,15 +1006,31 @@ import Foundation
       2 TYPE http://example.com
       1 EXID 456
       2 TYPE http://example.com
+
       1 NOTE me@example.com is an example email address.
       2 CONT @@me and @I are example social media handles.
       2 CONT @@@@@ has four @ characters where only the first is escaped.
-      1 SNOTE @N1@
-      1 SOUR @S1@
-      2 PAGE 1
-      2 QUAY 3
-      1 SOUR @S2@
       */
+      #expect(ged.individualRecordsMap["@I1@"]?.notes.count == 2)
+      switch ged.individualRecordsMap["@I1@"]?.notes[0] {
+      case .Note(let n):
+        #expect(n.text == "me@example.com is an example email address.\n@@me and @I are example social media handles.\n@@@@@ has four @ characters where only the first is escaped.")
+      default:
+        Issue.record("bad note in individual")
+      }
+      switch ged.individualRecordsMap["@I1@"]?.notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad note in individual")
+      }
+
+      #expect(ged.individualRecordsMap["@I1@"]?.citations.count == 2)
+      #expect(ged.individualRecordsMap["@I1@"]?.citations[0].xref == "@S1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.citations[0].page == "1")
+      #expect(ged.individualRecordsMap["@I1@"]?.citations[0].quality == 3)
+      #expect(ged.individualRecordsMap["@I1@"]?.citations[1].xref == "@S2@")
+
       #expect(ged.individualRecordsMap["@I1@"]?.multimediaLinks.count == 2)
       #expect(ged.individualRecordsMap["@I1@"]?.multimediaLinks[0].xref == "@O1@")
       #expect(ged.individualRecordsMap["@I1@"]?.multimediaLinks[1].xref == "@O2@")

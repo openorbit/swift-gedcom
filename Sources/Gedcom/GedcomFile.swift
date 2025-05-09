@@ -99,7 +99,14 @@ class GedcomFile {
           self.recordLines.append(record)
           recordStack = [record]
         } else {
-          if recordStack.last!.line.level < gedLine.level {
+          if recordStack.last!.line.level == gedLine.level - 1 && gedLine.tag == "CONT" {
+            //
+            if recordStack[recordStack.count - 1].line.value == nil {
+              recordStack[recordStack.count - 1].line.value = ""
+            }
+            recordStack[recordStack.count - 1].line.value!.append("\n\(gedLine.value!)")
+
+          } else if recordStack.last!.line.level < gedLine.level {
             recordStack.last!.children.append(record)
             recordStack.append(record)
           } else {
