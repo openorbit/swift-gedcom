@@ -81,8 +81,8 @@ public class DateValue : RecordProtocol {
       }
     }
   }
-
 }
+
 public class CreationDate : RecordProtocol {
   var date: DateTime = DateTime()
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
