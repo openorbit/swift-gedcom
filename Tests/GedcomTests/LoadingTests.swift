@@ -970,7 +970,22 @@ import Foundation
         2 SOUR @S1@
           3 PAGE 2
       1 NO EMIG
+*/
 
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].kind == .BAPL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].kind == .BAPL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[2].kind == .BAPL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].kind == .CONL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[4].kind == .CONL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].kind == .ENDL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[6].kind == .ENDL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].kind == .INIL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[8].kind == .INIL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[9].kind == .SLGC)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].kind == .SLGC)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[11].kind == .SLGC)
+
+/*
 
       // LDS_INDIVIDUAL_ORDINANCE
       1 BAPL

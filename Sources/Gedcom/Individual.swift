@@ -299,6 +299,104 @@ public class IndividualEvent : RecordProtocol {
   }
 }
 
+public enum LdsIndividualOrdinanceKind : String {
+  case BAPL
+  case CONL
+  case ENDL
+  case INIL
+  case SLGC
+}
+
+public enum LdsIndividualOrdinanceStatusKind : String {
+  case BIC
+  case CANCELED
+  case CHILD
+  case COMPLETED
+  case EXCLUDED
+  case DNS
+  case DNS_CAN
+  case INFANT
+  case PRE_1970
+  case STILLBORN
+  case SUBMITTED
+  case UNCLEARED
+}
+public class LdsIndividualOrdinanceStatus : RecordProtocol {
+  var kind: LdsIndividualOrdinanceStatusKind
+  var date: DateTime?
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "DATE" : \LdsIndividualOrdinanceStatus.date,
+  ]
+
+  required init(record: Record) throws {
+    self.kind = LdsIndividualOrdinanceStatusKind(rawValue: record.line.tag)!
+
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinanceStatus, DateTime?> {
+        mutableSelf[keyPath: wkp] = try DateTime(record: child)
+      }
+    }
+
+    if date == nil {
+      throw GedcomError.badRecord
+    }
+  }
+
+}
+public class LdsIndividualOrdinance : RecordProtocol {
+  var kind: LdsIndividualOrdinanceKind
+
+  var date: DateValue?
+  var temple: String?
+  var place: PlaceStructure?
+
+  var status: LdsIndividualOrdinanceStatus?
+
+  var notes: [NoteStructure] = []
+
+  // Only SLGC
+  var familyChild: String? // XREF
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "DATE" : \LdsIndividualOrdinance.date,
+    "TEMP" : \LdsIndividualOrdinance.temple,
+    "PLAC" : \LdsIndividualOrdinance.place,
+
+    "STAT": \LdsIndividualOrdinance.status,
+
+    "NOTE" : \LdsIndividualOrdinance.notes,
+    "SNOTE" : \LdsIndividualOrdinance.notes,
+
+    "FAMC" : \LdsIndividualOrdinance.familyChild,
+  ]
+
+
+  required init(record: Record) throws {
+    self.kind = LdsIndividualOrdinanceKind(rawValue: record.line.tag)!
+
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+}
+
+
 public enum NameTypeKind : String {
   case AKA = "AKA"
   case BIRTH = "BIRTH"
@@ -891,7 +989,7 @@ public class Individual : RecordProtocol {
   public var individualAttributes: [IndividualAttributeStructure] = []
   public var individualEvents: [IndividualEvent] = []
   public var nonEvents: [String] = [] // TODO
-  public var ldsDetails: [String] = [] // TODO
+  public var ldsDetails: [LdsIndividualOrdinance] = []
 
   public var childOfFamilies: [FamilyChild] = []
   public var spouseFamilies: [FamilySpouse] = []
@@ -922,6 +1020,8 @@ public class Individual : RecordProtocol {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Individual, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<Individual, [LdsIndividualOrdinance]> {
+        mutableSelf[keyPath: wkp].append(try LdsIndividualOrdinance(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [IndividualAttributeStructure]> {
         mutableSelf[keyPath: wkp].append(try IndividualAttributeStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [IndividualEvent]> {
