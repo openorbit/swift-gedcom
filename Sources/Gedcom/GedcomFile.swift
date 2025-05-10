@@ -147,7 +147,6 @@ class GedcomFile {
       guard let kp = Self.keys[record.line.tag] else {
         continue
       }
-      print("\(String(describing: record.line.xref)) \(record.line.tag)")
       if let wkp = kp as? WritableKeyPath<GedcomFile, Header?> {
         mutableSelf[keyPath: wkp] = try Header(record: record)
       } else if let wkp = kp as? WritableKeyPath<GedcomFile, [Family]> {

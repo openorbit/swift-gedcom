@@ -15,6 +15,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+import Foundation
+
+public class Age : RecordProtocol {
+  var age: String
+  var phrase: String?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "PHRASE" : \Age.phrase,
+  ]
+
+
+  required init(record: Record) throws {
+    age = record.line.value ?? ""
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<Age, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+
+}
 
 public enum IndividualAttributes : String {
   case cast = "CAST"
@@ -39,7 +67,7 @@ public class IndividualAttributeStructure  : RecordProtocol {
 
   public var date: DateValue?
   public var place: PlaceStructure?
-  public var addr: AddressStructure?
+  public var address: AddressStructure?
   public var phone: [String] = []
   public var email: [String] = []
   public var fax: [String] = []
@@ -58,14 +86,14 @@ public class IndividualAttributeStructure  : RecordProtocol {
   public var multimediaLinks: [MultimediaLink] = []
   public var uids: [UID] = []
 
-  public var age: String? // TODO: With phrase
+  public var age: Age? // TODO: With phrase
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     // Event attributes
     "TYPE" : \IndividualAttributeStructure.type,
     "DATE" : \IndividualAttributeStructure.date,
+    "ADDR" : \IndividualAttributeStructure.address,
     "PLACE" : \IndividualAttributeStructure.place,
-    "ADDR" : \IndividualAttributeStructure.addr,
     "PHON" : \IndividualAttributeStructure.phone,
     "EMAIL" : \IndividualAttributeStructure.email,
     "FAX" : \IndividualAttributeStructure.fax,
@@ -95,7 +123,6 @@ public class IndividualAttributeStructure  : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -106,30 +133,135 @@ public class IndividualAttributeStructure  : RecordProtocol {
 
 
 
-enum IndividualEvent : String {
-  case adoption = "ADOP"
-  case baptism = "BAPM"
-  case barMitzvah = "BARM"
-  case masMitzvah = "BASM"
-  case birth = "BIRT"
-  case blessing = "BLES"
-  case burial = "BURI"
-  case census = "CENS"
-  case christening = "CHR"
-  case adultChristening = "CHRA"
-  case confirmation = "CONF"
-  case cremation = "CREM"
-  case death = "DEAT"
-  case emigration = "EMIG"
-  case firstCommunion = "FCOM"
-  case graduation = "GRAD"
-  case immigration = "IMMI"
-  case naturalization = "NATU"
-  case ordination = "ORDN"
-  case probate = "PROB"
-  case retirement = "RETI"
-  case will = "WILL"
-  case event = "EVEN"
+enum IndividualEventKind : String {
+  case ADOP = "ADOP"
+  case BAPM = "BAPM"
+  case BARM = "BARM"
+  case BASM = "BASM"
+  case BIRT = "BIRT"
+  case BLES = "BLES"
+  case BURI = "BURI"
+  case CENS = "CENS"
+  case CHR = "CHR"
+  case CHRA = "CHRA"
+  case CONF = "CONF"
+  case CREM = "CREM"
+  case DEAT = "DEAT"
+  case EMIG = "EMIG"
+  case FCOM = "FCOM"
+  case GRAD = "GRAD"
+  case IMMI = "IMMI"
+  case NATU = "NATU"
+  case ORDN = "ORDN"
+  case PROB = "PROB"
+  case RETI = "RETI"
+  case WILL = "WILL"
+  case EVEN = "EVEN"
+}
+
+public class IndividualEvent : RecordProtocol {
+  var kind: IndividualEventKind
+  var text: String?
+  var occured: Bool
+  var type: String?
+
+  // Individual event detail
+  var age: Age?
+  // Event detail
+  // n <<DATE_VALUE>>                           {0:1}
+  public var date: DateValue?
+  public var sdate: DateValue?
+  public var place: PlaceStructure?
+  public var address: AddressStructure?
+  public var phone: [String] = []
+  public var email: [String] = []
+  public var fax: [String] = []
+  public var www: [URL] = []
+  public var agency: String?
+  public var religion: String?
+  public var cause: String?
+  public var restrictions: [Restriction] = []
+  public var associations: [AssoiciationStructure] = []
+  public var notes: [NoteStructure] = []
+  public var citations: [SourceCitation] = []
+  public var multimediaLinks: [MultimediaLink] = []
+  public var uid: [UUID] = []
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "TYPE" : \IndividualEvent.type,
+    "AGE" : \IndividualEvent.age,
+    "ADDR" : \IndividualEvent.address,
+    "DATE" : \IndividualEvent.date,
+    "PHON" : \IndividualEvent.phone,
+    "EMAIL" : \IndividualEvent.email,
+    "FAX" : \IndividualEvent.fax,
+    "WWW" : \IndividualEvent.www,
+    "SDATE" : \IndividualEvent.sdate,
+    "PLAC": \IndividualEvent.place,
+    "AGNC": \IndividualEvent.agency,
+    "RELI": \IndividualEvent.religion,
+    "CAUS": \IndividualEvent.cause,
+    "RESN" : \IndividualEvent.restrictions,
+    "ASSO" : \IndividualEvent.associations,
+    "NOTE" : \IndividualEvent.notes,
+    "SNOTE" : \IndividualEvent.notes,
+    "SOUR" : \IndividualEvent.citations,
+    "OBJE" : \IndividualEvent.multimediaLinks,
+    "UID" : \IndividualEvent.uid,
+  ]
+
+
+  required init(record: Record) throws {
+    self.kind = IndividualEventKind(rawValue: record.line.tag) ?? .EVEN
+    if record.line.value == "Y" {
+      occured = true
+    } else {
+      occured = false
+    }
+
+    if kind == .EVEN {
+      text = record.line.value ?? ""
+    }
+
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<IndividualEvent, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, Age?> {
+        mutableSelf[keyPath: wkp] = try Age(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, DateValue?> {
+        mutableSelf[keyPath: wkp] = try DateValue(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, PlaceStructure?> {
+        mutableSelf[keyPath: wkp] = try PlaceStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, AddressStructure?> {
+        mutableSelf[keyPath: wkp] = try AddressStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [String]> {
+        mutableSelf[keyPath: wkp].append(child.line.value ?? "")
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [URL]> {
+        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [MultimediaLink]> {
+        mutableSelf[keyPath: wkp].append(try MultimediaLink(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [UUID]> {
+        mutableSelf[keyPath: wkp].append(UUID(uuidString: child.line.value!)!)
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [AssoiciationStructure]> {
+        mutableSelf[keyPath: wkp].append(try AssoiciationStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [Restriction]> {
+        // TODO: This may crash on bad restrictions
+        let strings : [String] = (child.line.value?.components(separatedBy: ",").map({$0.trimmingCharacters(in: .whitespacesAndNewlines)})) ?? []
+        mutableSelf[keyPath: wkp] = strings.map({Restriction(rawValue: $0)!})
+      }
+    }
+  }
 }
 
 public enum NameTypeKind : String {
@@ -159,7 +291,6 @@ public class NameType : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<NameType, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -176,6 +307,7 @@ public enum PersonalNamePiece : Equatable {
   case SURN(String)
   case NSFX(String)
 }
+
 public class PersonalNameTranslation  : RecordProtocol {
   public var name: String
   public var lang: String = ""
@@ -200,7 +332,6 @@ public class PersonalNameTranslation  : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<PersonalNameTranslation, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -259,7 +390,6 @@ public class PersonalName  : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<PersonalName, [String]?> {
       } else if let wkp = kp as? WritableKeyPath<PersonalName, String?> {
@@ -481,7 +611,6 @@ public class Pedigree : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Pedigree, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -512,7 +641,6 @@ public class ChildStatus : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<ChildStatus, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -543,7 +671,6 @@ public class FamilyChild : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<FamilyChild, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
@@ -572,7 +699,6 @@ public class FamilySpouse : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<FamilySpouse, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
@@ -616,7 +742,6 @@ public class Role : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Role, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -654,7 +779,6 @@ public class AssoiciationStructure : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<AssoiciationStructure, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
@@ -779,7 +903,7 @@ public class Individual : RecordProtocol {
   public var sex: Sex?
 
   public var individualAttributes: [String] = []// TODO
-  public var individualEvents: [String] = []// TODO
+  public var individualEvents: [IndividualEvent] = []
   public var nonEvents: [String] = [] // TODO
   public var ldsDetails: [String] = [] // TODO
 
@@ -807,12 +931,13 @@ public class Individual : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Individual, [String]> {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Individual, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<Individual, [IndividualEvent]> {
+        mutableSelf[keyPath: wkp].append(try IndividualEvent(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [Restriction]> {
         // TODO: This may crash on bad restrictions
         let strings : [String] = (child.line.value?.components(separatedBy: ",").map({$0.trimmingCharacters(in: .whitespacesAndNewlines)})) ?? []
@@ -848,32 +973,9 @@ public class Individual : RecordProtocol {
 
 /*
   n @XREF:INDI@ INDI {1:1} g7:record-INDI
-  +1 RESN <List:Enum> {0:1} g7:RESN
-  +1 <<PERSONAL_NAME_STRUCTURE>> {0:M}
-  +1 SEX <Enum> {0:1} g7:SEX
   +1 <<INDIVIDUAL_ATTRIBUTE_STRUCTURE>> {0:M}
   +1 <<INDIVIDUAL_EVENT_STRUCTURE>> {0:M}
   +1 <<NON_EVENT_STRUCTURE>> {0:M}
   +1 <<LDS_INDIVIDUAL_ORDINANCE>> {0:M}
-  +1 FAMC @<XREF:FAM>@ {0:M} g7:INDI-FAMC
-  +2 PEDI <Enum> {0:1} g7:PEDI
-  +3 PHRASE <Text> {0:1} g7:PHRASE
-  +2 STAT <Enum> {0:1} g7:FAMC-STAT
-  +3 PHRASE <Text> {0:1} g7:PHRASE
-  +2 <<NOTE_STRUCTURE>> {0:M}
-  +1 FAMS @<XREF:FAM>@ {0:M} g7:FAMS
-  +2 <<NOTE_STRUCTURE>> {0:M}
-  +1 SUBM @<XREF:SUBM>@ {0:M} g7:SUBM
-  +1 <<ASSOCIATION_STRUCTURE>> {0:M}
-  +1 ALIA @<XREF:INDI>@ {0:M} g7:ALIA
-  +2 PHRASE <Text> {0:1} g7:PHRASE
-  +1 ANCI @<XREF:SUBM>@ {0:M} g7:ANCI
-  +1 DESI @<XREF:SUBM>@ {0:M} g7:DESI
-  +1 <<IDENTIFIER_STRUCTURE>> {0:M}
-  +1 <<NOTE_STRUCTURE>> {0:M}
-  +1 <<SOURCE_CITATION>> {0:M}
-  +1 <<MULTIMEDIA_LINK>> {0:M}
-  +1 <<CHANGE_DATE>> {0:1}
-  +1 <<CREATION_DATE>> {0:1}
 */
 }

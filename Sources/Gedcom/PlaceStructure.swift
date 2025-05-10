@@ -50,7 +50,6 @@ public class PlaceTranslation : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<PlaceTranslation, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -77,7 +76,6 @@ public class PlaceCoordinates : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<PlaceCoordinates, Double> {
         var valueStr = child.line.value ?? ""
@@ -135,7 +133,6 @@ public class PlaceStructure : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<PlaceStructure, [String]> {
         mutableSelf[keyPath: wkp] = (child.line.value ?? "")

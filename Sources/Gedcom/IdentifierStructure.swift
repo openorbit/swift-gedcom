@@ -33,7 +33,6 @@ public class REFN : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<REFN, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -72,7 +71,6 @@ public class EXID : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<EXID, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""

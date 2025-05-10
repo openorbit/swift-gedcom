@@ -773,182 +773,226 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.sex == .male)
 
 /*
+// Facts
       1 CAST Caste
-      2 TYPE Caste type
+        2 TYPE Caste type
       1 DSCR Description
-      2 TYPE Description type
-      2 SOUR @VOID@
-      3 PAGE Entire source
+        2 TYPE Description type
+        2 SOUR @VOID@
+          3 PAGE Entire source
       1 EDUC Education
-      2 TYPE Education type
+        2 TYPE Education type
       1 IDNO ID number
-      2 TYPE ID number type
+        2 TYPE ID number type
       1 NATI Nationality
-      2 TYPE Nationality type
+        2 TYPE Nationality type
       1 NCHI 2
-      2 TYPE nchi type
+        2 TYPE nchi type
       1 NMR 2
-      2 TYPE nmr type
+        2 TYPE nmr type
       1 OCCU occu
-      2 TYPE occu type
+        2 TYPE occu type
       1 PROP prop
-      2 TYPE prop type
+        2 TYPE prop type
       1 RELI reli
-      2 TYPE reli type
+        2 TYPE reli type
       1 RESI resi
-      2 TYPE resi type
+        2 TYPE resi type
       1 SSN ssn
-      2 TYPE ssn type
+        2 TYPE ssn type
       1 TITL titl
-      2 TYPE titl type
+        2 TYPE titl type
       1 FACT fact
-      2 TYPE fact type
-      1 BAPM
-      2 TYPE bapm type
-      1 BAPM Y
-      1 BARM
-      2 TYPE barm type
-      1 BASM
-      2 TYPE basm type
-      1 BLES
-      2 TYPE bles type
-      1 BURI
-      2 TYPE buri type
-      2 DATE 30 MAR 2022
-      1 CENS
-      2 TYPE cens type
-      1 CHRA
-      2 TYPE chra type
-      1 CONF
-      2 TYPE conf type
-      1 CREM
-      2 TYPE crem type
-      1 DEAT
-      2 TYPE deat type
-      2 DATE 28 MAR 2022
-      2 PLAC Somewhere
-      2 ADDR Address
-      2 PHON +1 (555) 555-1212
-      2 PHON +1 (555) 555-1234
-      2 EMAIL GEDCOM@FamilySearch.org
-      2 EMAIL GEDCOM@example.com
-      2 FAX +1 (555) 555-1212
-      2 FAX +1 (555) 555-1234
-      2 WWW http://gedcom.io
-      2 WWW http://gedcom.info
-      2 AGNC Agency
-      2 RELI Religion
-      2 CAUS Cause of death
-      2 RESN CONFIDENTIAL, LOCKED
-      2 SDATE 28 MAR 2022
-      3 TIME 16:47
-      3 PHRASE sdate phrase
-      2 ASSO @I3@
-      3 ROLE CHIL
-      2 ASSO @VOID@
-      3 ROLE PARENT
-      2 NOTE Note text
-      2 SNOTE @N1@
-      2 SOUR @S1@
-      3 PAGE 1
-      2 SOUR @S2@
-      3 PAGE 2
-      2 OBJE @O1@
-      2 OBJE @O2@
-      2 UID 82092878-6f4f-4bca-ad59-d1ae87c5e521
-      2 UID daf4b8c0-4141-42c4-bec8-01d1d818dfaf
-      1 EMIG
-      2 TYPE emig type
-      1 FCOM
-      2 TYPE fcom type
-      1 GRAD
-      2 TYPE grad type
-      1 IMMI
-      2 TYPE immi type
-      1 NATU
-      2 TYPE natu type
-      1 ORDN
-      2 TYPE ordn type
-      1 PROB
-      2 TYPE prob type
-      1 RETI
-      2 TYPE reti type
-      1 WILL
-      2 TYPE will type
+        2 TYPE fact type
+ */
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents.count == 26)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[0].kind == .BAPM)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[0].type == "bapm type")
+
+      // TOOD: 1 BAPM Y
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[1].kind == .BAPM)
+
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[2].kind == .BARM)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[2].type == "barm type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[3].kind == .BASM)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[3].type == "basm type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[4].kind == .BLES)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[4].type == "bles type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[5].kind == .BURI)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[5].type == "buri type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[5].date?.date == "30 MAR 2022")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[6].kind == .CENS)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[6].type == "cens type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[7].kind == .CHRA)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[7].type == "chra type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[8].kind == .CONF)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[8].type == "conf type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[9].kind == .CREM)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[9].type == "crem type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].kind == .DEAT)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].type == "deat type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].date?.date == "28 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].place?.place == ["Somewhere"])
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].address?.address == "Address")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].phone == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].email == ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"])
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].fax == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].www == [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!])
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].agency == "Agency")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].religion == "Religion")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].cause == "Cause of death")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].cause == "Cause of death")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].restrictions == [.CONFIDENTIAL, .LOCKED])
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].sdate?.date == "28 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].sdate?.time == "16:47")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].sdate?.phrase == "sdate phrase")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].associations[0].xref == "@I3@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].associations[0].role?.kind == .CHIL)
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].associations[1].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].associations[1].role?.kind == .PARENT)
+      switch ged.individualRecordsMap["@I1@"]?.individualEvents[10].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad note in individual event")
+      }
+      switch ged.individualRecordsMap["@I1@"]?.individualEvents[10].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad note in individual event")
+      }
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].citations[0].xref == "@S1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].citations[0].page == "1")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].citations[1].xref == "@S2@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].citations[1].page == "2")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].multimediaLinks[0].xref == "@O1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].multimediaLinks[1].xref == "@O2@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[10].uid == [
+        UUID(uuidString: "82092878-6f4f-4bca-ad59-d1ae87c5e521")!,
+        UUID(uuidString: "daf4b8c0-4141-42c4-bec8-01d1d818dfaf")!])
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[11].kind == .EMIG)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[11].type == "emig type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[12].kind == .FCOM)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[12].type == "fcom type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[13].kind == .GRAD)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[13].type == "grad type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[14].kind == .IMMI)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[14].type == "immi type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[15].kind == .NATU)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[15].type == "natu type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[16].kind == .ORDN)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[16].type == "ordn type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[17].kind == .PROB)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[17].type == "prob type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[18].kind == .RETI)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[18].type == "reti type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[19].kind == .WILL)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[19].type == "will type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].kind == .ADOP)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[21].kind == .ADOP)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[22].kind == .ADOP)
+      /*
       1 ADOP
-      2 TYPE adop type
-      2 FAMC @VOID@
-      3 ADOP BOTH
-      4 PHRASE Adoption phrase
+        2 TYPE adop type
+        2 FAMC @VOID@
+          3 ADOP BOTH
+            4 PHRASE Adoption phrase
       1 ADOP
-      2 FAMC @VOID@
-      3 ADOP HUSB
+        2 FAMC @VOID@
+          3 ADOP HUSB
       1 ADOP
-      2 FAMC @VOID@
-      3 ADOP WIFE
-      1 BIRT
-      2 TYPE birth type
-      2 DATE 1 JAN 2000
-      1 CHR
-      2 TYPE chr type
-      2 DATE 9 JAN 2000
-      2 AGE 8d
-      3 PHRASE Age phrase
-      1 EVEN Event
-      2 TYPE Event type
+        2 FAMC @VOID@
+          3 ADOP WIFE
+*/
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[23].kind == .BIRT)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[23].type == "birth type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[23].date?.date == "1 JAN 2000")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[24].kind == .CHR)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[24].type == "chr type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[24].date?.date == "9 JAN 2000")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[24].age?.age == "8d")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[24].age?.phrase == "Age phrase")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[25].kind == .EVEN)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[25].text == "Event")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[25].type == "Event type")
+
+
+
+      /*
+      // non event structures
       1 NO NATU
-      2 DATE FROM 1700 TO 1800
-      3 PHRASE No date phrase
-      2 NOTE Note text
-      2 SNOTE @N1@
-      2 SOUR @S1@
-      3 PAGE 1
-      2 SOUR @S1@
-      3 PAGE 2
+        2 DATE FROM 1700 TO 1800
+          3 PHRASE No date phrase
+        2 NOTE Note text
+        2 SNOTE @N1@
+        2 SOUR @S1@
+          3 PAGE 1
+        2 SOUR @S1@
+          3 PAGE 2
       1 NO EMIG
+
+
+      // LDS_INDIVIDUAL_ORDINANCE
       1 BAPL
-      2 STAT STILLBORN
-      3 DATE 27 MAR 2022
+        2 STAT STILLBORN
+          3 DATE 27 MAR 2022
       1 BAPL
-      2 STAT SUBMITTED
-      3 DATE 27 MAR 2022
+        2 STAT SUBMITTED
+          3 DATE 27 MAR 2022
       1 BAPL
-      2 DATE 27 MAR 2022
+        2 DATE 27 MAR 2022
+
       1 CONL
-      2 STAT INFANT
-      3 DATE 27 MAR 2022
+        2 STAT INFANT
+          3 DATE 27 MAR 2022
       1 CONL
-      2 DATE 27 MAR 2022
+        2 DATE 27 MAR 2022
       1 ENDL
-      2 STAT CHILD
-      3 DATE 27 MAR 2022
+        2 STAT CHILD
+          3 DATE 27 MAR 2022
       1 ENDL
-      2 DATE 27 MAR 2022
+        2 DATE 27 MAR 2022
       1 INIL
-      2 STAT EXCLUDED
-      3 DATE 27 MAR 2022
+        2 STAT EXCLUDED
+          3 DATE 27 MAR 2022
       1 INIL
-      2 DATE 27 MAR 2022
+        2 DATE 27 MAR 2022
       1 SLGC
-      2 DATE 27 MAR 2022
-      3 TIME 15:47
-      3 PHRASE Afternoon
-      2 TEMP SLAKE
-      2 FAMC @VOID@
+        2 DATE 27 MAR 2022
+          3 TIME 15:47
+          3 PHRASE Afternoon
+        2 TEMP SLAKE
+        2 FAMC @VOID@
       1 SLGC
-      2 PLAC Place
-      2 STAT BIC
-      3 DATE 27 MAR 2022
-      4 TIME 15:48
-      2 NOTE Note text
-      2 SNOTE @N1@
-      2 SOUR @S1@
-      3 PAGE 1
-      2 SOUR @S2@
-      3 PAGE 2
-      2 FAMC @VOID@
+        2 PLAC Place
+        2 STAT BIC
+          3 DATE 27 MAR 2022
+            4 TIME 15:48
+        2 NOTE Note text
+        2 SNOTE @N1@
+        2 SOUR @S1@
+          3 PAGE 1
+        2 SOUR @S2@
+          3 PAGE 2
+        2 FAMC @VOID@
       1 SLGC
-      2 FAMC @F2@
+        2 FAMC @F2@
       */
 
       #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies.count == 5)

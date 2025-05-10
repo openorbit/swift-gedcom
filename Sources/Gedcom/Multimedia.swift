@@ -69,7 +69,6 @@ public class MultimediaLink  : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<MultimediaLink, Crop?> {
         mutableSelf[keyPath: wkp] = try Crop(record: child)
@@ -98,7 +97,6 @@ public class FileTranslation : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<FileTranslation, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -123,7 +121,6 @@ public class MultimediaFileForm : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<MultimediaFileForm, Medium?> {
         mutableSelf[keyPath: wkp] = try Medium(record: child)
@@ -153,7 +150,6 @@ public class MultimediaFile : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<MultimediaFile, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -219,7 +215,6 @@ public class Multimedia  : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Multimedia, [String]> {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")

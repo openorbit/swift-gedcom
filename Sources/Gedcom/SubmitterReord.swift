@@ -76,7 +76,6 @@ public class Submitter : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Submitter, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""

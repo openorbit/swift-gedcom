@@ -61,7 +61,6 @@ public class SharedNote : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<SharedNote, [Translation]> {
         mutableSelf[keyPath: wkp].append(try Translation(record: child))

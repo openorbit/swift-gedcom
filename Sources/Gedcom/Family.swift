@@ -29,7 +29,6 @@ public class Family : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Family, [String]> {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")

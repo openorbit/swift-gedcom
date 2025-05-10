@@ -203,7 +203,6 @@ public class SourceDataEvents : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<SourceDataEvents, PlaceStructure?> {
         mutableSelf[keyPath: wkp] = try PlaceStructure(record: child)
@@ -233,7 +232,6 @@ public class SourceData : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<SourceData, [SourceDataEvents]> {
         mutableSelf[keyPath: wkp].append(try SourceDataEvents(record: child))
@@ -286,7 +284,6 @@ public class Medium : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Medium, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
@@ -310,7 +307,6 @@ public class CallNumber : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<CallNumber, Medium?> {
         mutableSelf[keyPath: wkp] = try Medium(record: child)
@@ -338,7 +334,6 @@ public class SourceRepositoryCitation : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<SourceRepositoryCitation, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
@@ -367,7 +362,6 @@ public class SourceText : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
       if let wkp = kp as? WritableKeyPath<SourceText, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
@@ -440,7 +434,6 @@ public class Source : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Source, SourceData?> {
         mutableSelf[keyPath: wkp] = try SourceData(record: child)

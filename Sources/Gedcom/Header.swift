@@ -25,7 +25,6 @@ public class Gedc : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Gedc, String> {
         guard let value = child.line.value else {
@@ -97,7 +96,6 @@ public class Header : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Header, Gedc?> {
         mutableSelf[keyPath: wkp] = try Gedc(record: child)

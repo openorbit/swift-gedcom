@@ -36,7 +36,6 @@ public class Translation : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Translation, String?> {
         mutableSelf[keyPath: wkp] = child.line.value!
@@ -62,7 +61,6 @@ public class Note : RecordProtocol {
         //  throw GedcomError.badRecord
         continue
       }
-      print("\(child.line.tag)")
 
       if let wkp = kp as? WritableKeyPath<Note, [Translation]> {
         mutableSelf[keyPath: wkp].append(try Translation(record: child))
