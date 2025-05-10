@@ -323,13 +323,15 @@ public enum LdsIndividualOrdinanceStatusKind : String {
 }
 public class LdsIndividualOrdinanceStatus : RecordProtocol {
   var kind: LdsIndividualOrdinanceStatusKind
+
+  // TODO: date should be non-optional
   var date: DateTime?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \LdsIndividualOrdinanceStatus.date,
   ]
 
   required init(record: Record) throws {
-    self.kind = LdsIndividualOrdinanceStatusKind(rawValue: record.line.tag)!
+    self.kind = LdsIndividualOrdinanceStatusKind(rawValue: record.line.value ?? "")!
 
     var mutableSelf = self
 
@@ -360,6 +362,7 @@ public class LdsIndividualOrdinance : RecordProtocol {
   var status: LdsIndividualOrdinanceStatus?
 
   var notes: [NoteStructure] = []
+  var citations: [SourceCitation] = []
 
   // Only SLGC
   var familyChild: String? // XREF
@@ -373,6 +376,8 @@ public class LdsIndividualOrdinance : RecordProtocol {
 
     "NOTE" : \LdsIndividualOrdinance.notes,
     "SNOTE" : \LdsIndividualOrdinance.notes,
+
+    "SOUR" : \LdsIndividualOrdinance.citations,
 
     "FAMC" : \LdsIndividualOrdinance.familyChild,
   ]
@@ -391,6 +396,16 @@ public class LdsIndividualOrdinance : RecordProtocol {
 
       if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, DateValue?> {
+        mutableSelf[keyPath: wkp] = try DateValue(record: child)
+      } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, PlaceStructure?> {
+        mutableSelf[keyPath: wkp] = try PlaceStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, LdsIndividualOrdinanceStatus?> {
+        mutableSelf[keyPath: wkp] = try LdsIndividualOrdinanceStatus(record: child)
+      } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       }
     }
   }

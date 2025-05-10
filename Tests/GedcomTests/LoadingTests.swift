@@ -973,66 +973,71 @@ import Foundation
 */
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].kind == .BAPL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].status?.kind == .STILLBORN)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].status?.date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].kind == .BAPL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].status?.kind == .SUBMITTED)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].status?.date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[2].kind == .BAPL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[2].date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].kind == .CONL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].status?.kind == .INFANT)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].status?.date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[4].kind == .CONL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[4].date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].kind == .ENDL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].status?.kind == .CHILD)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].status?.date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[6].kind == .ENDL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[6].date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].kind == .INIL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].status?.kind == .EXCLUDED)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].status?.date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[8].kind == .INIL)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[8].date?.date == "27 MAR 2022")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[9].kind == .SLGC)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[9].date?.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[9].date?.time == "15:47")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[9].date?.phrase == "Afternoon")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[9].temple == "SLAKE")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[9].familyChild == "@VOID@")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].kind == .SLGC)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].place?.place == ["Place"])
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.kind == .BIC)
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.date?.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.date?.time == "15:48")
+
+      switch ged.individualRecordsMap["@I1@"]?.ldsDetails[10].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad note in lds details")
+      }
+      switch ged.individualRecordsMap["@I1@"]?.ldsDetails[10].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad note in lds details")
+      }
+
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].citations[0].xref == "@S1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].citations[0].page == "1")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].citations[1].xref == "@S2@")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].citations[1].page == "2")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].familyChild == "@VOID@")
+
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[11].kind == .SLGC)
-
-/*
-
-      // LDS_INDIVIDUAL_ORDINANCE
-      1 BAPL
-        2 STAT STILLBORN
-          3 DATE 27 MAR 2022
-      1 BAPL
-        2 STAT SUBMITTED
-          3 DATE 27 MAR 2022
-      1 BAPL
-        2 DATE 27 MAR 2022
-
-      1 CONL
-        2 STAT INFANT
-          3 DATE 27 MAR 2022
-      1 CONL
-        2 DATE 27 MAR 2022
-      1 ENDL
-        2 STAT CHILD
-          3 DATE 27 MAR 2022
-      1 ENDL
-        2 DATE 27 MAR 2022
-      1 INIL
-        2 STAT EXCLUDED
-          3 DATE 27 MAR 2022
-      1 INIL
-        2 DATE 27 MAR 2022
-      1 SLGC
-        2 DATE 27 MAR 2022
-          3 TIME 15:47
-          3 PHRASE Afternoon
-        2 TEMP SLAKE
-        2 FAMC @VOID@
-      1 SLGC
-        2 PLAC Place
-        2 STAT BIC
-          3 DATE 27 MAR 2022
-            4 TIME 15:48
-        2 NOTE Note text
-        2 SNOTE @N1@
-        2 SOUR @S1@
-          3 PAGE 1
-        2 SOUR @S2@
-          3 PAGE 2
-        2 FAMC @VOID@
-      1 SLGC
-        2 FAMC @F2@
-      */
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[11].familyChild == "@F2@")
 
       #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies.count == 5)
       #expect(ged.individualRecordsMap["@I1@"]?.childOfFamilies[0].xref == "@VOID@")
