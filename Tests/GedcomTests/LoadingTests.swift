@@ -903,17 +903,21 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[19].type == "will type")
 
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].kind == .ADOP)
-      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[21].kind == .ADOP)
-      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[22].kind == .ADOP)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].type == "adop type")
       /*
       1 ADOP
-        2 TYPE adop type
         2 FAMC @VOID@
           3 ADOP BOTH
             4 PHRASE Adoption phrase
+      */
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[21].kind == .ADOP)
+      /*
       1 ADOP
         2 FAMC @VOID@
           3 ADOP HUSB
+       */
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[22].kind == .ADOP)
+      /*
       1 ADOP
         2 FAMC @VOID@
           3 ADOP WIFE
