@@ -810,8 +810,8 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[0].kind == .BAPM)
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[0].type == "bapm type")
 
-      // TOOD: 1 BAPM Y
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[1].kind == .BAPM)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[1].occured == true)
 
 
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[2].kind == .BARM)
@@ -904,24 +904,18 @@ import Foundation
 
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].kind == .ADOP)
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].type == "adop type")
-      /*
-      1 ADOP
-        2 FAMC @VOID@
-          3 ADOP BOTH
-            4 PHRASE Adoption phrase
-      */
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].familyChild?.xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].familyChild?.adoption?.kind == .BOTH)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[20].familyChild?.adoption?.phrase == "Adoption phrase")
+
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[21].kind == .ADOP)
-      /*
-      1 ADOP
-        2 FAMC @VOID@
-          3 ADOP HUSB
-       */
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[21].familyChild?.xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[21].familyChild?.adoption?.kind == .HUSB)
+
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[22].kind == .ADOP)
-      /*
-      1 ADOP
-        2 FAMC @VOID@
-          3 ADOP WIFE
-*/
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[22].familyChild?.xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[22].familyChild?.adoption?.kind == .WIFE)
+
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[23].kind == .BIRT)
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[23].type == "birth type")
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[23].date?.date == "1 JAN 2000")

@@ -162,8 +162,11 @@ enum IndividualEventKind : String {
 public class IndividualEvent : RecordProtocol {
   var kind: IndividualEventKind
   var text: String?
-  var occured: Bool
+  var occured: Bool // Text == Y
   var type: String?
+
+  // ADOP specific
+  var familyChild: FamilyChildAdoption?
 
   // Individual event detail
   var age: Age?
@@ -208,6 +211,7 @@ public class IndividualEvent : RecordProtocol {
     "SOUR" : \IndividualEvent.citations,
     "OBJE" : \IndividualEvent.multimediaLinks,
     "UID" : \IndividualEvent.uid,
+    "FAMC" : \IndividualEvent.familyChild,
   ]
 
 
@@ -259,6 +263,8 @@ public class IndividualEvent : RecordProtocol {
         // TODO: This may crash on bad restrictions
         let strings : [String] = (child.line.value?.components(separatedBy: ",").map({$0.trimmingCharacters(in: .whitespacesAndNewlines)})) ?? []
         mutableSelf[keyPath: wkp] = strings.map({Restriction(rawValue: $0)!})
+      } else if let wkp = kp as? WritableKeyPath<IndividualEvent, FamilyChildAdoption?> {
+        mutableSelf[keyPath: wkp] = try FamilyChildAdoption(record: child)
       }
     }
   }
@@ -356,7 +362,6 @@ public class PersonalNameTranslation  : RecordProtocol {
     }
   }
 }
-
 
 // Name type: AKA, BIRTH, IMMIGRANT, MAIDEN, MARRIED, PROFESSIONAL, OTHER
 public class PersonalName  : RecordProtocol {
@@ -623,6 +628,58 @@ public enum ChildStatusKind : String {
   case CHALLENGED
   case DISPROVEN
   case PROVEN
+}
+public enum AdoptionKind : String {
+  case HUSB
+  case WIFE
+  case BOTH
+}
+public class FamilyChildAdoptionKind : RecordProtocol {
+  public var kind: AdoptionKind
+  public var phrase: String?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "PHRASE" : \FamilyChildAdoptionKind.phrase,
+  ]
+
+  required init(record: Record) throws {
+    self.kind = AdoptionKind(rawValue: record.line.value ?? "") ?? .BOTH
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<FamilyChildAdoptionKind, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+}
+
+public class FamilyChildAdoption : RecordProtocol {
+  public var xref: String
+  public var adoption: FamilyChildAdoptionKind?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "ADOP" : \FamilyChildAdoption.adoption,
+  ]
+
+  required init(record: Record) throws {
+    self.xref = record.line.value ?? ""
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<FamilyChildAdoption, FamilyChildAdoptionKind?> {
+        mutableSelf[keyPath: wkp] = try FamilyChildAdoptionKind(record: child)
+      }
+    }
+  }
 }
 
 public class ChildStatus : RecordProtocol {
