@@ -44,49 +44,48 @@ public class Age : RecordProtocol {
 
 }
 
-public enum IndividualAttributes : String {
-  case cast = "CAST"
-  case physicalDescription = "DSCR"
-  case education = "EDUC"
-  case identifyingNumber = "IDNO"
-  case nationality = "NATI"
-  case numberOfChildren = "NCHI"
-  case numberOfMarriages = "NMR"
-  case occupation = "OCCU"
-  case property = "PROP"
-  case religion = "RELI"
-  case residence = "RESI"
-  case socialSecurityNumber = "SSN"
-  case title = "TITL"
-  case fact = "FACT"
+public enum IndividualAttributeKind : String {
+  case CAST = "CAST"
+  case DSCR = "DSCR"
+  case EDUC = "EDUC"
+  case IDNO = "IDNO"
+  case NATI = "NATI"
+  case NCHI = "NCHI"
+  case NMR = "NMR"
+  case OCCU = "OCCU"
+  case PROP = "PROP"
+  case RELI = "RELI"
+  case RESI = "RESI"
+  case SSN = "SSN"
+  case TITL = "TITL"
+  case FACT = "FACT"
 }
 
 public class IndividualAttributeStructure  : RecordProtocol {
-  public var attr: IndividualAttributes
+  public var kind: IndividualAttributeKind
+  public var text: String?
   public var type: String?
 
+  // Individual event detail
+  public var age: Age?
+  // Event detail
   public var date: DateValue?
+  public var sdate: DateValue?
   public var place: PlaceStructure?
   public var address: AddressStructure?
   public var phone: [String] = []
   public var email: [String] = []
   public var fax: [String] = []
-  public var www: [String] = []
-
+  public var www: [URL] = []
   public var agency: String?
   public var religion: String?
-  public var cause: String? // TODO: Is this correct
-  public var restriction : Restriction?
-
-
-  public var sdate: DateValue?
+  public var cause: String?
+  public var restrictions: [Restriction] = []
   public var associations: [AssoiciationStructure] = []
   public var notes: [NoteStructure] = []
   public var citations: [SourceCitation] = []
   public var multimediaLinks: [MultimediaLink] = []
-  public var uids: [UID] = []
-
-  public var age: Age? // TODO: With phrase
+  public var uid: [UUID] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     // Event attributes
@@ -102,30 +101,61 @@ public class IndividualAttributeStructure  : RecordProtocol {
     "AGNC" : \IndividualAttributeStructure.agency,
     "RELI" : \IndividualAttributeStructure.religion,
     "CAUS" : \IndividualAttributeStructure.cause,
-    "RESN" : \IndividualAttributeStructure.restriction,
+    "RESN" : \IndividualAttributeStructure.restrictions,
     "SDATE" : \IndividualAttributeStructure.sdate,
     "ASSOC" : \IndividualAttributeStructure.associations,
     "NOTE" : \IndividualAttributeStructure.notes,
     "SNOTE" : \IndividualAttributeStructure.notes,
     "SOUR" : \IndividualAttributeStructure.citations,
     "OBJ" : \IndividualAttributeStructure.multimediaLinks,
-    "UID" : \IndividualAttributeStructure.uids,
+    "UID" : \IndividualAttributeStructure.uid,
     // Individual attributes
     "AGE" : \IndividualAttributeStructure.age,
   ]
 
   required init(record: Record) throws {
-    self.attr = IndividualAttributes(rawValue: record.line.value ?? "")!
+    self.kind = IndividualAttributeKind(rawValue: record.line.tag)!
     var mutableSelf = self
+
+    if record.line.value != nil {
+      text = record.line.value!
+    }
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
         //  throw GedcomError.badRecord
         continue
       }
-
       if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, Age?> {
+        mutableSelf[keyPath: wkp] = try Age(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, DateValue?> {
+        mutableSelf[keyPath: wkp] = try DateValue(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, PlaceStructure?> {
+        mutableSelf[keyPath: wkp] = try PlaceStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, AddressStructure?> {
+        mutableSelf[keyPath: wkp] = try AddressStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [String]> {
+        mutableSelf[keyPath: wkp].append(child.line.value ?? "")
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [URL]> {
+        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [MultimediaLink]> {
+        mutableSelf[keyPath: wkp].append(try MultimediaLink(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [UUID]> {
+        mutableSelf[keyPath: wkp].append(UUID(uuidString: child.line.value!)!)
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [AssoiciationStructure]> {
+        mutableSelf[keyPath: wkp].append(try AssoiciationStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [Restriction]> {
+        // TODO: This may crash on bad restrictions
+        let strings : [String] = (child.line.value?.components(separatedBy: ",").map({$0.trimmingCharacters(in: .whitespacesAndNewlines)})) ?? []
+        mutableSelf[keyPath: wkp] = strings.map({Restriction(rawValue: $0)!})
+      } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, FamilyChildAdoption?> {
+        mutableSelf[keyPath: wkp] = try FamilyChildAdoption(record: child)
       }
     }
   }
@@ -171,7 +201,6 @@ public class IndividualEvent : RecordProtocol {
   // Individual event detail
   var age: Age?
   // Event detail
-  // n <<DATE_VALUE>>                           {0:1}
   public var date: DateValue?
   public var sdate: DateValue?
   public var place: PlaceStructure?
@@ -490,106 +519,6 @@ public class PersonalName  : RecordProtocol {
  ]
 
  */
-
-/*INDIVIDUAL_EVENT_STRUCTURE
- n ADOP [Y|<NULL>]                          {1:1}  g7:ADOP
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
-   +1 FAMC @<XREF:FAM>@                     {0:1}  g7:ADOP-FAMC
-      +2 ADOP <Enum>                        {0:1}  g7:FAMC-ADOP
-         +3 PHRASE <Text>                   {0:1}  g7:PHRASE
- |
- n BAPM [Y|<NULL>]                          {1:1}  g7:BAPM
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n BARM [Y|<NULL>]                          {1:1}  g7:BARM
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n BASM [Y|<NULL>]                          {1:1}  g7:BASM
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n BIRT [Y|<NULL>]                          {1:1}  g7:BIRT
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
-   +1 FAMC @<XREF:FAM>@                     {0:1}  g7:FAMC
- |
- n BLES [Y|<NULL>]                          {1:1}  g7:BLES
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n BURI [Y|<NULL>]                          {1:1}  g7:BURI
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n CENS [Y|<NULL>]                          {1:1}  g7:INDI-CENS
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n CHR [Y|<NULL>]                           {1:1}  g7:CHR
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
-   +1 FAMC @<XREF:FAM>@                     {0:1}  g7:FAMC
- |
- n CHRA [Y|<NULL>]                          {1:1}  g7:CHRA
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n CONF [Y|<NULL>]                          {1:1}  g7:CONF
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n CREM [Y|<NULL>]                          {1:1}  g7:CREM
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n DEAT [Y|<NULL>]                          {1:1}  g7:DEAT
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n EMIG [Y|<NULL>]                          {1:1}  g7:EMIG
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n FCOM [Y|<NULL>]                          {1:1}  g7:FCOM
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n GRAD [Y|<NULL>]                          {1:1}  g7:GRAD
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n IMMI [Y|<NULL>]                          {1:1}  g7:IMMI
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n NATU [Y|<NULL>]                          {1:1}  g7:NATU
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n ORDN [Y|<NULL>]                          {1:1}  g7:ORDN
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n PROB [Y|<NULL>]                          {1:1}  g7:PROB
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n RETI [Y|<NULL>]                          {1:1}  g7:RETI
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n WILL [Y|<NULL>]                          {1:1}  g7:WILL
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n EVEN <Text>                              {1:1}  g7:INDI-EVEN
-   +1 TYPE <Text>                           {1:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- ]
-*/
 
 public enum PedigreeKind : String {
   case ADOPTED
@@ -959,7 +888,7 @@ public class Individual : RecordProtocol {
   public var names: [PersonalName] = []
   public var sex: Sex?
 
-  public var individualAttributes: [String] = []// TODO
+  public var individualAttributes: [IndividualAttributeStructure] = []
   public var individualEvents: [IndividualEvent] = []
   public var nonEvents: [String] = [] // TODO
   public var ldsDetails: [String] = [] // TODO
@@ -993,6 +922,8 @@ public class Individual : RecordProtocol {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Individual, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<Individual, [IndividualAttributeStructure]> {
+        mutableSelf[keyPath: wkp].append(try IndividualAttributeStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [IndividualEvent]> {
         mutableSelf[keyPath: wkp].append(try IndividualEvent(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [Restriction]> {

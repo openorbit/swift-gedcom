@@ -772,39 +772,65 @@ import Foundation
 
       #expect(ged.individualRecordsMap["@I1@"]?.sex == .male)
 
-/*
-// Facts
-      1 CAST Caste
-        2 TYPE Caste type
-      1 DSCR Description
-        2 TYPE Description type
-        2 SOUR @VOID@
-          3 PAGE Entire source
-      1 EDUC Education
-        2 TYPE Education type
-      1 IDNO ID number
-        2 TYPE ID number type
-      1 NATI Nationality
-        2 TYPE Nationality type
-      1 NCHI 2
-        2 TYPE nchi type
-      1 NMR 2
-        2 TYPE nmr type
-      1 OCCU occu
-        2 TYPE occu type
-      1 PROP prop
-        2 TYPE prop type
-      1 RELI reli
-        2 TYPE reli type
-      1 RESI resi
-        2 TYPE resi type
-      1 SSN ssn
-        2 TYPE ssn type
-      1 TITL titl
-        2 TYPE titl type
-      1 FACT fact
-        2 TYPE fact type
- */
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes.count == 14)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[0].kind == .CAST)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[0].text == "Caste")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[0].type == "Caste type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[1].kind == .DSCR)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[1].text == "Description")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[1].type == "Description type")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[1].citations[0].xref == "@VOID@")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[1].citations[0].page == "Entire source")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[2].kind == .EDUC)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[2].text == "Education")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[2].type == "Education type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[3].kind == .IDNO)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[3].text == "ID number")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[3].type == "ID number type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[4].kind == .NATI)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[4].text == "Nationality")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[4].type == "Nationality type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[5].kind == .NCHI)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[5].text == "2")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[5].type == "nchi type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[6].kind == .NMR)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[6].text == "2")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[6].type == "nmr type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[7].kind == .OCCU)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[7].text == "occu")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[7].type == "occu type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[8].kind == .PROP)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[8].text == "prop")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[8].type == "prop type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[9].kind == .RELI)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[9].text == "reli")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[9].type == "reli type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[10].kind == .RESI)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[10].text == "resi")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[10].type == "resi type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[11].kind == .SSN)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[11].text == "ssn")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[11].type == "ssn type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[12].kind == .TITL)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[12].text == "titl")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[12].type == "titl type")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[13].kind == .FACT)
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[13].text == "fact")
+      #expect(ged.individualRecordsMap["@I1@"]?.individualAttributes[13].type == "fact type")
+
 
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents.count == 26)
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[0].kind == .BAPM)
