@@ -25,6 +25,9 @@ public class Age : RecordProtocol {
     "PHRASE" : \Age.phrase,
   ]
 
+  init() {
+    age = ""
+  }
 
   required init(record: Record) throws {
     age = record.line.value ?? ""

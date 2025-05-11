@@ -1243,96 +1243,135 @@ import Foundation
     // Family records
     @Test func families() async throws {
       #expect(ged.familyRecordsMap["@F1@"]?.restrictions == [.CONFIDENTIAL, .LOCKED])
-/**
 
- 0 @F1@ FAM
- 1 NCHI 2
- 2 TYPE Type of children
- 2 HUSB
- 3 AGE 25y
- 4 PHRASE Adult
- 2 WIFE
- 3 AGE 25y
- 4 PHRASE Adult
- 1 RESI Residence
- 2 TYPE Type of residence
- 2 HUSB
- 3 AGE 25y
- 4 PHRASE Adult
- 2 WIFE
- 3 AGE 25y
- 4 PHRASE Adult
- 1 FACT Fact
- 2 TYPE Type of fact
- 2 HUSB
- 3 AGE 25y
- 4 PHRASE Adult
- 2 WIFE
- 3 AGE 25y
- 4 PHRASE Adult
- 1 ANUL Y
- 1 CENS Y
- 1 DIV Y
- 1 DIVF Y
- 1 ENGA Y
- 1 MARB Y
- 1 MARC Y
- 1 MARL Y
- 1 MARS Y
- 1 MARR Y
- 2 HUSB
- 3 AGE 25y
- 4 PHRASE Adult
- 2 WIFE
- 3 AGE 25y
- 4 PHRASE Adult
- 2 DATE 27 MAR 2022
- 3 TIME 16:02
- 3 PHRASE Afternoon
- 2 PLAC Place
- 2 ADDR Address
- 2 PHON +1 (555) 555-1212
- 2 PHON +1 (555) 555-1234
- 2 EMAIL GEDCOM@FamilySearch.org
- 2 EMAIL GEDCOM@example.com
- 2 FAX +1 (555) 555-1212
- 2 FAX +1 (555) 555-1234
- 2 WWW http://gedcom.io
- 2 WWW http://gedcom.info
- 2 AGNC Agency
- 2 RELI Religion
- 2 CAUS Cause
- 2 RESN CONFIDENTIAL, LOCKED
- 2 SDATE 27 MAR 2022
- 3 TIME 16:03
- 3 PHRASE Afternoon
- 2 ASSO @VOID@
- 3 ROLE OFFICIATOR
- 2 ASSO @VOID@
- 3 ROLE WITN
- 3 NOTE Note text
- 2 SNOTE @N1@
- 2 SOUR @S1@
- 3 PAGE 1
- 2 SOUR @S1@
- 3 PAGE 2
- 2 OBJE @O1@
- 2 OBJE @O2@
- 2 UID bbcc0025-34cb-4542-8cfb-45ba201c9c2c
- 2 UID 9ead4205-5bad-4c05-91c1-0aecd3f5127d
- 1 EVEN Event
- 2 TYPE Event type
- 1 NO DIV
- 2 DATE FROM 1700 TO 1800
- 3 PHRASE No date phrase
- 2 NOTE Note text
- 2 SNOTE @N2@
- 2 SOUR @S1@
- 3 PAGE 1
- 2 SOUR @S1@
- 3 PAGE 2
- 1 NO ANUL
- */
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes.count == 3)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[0].kind == .NCHI)
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[0].type == "Type of children")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[0].husbandInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[0].husbandInfo?.age.phrase == "Adult")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[0].wifeInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[0].wifeInfo?.age.phrase == "Adult")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[1].kind == .RESI)
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[1].type == "Type of residence")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[1].husbandInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[1].husbandInfo?.age.phrase == "Adult")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[1].wifeInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[1].wifeInfo?.age.phrase == "Adult")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[2].kind == .FACT)
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[2].type == "Type of fact")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[2].husbandInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[2].husbandInfo?.age.phrase == "Adult")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[2].wifeInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.attributes[2].wifeInfo?.age.phrase == "Adult")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[0].kind == .ANUL)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[0].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[1].kind == .CENS)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[1].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[2].kind == .DIV)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[2].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[3].kind == .DIVF)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[3].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[4].kind == .ENGA)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[4].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[5].kind == .MARB)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[5].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[6].kind == .MARC)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[6].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[7].kind == .MARL)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[7].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[8].kind == .MARS)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[8].occured == true)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].kind == .MARR)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].occured == true)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].husbandInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].husbandInfo?.age.phrase == "Adult")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].wifeInfo?.age.age == "25y")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].wifeInfo?.age.phrase == "Adult")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].date?.time == "16:02")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].date?.phrase == "Afternoon")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].place?.place == ["Place"])
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].address?.address == "Address")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].phone == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].email == ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"])
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].fax == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].www == [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!])
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].agency == "Agency")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].religion == "Religion")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].cause == "Cause")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].restrictions == [.CONFIDENTIAL, .LOCKED])
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].sdate?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].sdate?.time == "16:03")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].sdate?.phrase == "Afternoon")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].associations[0].xref == "@VOID@")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].associations[0].role?.kind == .OFFICIATOR)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].associations[1].xref == "@VOID@")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].associations[1].role?.kind == .WITN)
+      switch ged.familyRecordsMap["@F1@"]?.events[9].associations[1].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad note in family event association")
+      }
+
+      switch ged.familyRecordsMap["@F1@"]?.events[9].notes[0] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad note in family event")
+      }
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].citations[0].xref == "@S1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].citations[0].page == "1")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].citations[1].xref == "@S1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].citations[1].page == "2")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].multimediaLinks[0].xref == "@O1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].multimediaLinks[1].xref == "@O2@")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[9].uid == [UUID(uuidString: "bbcc0025-34cb-4542-8cfb-45ba201c9c2c")!, UUID(uuidString: "9ead4205-5bad-4c05-91c1-0aecd3f5127d")!])
+
+      #expect(ged.familyRecordsMap["@F1@"]?.events[10].kind == .EVEN)
+      #expect(ged.familyRecordsMap["@F1@"]?.events[10].text == "Event")
+      #expect(ged.familyRecordsMap["@F1@"]?.events[10].type == "Event type")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[0].kind == .DIV)
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[0].date?.date == "FROM 1700 TO 1800")
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[0].date?.phrase == "No date phrase")
+
+      switch ged.familyRecordsMap["@F1@"]?.nonEvents[0].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad note in family non event")
+      }
+      switch ged.familyRecordsMap["@F1@"]?.nonEvents[0].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N2@")
+      default:
+        Issue.record("bad note in family non event")
+      }
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[0].citations[0].xref == "@S1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[0].citations[0].page == "1")
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[0].citations[1].xref == "@S1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[0].citations[1].page == "2")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.nonEvents[1].kind == .ANUL)
+
 
       #expect(ged.familyRecordsMap["@F1@"]?.husband?.xref == "@I1@")
       #expect(ged.familyRecordsMap["@F1@"]?.husband?.phrase == "Husband phrase")
@@ -1504,14 +1543,9 @@ import Foundation
       #expect(ged.familyRecordsMap["@F1@"]?.creationDate?.date.date == "27 MAR 2022")
       #expect(ged.familyRecordsMap["@F1@"]?.creationDate?.date.time == "08:55")
 
+      #expect(ged.familyRecordsMap["@F2@"]?.events[0].kind == .MARR)
+      #expect(ged.familyRecordsMap["@F2@"]?.events[0].date?.date == "1998")
       #expect(ged.familyRecordsMap["@F2@"]?.children[0].xref == "@I1@")
-
-/*
- 0 @F2@ FAM
- 1 MARR
- 2 DATE 1998
- 1 CHIL @I1@
- */
     }
   }
 }
