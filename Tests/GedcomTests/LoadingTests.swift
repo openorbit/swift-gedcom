@@ -52,6 +52,55 @@ import Foundation
       #expect(ged.submitterRecordsMap.count == 2)
     }
 
+    @Test func header() async throws {
+      #expect(ged.header.gedc.vers == "7.0")
+      #expect(ged.header.source != nil)
+      #expect(ged.header.source?.source == "https://gedcom.io/")
+      #expect(ged.header.source?.name == "GEDCOM Steering Committee")
+      #expect(ged.header.source?.corporation?.corporation == "FamilySearch")
+      #expect(ged.header.source?.corporation?.address?.address == "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")
+      #expect(ged.header.source?.corporation?.address?.adr1 == "Family History Department")
+      #expect(ged.header.source?.corporation?.address?.adr2 == "15 East South Temple Street")
+      #expect(ged.header.source?.corporation?.address?.adr3 == "Salt Lake City, UT 84150 USA")
+      #expect(ged.header.source?.corporation?.address?.city == "Salt Lake City")
+      #expect(ged.header.source?.corporation?.address?.state == "UT")
+      #expect(ged.header.source?.corporation?.address?.postalCode == "84150")
+      #expect(ged.header.source?.corporation?.address?.country == "USA")
+      #expect(ged.header.source?.corporation?.phone == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+      #expect(ged.header.source?.corporation?.email == ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"])
+      #expect(ged.header.source?.corporation?.fax == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+      #expect(ged.header.source?.corporation?.www == [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!])
+      #expect(ged.header.source?.data?.data == "HEAD-SOUR-DATA")
+      #expect(ged.header.source?.data?.date?.date == "1 NOV 2022")
+      #expect(ged.header.source?.data?.date?.time == "8:38")
+      #expect(ged.header.source?.data?.copyright == "copyright statement")
+      #expect(ged.header.destination == "https://gedcom.io/")
+      #expect(ged.header.date?.date == "10 JUN 2022")
+      #expect(ged.header.date?.time == "15:43:20.48Z")
+      #expect(ged.header.submitter == "@U1@")
+      #expect(ged.header.copyright == "another copyright statement")
+      #expect(ged.header.lang == "en-US")
+      #expect(ged.header.place?.form == ["City", "County", "State", "Country"])
+
+      switch ged.header.note {
+      case .Note(let n):
+        #expect(n.text == "American English")
+        #expect(n.mimeType == "text/plain")
+        #expect(n.lang == "en-US")
+        #expect(n.translations[0].text == "British English")
+        #expect(n.translations[0].lang == "en-GB")
+        #expect(n.citations[0].xref == "@S1@")
+        #expect(n.citations[0].page == "1")
+        #expect(n.citations[1].xref == "@S1@")
+        #expect(n.citations[1].page == "2")
+      default:
+        Issue.record("bad header note")
+      }
+
+      #expect(ged.header.schema?.tags["_SKYPEID"] == URL(string: "http://xmlns.com/foaf/0.1/skypeID")!)
+      #expect(ged.header.schema?.tags["_JABBERID"] == URL(string: "http://xmlns.com/foaf/0.1/jabberID")!)
+    }
+
     @Test func submitterRecords() async throws {
       #expect(ged.submitterRecordsMap["@U1@"]!.name == "GEDCOM Steering Committee")
 

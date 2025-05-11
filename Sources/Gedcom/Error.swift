@@ -25,4 +25,6 @@ enum GedcomError : Error {
   case badRecord
   case badRestriction
   case badNamePiece
+  case badURL
+  case badSchema
 }

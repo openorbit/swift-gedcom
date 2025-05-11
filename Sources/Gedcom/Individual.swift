@@ -141,7 +141,7 @@ public class IndividualAttributeStructure  : RecordProtocol {
       } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [String]> {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [URL]> {
-        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
+        try mutableSelf[keyPath: wkp].append(URL(string: child.line.value ?? "") ?? { throw GedcomError.badURL } ())
       } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [SourceCitation]> {
         mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       } else if let wkp = kp as? WritableKeyPath<IndividualAttributeStructure, [MultimediaLink]> {
@@ -317,7 +317,7 @@ public class IndividualEvent : RecordProtocol {
       } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [String]> {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [URL]> {
-        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
+        try mutableSelf[keyPath: wkp].append(URL(string: child.line.value ?? "") ?? { throw GedcomError.badURL } ())
       } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [SourceCitation]> {
         mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       } else if let wkp = kp as? WritableKeyPath<IndividualEvent, [MultimediaLink]> {

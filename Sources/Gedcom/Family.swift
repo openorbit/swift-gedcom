@@ -180,7 +180,7 @@ public class FamilyAttribute  : RecordProtocol {
       } else if let wkp = kp as? WritableKeyPath<FamilyAttribute, [String]> {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<FamilyAttribute, [URL]> {
-        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
+        try mutableSelf[keyPath: wkp].append(URL(string: child.line.value ?? "") ?? { throw GedcomError.badURL } ())
       } else if let wkp = kp as? WritableKeyPath<FamilyAttribute, [SourceCitation]> {
         mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       } else if let wkp = kp as? WritableKeyPath<FamilyAttribute, [MultimediaLink]> {
@@ -345,7 +345,7 @@ public class FamilyEvent : RecordProtocol {
       } else if let wkp = kp as? WritableKeyPath<FamilyEvent, [String]> {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<FamilyEvent, [URL]> {
-        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
+        try mutableSelf[keyPath: wkp].append(URL(string: child.line.value ?? "") ?? { throw GedcomError.badURL } ())
       } else if let wkp = kp as? WritableKeyPath<FamilyEvent, [SourceCitation]> {
         mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       } else if let wkp = kp as? WritableKeyPath<FamilyEvent, [MultimediaLink]> {

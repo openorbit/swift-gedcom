@@ -90,7 +90,7 @@ public class Submitter : RecordProtocol {
       } else if let wkp = kp as? WritableKeyPath<Submitter, [MultimediaLink]> {
         mutableSelf[keyPath: wkp].append(try MultimediaLink(record: child))
       } else if let wkp = kp as? WritableKeyPath<Submitter, [URL]> {
-        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
+        try mutableSelf[keyPath: wkp].append(URL(string: child.line.value ?? "") ?? { throw GedcomError.badURL } ())
       } else if let wkp = kp as? WritableKeyPath<Submitter, ChangeDate?> {
         mutableSelf[keyPath: wkp] = try ChangeDate(record: child)
       } else if let wkp = kp as? WritableKeyPath<Submitter, CreationDate?> {

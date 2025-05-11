@@ -54,6 +54,37 @@ public class DateTime : RecordProtocol {
   }
 }
 
+public class DateTimeExact : RecordProtocol {
+  var date: String = ""
+  var time: String?
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "TIME" : \DateTimeExact.time,
+  ]
+
+  init()
+  {
+
+  }
+  required init(record: Record) throws {
+    date = record.line.value ?? ""
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      if let wkp = kp as? WritableKeyPath<DateTimeExact, String> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<DateTimeExact, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+}
+
+
 /*
  n DATE <DateValue> {1:1} g7:DATE
  +1 TIME <Time> {0:1} g7:TIME

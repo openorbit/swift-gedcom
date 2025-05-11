@@ -25,7 +25,7 @@ class GedcomFile {
   var data: Data
   var recordLines: [Record] = []
 
-  var header: Header?
+  var header: Header = Header()
   var familyRecords: [Family] = []
   var individualRecords: [Individual] = []
   var multimediaRecords: [Multimedia] = []
@@ -131,7 +131,7 @@ class GedcomFile {
   }
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    "HDR" : \GedcomFile.header,
+    "HEAD" : \GedcomFile.header,
     "INDI" : \GedcomFile.individualRecords,
     "FAM" : \GedcomFile.familyRecords,
     "OBJE" : \GedcomFile.multimediaRecords,
@@ -147,7 +147,7 @@ class GedcomFile {
       guard let kp = Self.keys[record.line.tag] else {
         continue
       }
-      if let wkp = kp as? WritableKeyPath<GedcomFile, Header?> {
+      if let wkp = kp as? WritableKeyPath<GedcomFile, Header> {
         mutableSelf[keyPath: wkp] = try Header(record: record)
       } else if let wkp = kp as? WritableKeyPath<GedcomFile, [Family]> {
         mutableSelf[keyPath: wkp].append(try Family(record: record))
