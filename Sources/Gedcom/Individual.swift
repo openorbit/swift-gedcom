@@ -18,8 +18,8 @@
 import Foundation
 
 public class Age : RecordProtocol {
-  var age: String
-  var phrase: String?
+  public var age: String
+  public var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \Age.phrase,
@@ -41,7 +41,6 @@ public class Age : RecordProtocol {
       }
     }
   }
-
 }
 
 public enum IndividualAttributeKind : String {
@@ -161,9 +160,7 @@ public class IndividualAttributeStructure  : RecordProtocol {
   }
 }
 
-
-
-enum IndividualEventKind : String {
+public enum IndividualEventKind : String {
   case ADOP = "ADOP"
   case BAPM = "BAPM"
   case BARM = "BARM"
@@ -189,17 +186,57 @@ enum IndividualEventKind : String {
   case EVEN = "EVEN"
 }
 
+public class NonEventStructure : RecordProtocol {
+  public var kind: IndividualEventKind
+  public var date: DatePeriod?
+  public var notes: [NoteStructure] = []
+  public var citations: [SourceCitation] = []
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "DATE" : \NonEventStructure.date,
+    "NOTE" : \NonEventStructure.notes,
+    "SNOTE" : \NonEventStructure.notes,
+    "SOUR" : \NonEventStructure.citations,
+  ]
+
+
+  required init(record: Record) throws {
+    self.kind = IndividualEventKind(rawValue: record.line.value ?? "") ?? .EVEN
+
+    if kind == .EVEN {
+      throw GedcomError.badRecord
+    }
+
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<NonEventStructure, DatePeriod?> {
+        mutableSelf[keyPath: wkp] = try DatePeriod(record: child)
+      } else if let wkp = kp as? WritableKeyPath<NonEventStructure, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<NonEventStructure, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
+      }
+    }
+  }
+}
+
 public class IndividualEvent : RecordProtocol {
-  var kind: IndividualEventKind
-  var text: String?
-  var occured: Bool // Text == Y
-  var type: String?
+  public var kind: IndividualEventKind
+  public var text: String?
+  public var occured: Bool // Text == Y
+  public var type: String?
 
   // ADOP specific
-  var familyChild: FamilyChildAdoption?
+  public var familyChild: FamilyChildAdoption?
 
   // Individual event detail
-  var age: Age?
+  public var age: Age?
   // Event detail
   public var date: DateValue?
   public var sdate: DateValue?
@@ -321,6 +358,7 @@ public enum LdsIndividualOrdinanceStatusKind : String {
   case SUBMITTED
   case UNCLEARED
 }
+
 public class LdsIndividualOrdinanceStatus : RecordProtocol {
   var kind: LdsIndividualOrdinanceStatusKind
 
@@ -350,8 +388,8 @@ public class LdsIndividualOrdinanceStatus : RecordProtocol {
       throw GedcomError.badRecord
     }
   }
-
 }
+
 public class LdsIndividualOrdinance : RecordProtocol {
   var kind: LdsIndividualOrdinanceKind
 
@@ -410,7 +448,6 @@ public class LdsIndividualOrdinance : RecordProtocol {
     }
   }
 }
-
 
 public enum NameTypeKind : String {
   case AKA = "AKA"
@@ -505,10 +542,9 @@ public class PersonalNameTranslation  : RecordProtocol {
   }
 }
 
-// Name type: AKA, BIRTH, IMMIGRANT, MAIDEN, MARRIED, PROFESSIONAL, OTHER
 public class PersonalName  : RecordProtocol {
   public var name: String
-  public var type: NameType? // TODO: Substructure with phrase
+  public var type: NameType?
   public var namePieces : [PersonalNamePiece] = []
   public var translations : [PersonalNameTranslation] = []
   public var notes: [NoteStructure] = []
@@ -570,68 +606,6 @@ public class PersonalName  : RecordProtocol {
   }
 }
 
-
-/*
- INDIVIDUAL_ATTRIBUTE_STRUCTURE :=
-
- n CAST <Text>                              {1:1}  g7:CAST
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n DSCR <Text>                              {1:1}  g7:DSCR
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n EDUC <Text>                              {1:1}  g7:EDUC
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n IDNO <Special>                           {1:1}  g7:IDNO
-   +1 TYPE <Text>                           {1:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n NATI <Text>                              {1:1}  g7:NATI
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n NCHI <Integer>                           {1:1}  g7:INDI-NCHI
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n NMR <Integer>                            {1:1}  g7:NMR
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n OCCU <Text>                              {1:1}  g7:OCCU
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n PROP <Text>                              {1:1}  g7:PROP
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n RELI <Text>                              {1:1}  g7:INDI-RELI
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n RESI <Text>                              {1:1}  g7:INDI-RESI
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n SSN <Special>                            {1:1}  g7:SSN
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n TITL <Text>                              {1:1}  g7:INDI-TITL
-   +1 TYPE <Text>                           {0:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- |
- n FACT <Text>                              {1:1}  g7:INDI-FACT
-   +1 TYPE <Text>                           {1:1}  g7:TYPE
-   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
- ]
-
- */
 
 public enum PedigreeKind : String {
   case ADOPTED
@@ -1003,7 +977,7 @@ public class Individual : RecordProtocol {
 
   public var individualAttributes: [IndividualAttributeStructure] = []
   public var individualEvents: [IndividualEvent] = []
-  public var nonEvents: [String] = [] // TODO
+  public var nonEvents: [NonEventStructure] = []
   public var ldsDetails: [LdsIndividualOrdinance] = []
 
   public var childOfFamilies: [FamilyChild] = []
@@ -1041,6 +1015,8 @@ public class Individual : RecordProtocol {
         mutableSelf[keyPath: wkp].append(try IndividualAttributeStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [IndividualEvent]> {
         mutableSelf[keyPath: wkp].append(try IndividualEvent(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Individual, [NonEventStructure]> {
+        mutableSelf[keyPath: wkp].append(try NonEventStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Individual, [Restriction]> {
         // TODO: This may crash on bad restrictions
         let strings : [String] = (child.line.value?.components(separatedBy: ",").map({$0.trimmingCharacters(in: .whitespacesAndNewlines)})) ?? []

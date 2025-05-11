@@ -16,34 +16,140 @@
 // limitations under the License.
 //
 
-enum Calendar {
-  case gregorian
-  case julian
-  case frenchRevolutionary
-  case hebrew
-  case other
-}
 
+/*
+  n CHAN {1:1} g7:CHAN
+  +1 DATE <DateExact> {1:1} g7:DATE-exact
+  +2 TIME <Time> {0:1} g7:TIME
+  +1 <<NOTE_STRUCTURE>> {0:M}
+*/
 
-enum Epoch {
-  case bce
-  case ce
-}
+public class DateTime : RecordProtocol {
+  var date: String = ""
+  var time: String?
 
-
-func parseMonth(monthString: Substring) -> Int? {
-  let monthNumbers: [String:Int] = [
-    "JAN" : 1, "FEB" : 2, "MAR" : 3, "APR" : 4, "MAY" : 5, "JUN" : 6,
-    "JUL" : 7, "AUG" : 8, "SEP" : 9, "OCT" : 10, "NOV": 11, "DEC": 12,
-    // French revolutionary months
-    "VEND" : 1, "BRUM" : 2, "FRIM" : 3, "NIVO" : 4, "PLUV" : 5,
-    "VENT" : 6, "GERM" : 7, "FLOR" : 8, "PRAI" : 9, "MESS" : 10,
-    "THER" : 11, "FRUC" : 12, "COMP" : 13,
-    // Hebrew months
-    "TSH" : 1, "CSH" : 2, "KSL" : 3, "TVT" : 4, "SHV" : 5, "ADR" : 6,
-    "ADS" : 7, "NSN" : 8, "IYR" : 9, "SVN" : 10, "TMZ" : 11, "AAV" : 12,
-    "ELL" : 13,
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "TIME" : \DateTime.time,
   ]
-  return monthNumbers[String(monthString)]
+
+  init()
+  {
+    
+  }
+  required init(record: Record) throws {
+    date = record.line.value ?? ""
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+      if let wkp = kp as? WritableKeyPath<DateTime, String> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<DateTime, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
 }
 
+/*
+ n DATE <DateValue> {1:1} g7:DATE
+ +1 TIME <Time> {0:1} g7:TIME
+ +1 PHRASE <Text> {0:1} g7:PHRASE
+*/
+public class DateValue : RecordProtocol {
+  var date: String = ""
+  var time: String?
+  var phrase: String?
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "TIME" : \DateValue.time,
+    "PHRASE" : \DateValue.phrase,
+  ]
+  required init(record: Record) throws {
+    date = record.line.value ?? ""
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<DateValue, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+}
+
+public class DatePeriod : RecordProtocol {
+  var date: String = ""
+  var time: String?
+  var phrase: String?
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "TIME" : \DatePeriod.time,
+    "PHRASE" : \DatePeriod.phrase,
+  ]
+  required init(record: Record) throws {
+    date = record.line.value ?? ""
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<DatePeriod, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      }
+    }
+  }
+}
+
+
+public class CreationDate : RecordProtocol {
+  var date: DateTime = DateTime()
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "DATE" : \CreationDate.date,
+  ]
+
+  required init(record: Record) throws {
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<CreationDate, DateTime> {
+        mutableSelf[keyPath: wkp] = try DateTime(record: child)
+      }
+    }
+  }
+}
+public class ChangeDate : RecordProtocol {
+  var date: DateTime = DateTime()
+  var notes: [NoteStructure] = []
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "DATE" : \ChangeDate.date,
+    "NOTE" : \ChangeDate.notes,
+    "SNOTE" : \ChangeDate.notes,
+  ]
+  required init(record: Record) throws {
+    var mutableSelf = self
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<ChangeDate, DateTime> {
+        mutableSelf[keyPath: wkp] = try DateTime(record: child)
+      } else if let wkp = kp as? WritableKeyPath<ChangeDate, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      }
+    }
+  }
+}

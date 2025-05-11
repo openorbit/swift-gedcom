@@ -956,21 +956,31 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[25].text == "Event")
       #expect(ged.individualRecordsMap["@I1@"]?.individualEvents[25].type == "Event type")
 
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[0].kind == .NATU)
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[0].date?.date == "FROM 1700 TO 1800")
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[0].date?.phrase == "No date phrase")
 
+      switch ged.individualRecordsMap["@I1@"]?.nonEvents[0].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad note in individual non-event details")
+      }
 
-      /*
-      // non event structures
-      1 NO NATU
-        2 DATE FROM 1700 TO 1800
-          3 PHRASE No date phrase
-        2 NOTE Note text
-        2 SNOTE @N1@
-        2 SOUR @S1@
-          3 PAGE 1
-        2 SOUR @S1@
-          3 PAGE 2
-      1 NO EMIG
-*/
+      switch ged.individualRecordsMap["@I1@"]?.nonEvents[0].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad note in individual non-event details")
+      }
+
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[0].citations[0].xref == "@S1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[0].citations[0].page == "1")
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[0].citations[1].xref == "@S1@")
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[0].citations[1].page == "2")
+
+      #expect(ged.individualRecordsMap["@I1@"]?.nonEvents[1].kind == .EMIG)
+
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].kind == .BAPL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].status?.kind == .STILLBORN)
