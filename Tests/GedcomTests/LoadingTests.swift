@@ -984,32 +984,32 @@ import Foundation
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].kind == .BAPL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].status?.kind == .STILLBORN)
-      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].status?.date?.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[0].status?.date.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].kind == .BAPL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].status?.kind == .SUBMITTED)
-      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].status?.date?.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[1].status?.date.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[2].kind == .BAPL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[2].date?.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].kind == .CONL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].status?.kind == .INFANT)
-      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].status?.date?.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[3].status?.date.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[4].kind == .CONL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[4].date?.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].kind == .ENDL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].status?.kind == .CHILD)
-      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].status?.date?.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[5].status?.date.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[6].kind == .ENDL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[6].date?.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].kind == .INIL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].status?.kind == .EXCLUDED)
-      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].status?.date?.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[7].status?.date.date == "27 MAR 2022")
 
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[8].kind == .INIL)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[8].date?.date == "27 MAR 2022")
@@ -1024,8 +1024,8 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].kind == .SLGC)
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].place?.place == ["Place"])
       #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.kind == .BIC)
-      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.date?.date == "27 MAR 2022")
-      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.date?.time == "15:48")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.date.date == "27 MAR 2022")
+      #expect(ged.individualRecordsMap["@I1@"]?.ldsDetails[10].status?.date.time == "15:48")
 
       switch ged.individualRecordsMap["@I1@"]?.ldsDetails[10].notes[0] {
       case .Note(let n):

@@ -366,12 +366,13 @@ public class LdsIndividualOrdinanceStatus : RecordProtocol {
   var kind: LdsIndividualOrdinanceStatusKind
 
   // TODO: date should be non-optional
-  var date: DateTime?
+  var date: DateTime
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \LdsIndividualOrdinanceStatus.date,
   ]
 
   required init(record: Record) throws {
+    self.date = DateTime()
     self.kind = LdsIndividualOrdinanceStatusKind(rawValue: record.line.value ?? "")!
 
     var mutableSelf = self
@@ -382,13 +383,9 @@ public class LdsIndividualOrdinanceStatus : RecordProtocol {
         continue
       }
 
-      if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinanceStatus, DateTime?> {
+      if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinanceStatus, DateTime> {
         mutableSelf[keyPath: wkp] = try DateTime(record: child)
       }
-    }
-
-    if date == nil {
-      throw GedcomError.badRecord
     }
   }
 }
