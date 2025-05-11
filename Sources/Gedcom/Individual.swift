@@ -803,7 +803,7 @@ public class Role : RecordProtocol {
   var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    "PHRASE" : \NameType.phrase,
+    "PHRASE" : \Role.phrase,
   ]
 
   required init(record: Record) throws {
@@ -816,7 +816,7 @@ public class Role : RecordProtocol {
         continue
       }
 
-      if let wkp = kp as? WritableKeyPath<Role, String> {
+      if let wkp = kp as? WritableKeyPath<Role, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
@@ -837,11 +837,13 @@ public class AssoiciationStructure : RecordProtocol {
     "ROLE" : \AssoiciationStructure.role,
     "NOTE" : \AssoiciationStructure.notes,
     "SNOTE" : \AssoiciationStructure.notes,
+    "SOUR" : \AssoiciationStructure.citations,
   ]
   public var xref: String
   public var phrase: String?
   public var role: Role?
   public var notes: [NoteStructure] = []
+  public var citations: [SourceCitation] = []
 
   required init(record: Record) throws {
     self.xref = record.line.value ?? ""
@@ -859,6 +861,8 @@ public class AssoiciationStructure : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       } else if let wkp = kp as? WritableKeyPath<AssoiciationStructure, Role?> {
         mutableSelf[keyPath: wkp] = try Role(record: child)
+      } else if let wkp = kp as? WritableKeyPath<AssoiciationStructure, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       }
     }
   }

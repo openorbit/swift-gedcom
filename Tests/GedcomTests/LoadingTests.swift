@@ -1242,8 +1242,276 @@ import Foundation
 
     // Family records
     @Test func families() async throws {
+      #expect(ged.familyRecordsMap["@F1@"]?.restrictions == [.CONFIDENTIAL, .LOCKED])
+/**
+
+ 0 @F1@ FAM
+ 1 NCHI 2
+ 2 TYPE Type of children
+ 2 HUSB
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 2 WIFE
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 1 RESI Residence
+ 2 TYPE Type of residence
+ 2 HUSB
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 2 WIFE
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 1 FACT Fact
+ 2 TYPE Type of fact
+ 2 HUSB
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 2 WIFE
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 1 ANUL Y
+ 1 CENS Y
+ 1 DIV Y
+ 1 DIVF Y
+ 1 ENGA Y
+ 1 MARB Y
+ 1 MARC Y
+ 1 MARL Y
+ 1 MARS Y
+ 1 MARR Y
+ 2 HUSB
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 2 WIFE
+ 3 AGE 25y
+ 4 PHRASE Adult
+ 2 DATE 27 MAR 2022
+ 3 TIME 16:02
+ 3 PHRASE Afternoon
+ 2 PLAC Place
+ 2 ADDR Address
+ 2 PHON +1 (555) 555-1212
+ 2 PHON +1 (555) 555-1234
+ 2 EMAIL GEDCOM@FamilySearch.org
+ 2 EMAIL GEDCOM@example.com
+ 2 FAX +1 (555) 555-1212
+ 2 FAX +1 (555) 555-1234
+ 2 WWW http://gedcom.io
+ 2 WWW http://gedcom.info
+ 2 AGNC Agency
+ 2 RELI Religion
+ 2 CAUS Cause
+ 2 RESN CONFIDENTIAL, LOCKED
+ 2 SDATE 27 MAR 2022
+ 3 TIME 16:03
+ 3 PHRASE Afternoon
+ 2 ASSO @VOID@
+ 3 ROLE OFFICIATOR
+ 2 ASSO @VOID@
+ 3 ROLE WITN
+ 3 NOTE Note text
+ 2 SNOTE @N1@
+ 2 SOUR @S1@
+ 3 PAGE 1
+ 2 SOUR @S1@
+ 3 PAGE 2
+ 2 OBJE @O1@
+ 2 OBJE @O2@
+ 2 UID bbcc0025-34cb-4542-8cfb-45ba201c9c2c
+ 2 UID 9ead4205-5bad-4c05-91c1-0aecd3f5127d
+ 1 EVEN Event
+ 2 TYPE Event type
+ 1 NO DIV
+ 2 DATE FROM 1700 TO 1800
+ 3 PHRASE No date phrase
+ 2 NOTE Note text
+ 2 SNOTE @N2@
+ 2 SOUR @S1@
+ 3 PAGE 1
+ 2 SOUR @S1@
+ 3 PAGE 2
+ 1 NO ANUL
+ */
+
+      #expect(ged.familyRecordsMap["@F1@"]?.husband?.xref == "@I1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.husband?.phrase == "Husband phrase")
+      #expect(ged.familyRecordsMap["@F1@"]?.wife?.xref == "@I2@")
+      #expect(ged.familyRecordsMap["@F1@"]?.wife?.phrase == "Wife phrase")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.children[0].xref == "@I4@")
+      #expect(ged.familyRecordsMap["@F1@"]?.children[0].phrase == "First child")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.children[1].xref == "@VOID@")
+      #expect(ged.familyRecordsMap["@F1@"]?.children[1].phrase == "Second child")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].xref == "@I3@")
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].phrase == "Association text")
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].role?.kind == .OTHER)
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].role?.phrase == "Role text")
+      switch ged.familyRecordsMap["@F1@"]?.associations[0].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad note in family")
+      }
+      switch ged.familyRecordsMap["@F1@"]?.associations[0].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad note in family")
+      }
+
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].citations[0].xref == "@S1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].citations[0].page == "1")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].citations[1].xref == "@S2@")
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[0].citations[1].page == "2")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[1].xref == "@VOID@")
+      #expect(ged.familyRecordsMap["@F1@"]?.associations[1].role?.kind == .CLERGY)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.submitters[0] == "@U1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.submitters[1] == "@U2@")
+      #expect(ged.familyRecordsMap["@F1@"]?.submitters[2] == "@VOID@")
+
+/*
+ 1 SLGS
+ 2 DATE 27 MAR 2022
+ 3 TIME 15:47
+ 3 PHRASE Afternoon
+ 2 TEMP LOGAN
+ 2 PLAC Place
+ 2 STAT COMPLETED
+ 3 DATE 27 MAR 2022
+ 4 TIME 15:48
+ 2 NOTE Note text
+ 2 SNOTE @N1@
+ 2 SOUR @S1@
+ 3 PAGE 1
+ 2 SOUR @S2@
+ 3 PAGE 2
+*/
+/*
+ 1 SLGS
+ 2 DATE 27 MAR 2022
+ 2 STAT CANCELED
+ 3 DATE 27 MAR 2022
+ 1 SLGS
+ 2 DATE 27 MAR 2022
+ 2 STAT EXCLUDED
+ 3 DATE 27 MAR 2022
+ 1 SLGS
+ 2 DATE 27 MAR 2022
+ 2 STAT DNS
+ 3 DATE 27 MAR 2022
+ 1 SLGS
+ 2 DATE 27 MAR 2022
+ 2 STAT DNS_CAN
+ 3 DATE 27 MAR 2022
+ 1 SLGS
+ 2 DATE 27 MAR 2022
+ 2 STAT PRE_1970
+ 3 DATE 27 MAR 2022
+ 1 SLGS
+ 2 DATE 27 MAR 2022
+ 2 STAT UNCLEARED
+ 3 DATE 27 MAR 2022
+*/
+
+      switch (ged.familyRecordsMap["@F1@"]!.identifiers[0]) {
+      case .Refn(let refn):
+        #expect(refn.refn == "1")
+        #expect(refn.type == "User-generated identifier")
+      default:
+        Issue.record("unexpected identifier type")
+      }
+      switch (ged.familyRecordsMap["@F1@"]!.identifiers[1]) {
+      case .Refn(let refn):
+        #expect(refn.refn == "10")
+        #expect(refn.type == "User-generated identifier")
+      default:
+        Issue.record("unexpected identifier type")
+      }
+      switch (ged.familyRecordsMap["@F1@"]!.identifiers[2]) {
+      case .Uuid(let uid):
+        #expect(uid.uid == UUID(uuidString: "f096b664-5e40-40e2-bb72-c1664a46fe45")!)
+      default:
+        Issue.record("unexpected identifier type")
+      }
+      switch (ged.familyRecordsMap["@F1@"]!.identifiers[3]) {
+      case .Uuid(let uid):
+        #expect(uid.uid == UUID(uuidString: "1f76f868-8a36-449c-af0d-a29247b3ab50")!)
+      default:
+        Issue.record("unexpected identifier type")
+      }
+      switch (ged.familyRecordsMap["@F1@"]!.identifiers[4]) {
+      case .Exid(let exid):
+        #expect(exid.exid == "123")
+        #expect(exid.type == "http://example.com")
+      default:
+        Issue.record("unexpected identifier type")
+      }
+      switch (ged.familyRecordsMap["@F1@"]!.identifiers[5]) {
+      case .Exid(let exid):
+        #expect(exid.exid == "456")
+        #expect(exid.type == "http://example.com")
+      default:
+        Issue.record("unexpected identifier type")
+      }
 
 
+      switch (ged.familyRecordsMap["@F1@"]!.notes[0]) {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("unexpected family note")
+      }
+      switch (ged.familyRecordsMap["@F1@"]!.notes[1]) {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("unexpected family note")
+      }
+
+      #expect(ged.familyRecordsMap["@F1@"]?.citations[0].xref == "@S1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.citations[0].page == "1")
+      #expect(ged.familyRecordsMap["@F1@"]?.citations[0].quality == 1)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.citations[1].xref == "@S2@")
+      #expect(ged.familyRecordsMap["@F1@"]?.citations[1].page == "2")
+      #expect(ged.familyRecordsMap["@F1@"]?.citations[1].quality == 2)
+
+      #expect(ged.familyRecordsMap["@F1@"]?.multimediaLinks[0].xref == "@O1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.multimediaLinks[1].xref == "@O2@")
+      #expect(ged.familyRecordsMap["@F1@"]?.multimediaLinks[2].xref == "@VOID@")
+      #expect(ged.familyRecordsMap["@F1@"]?.multimediaLinks[2].title == "Title")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.changeDate?.date.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.changeDate?.date.time == "08:56")
+      switch ged.familyRecordsMap["@F1@"]?.changeDate?.notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Change date note 1")
+      default:
+        Issue.record("unexpected change date note")
+      }
+      switch ged.familyRecordsMap["@F1@"]?.changeDate?.notes[1] {
+      case .Note(let n):
+        #expect(n.text == "Change date note 2")
+      default:
+        Issue.record("unexpected change date note")
+      }
+      #expect(ged.familyRecordsMap["@F1@"]?.creationDate?.date.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.creationDate?.date.time == "08:55")
+
+      #expect(ged.familyRecordsMap["@F2@"]?.children[0].xref == "@I1@")
+
+/*
+ 0 @F2@ FAM
+ 1 MARR
+ 2 DATE 1998
+ 1 CHIL @I1@
+ */
     }
   }
 }
