@@ -17,6 +17,57 @@
 //
 import Foundation
 
+public class LdsSpouseSealing : RecordProtocol {
+  var date: DateValue?
+  var temple: String?
+  var place: PlaceStructure?
+
+  var status: LdsOrdinanceStatus?
+
+  var notes: [NoteStructure] = []
+  var citations: [SourceCitation] = []
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "DATE" : \LdsSpouseSealing.date,
+    "TEMP" : \LdsSpouseSealing.temple,
+    "PLAC" : \LdsSpouseSealing.place,
+
+    "STAT": \LdsSpouseSealing.status,
+
+    "NOTE" : \LdsSpouseSealing.notes,
+    "SNOTE" : \LdsSpouseSealing.notes,
+
+    "SOUR" : \LdsSpouseSealing.citations,
+  ]
+
+
+  required init(record: Record) throws {
+    var mutableSelf = self
+
+    for child in record.children {
+      guard let kp = Self.keys[child.line.tag] else {
+        //  throw GedcomError.badRecord
+        continue
+      }
+
+      if let wkp = kp as? WritableKeyPath<LdsSpouseSealing, String?> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<LdsSpouseSealing, DateValue?> {
+        mutableSelf[keyPath: wkp] = try DateValue(record: child)
+      } else if let wkp = kp as? WritableKeyPath<LdsSpouseSealing, PlaceStructure?> {
+        mutableSelf[keyPath: wkp] = try PlaceStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<LdsSpouseSealing, LdsOrdinanceStatus?> {
+        mutableSelf[keyPath: wkp] = try LdsOrdinanceStatus(record: child)
+      } else if let wkp = kp as? WritableKeyPath<LdsSpouseSealing, [NoteStructure]> {
+        mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<LdsSpouseSealing, [SourceCitation]> {
+        mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
+      }
+    }
+  }
+}
+
+
 public class SpouseAge : RecordProtocol {
   public var age: Age
 
@@ -323,8 +374,7 @@ public class Family : RecordProtocol {
   public var events: [FamilyEvent] = []
   public var nonEvents: [NonFamilyEventStructure] = []
 
-  //+1 <<LDS_SPOUSE_SEALING>> {0:M}
-  //public var ldsSpouseSealings: [LdsSpouseSealing] = []
+  public var ldsSpouseSealings: [LdsSpouseSealing] = []
 
   public var husband: PhraseRef?
   public var wife: PhraseRef?
@@ -359,6 +409,8 @@ public class Family : RecordProtocol {
     "EVEN" : \Family.events,
 
     "NO" : \Family.nonEvents,
+
+    "SLGS" : \Family.ldsSpouseSealings,
 
     "HUSB" : \Family.husband,
     "WIFE" : \Family.wife,
@@ -400,6 +452,8 @@ public class Family : RecordProtocol {
         mutableSelf[keyPath: wkp].append(try FamilyEvent(record: child))
       } else if let wkp = kp as? WritableKeyPath<Family, [NonFamilyEventStructure]> {
         mutableSelf[keyPath: wkp].append(try NonFamilyEventStructure(record: child))
+      } else if let wkp = kp as? WritableKeyPath<Family, [LdsSpouseSealing]> {
+        mutableSelf[keyPath: wkp].append(try LdsSpouseSealing(record: child))
       } else if let wkp = kp as? WritableKeyPath<Family, [PhraseRef]> {
         mutableSelf[keyPath: wkp].append(try PhraseRef(record: child))
       } else if let wkp = kp as? WritableKeyPath<Family, PhraseRef?> {

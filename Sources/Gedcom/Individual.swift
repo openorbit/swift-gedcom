@@ -347,7 +347,7 @@ public enum LdsIndividualOrdinanceKind : String {
   case SLGC
 }
 
-public enum LdsIndividualOrdinanceStatusKind : String {
+public enum LdsOrdinanceStatusKind : String {
   case BIC
   case CANCELED
   case CHILD
@@ -362,18 +362,18 @@ public enum LdsIndividualOrdinanceStatusKind : String {
   case UNCLEARED
 }
 
-public class LdsIndividualOrdinanceStatus : RecordProtocol {
-  var kind: LdsIndividualOrdinanceStatusKind
+public class LdsOrdinanceStatus : RecordProtocol {
+  var kind: LdsOrdinanceStatusKind
 
   // TODO: date should be non-optional
   var date: DateTime
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    "DATE" : \LdsIndividualOrdinanceStatus.date,
+    "DATE" : \LdsOrdinanceStatus.date,
   ]
 
   required init(record: Record) throws {
     self.date = DateTime()
-    self.kind = LdsIndividualOrdinanceStatusKind(rawValue: record.line.value ?? "")!
+    self.kind = LdsOrdinanceStatusKind(rawValue: record.line.value ?? "")!
 
     var mutableSelf = self
 
@@ -383,7 +383,7 @@ public class LdsIndividualOrdinanceStatus : RecordProtocol {
         continue
       }
 
-      if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinanceStatus, DateTime> {
+      if let wkp = kp as? WritableKeyPath<LdsOrdinanceStatus, DateTime> {
         mutableSelf[keyPath: wkp] = try DateTime(record: child)
       }
     }
@@ -397,7 +397,7 @@ public class LdsIndividualOrdinance : RecordProtocol {
   var temple: String?
   var place: PlaceStructure?
 
-  var status: LdsIndividualOrdinanceStatus?
+  var status: LdsOrdinanceStatus?
 
   var notes: [NoteStructure] = []
   var citations: [SourceCitation] = []
@@ -438,8 +438,8 @@ public class LdsIndividualOrdinance : RecordProtocol {
         mutableSelf[keyPath: wkp] = try DateValue(record: child)
       } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, PlaceStructure?> {
         mutableSelf[keyPath: wkp] = try PlaceStructure(record: child)
-      } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, LdsIndividualOrdinanceStatus?> {
-        mutableSelf[keyPath: wkp] = try LdsIndividualOrdinanceStatus(record: child)
+      } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, LdsOrdinanceStatus?> {
+        mutableSelf[keyPath: wkp] = try LdsOrdinanceStatus(record: child)
       } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<LdsIndividualOrdinance, [SourceCitation]> {

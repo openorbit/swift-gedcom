@@ -1414,49 +1414,55 @@ import Foundation
       #expect(ged.familyRecordsMap["@F1@"]?.submitters[1] == "@U2@")
       #expect(ged.familyRecordsMap["@F1@"]?.submitters[2] == "@VOID@")
 
-/*
- 1 SLGS
- 2 DATE 27 MAR 2022
- 3 TIME 15:47
- 3 PHRASE Afternoon
- 2 TEMP LOGAN
- 2 PLAC Place
- 2 STAT COMPLETED
- 3 DATE 27 MAR 2022
- 4 TIME 15:48
- 2 NOTE Note text
- 2 SNOTE @N1@
- 2 SOUR @S1@
- 3 PAGE 1
- 2 SOUR @S2@
- 3 PAGE 2
-*/
-/*
- 1 SLGS
- 2 DATE 27 MAR 2022
- 2 STAT CANCELED
- 3 DATE 27 MAR 2022
- 1 SLGS
- 2 DATE 27 MAR 2022
- 2 STAT EXCLUDED
- 3 DATE 27 MAR 2022
- 1 SLGS
- 2 DATE 27 MAR 2022
- 2 STAT DNS
- 3 DATE 27 MAR 2022
- 1 SLGS
- 2 DATE 27 MAR 2022
- 2 STAT DNS_CAN
- 3 DATE 27 MAR 2022
- 1 SLGS
- 2 DATE 27 MAR 2022
- 2 STAT PRE_1970
- 3 DATE 27 MAR 2022
- 1 SLGS
- 2 DATE 27 MAR 2022
- 2 STAT UNCLEARED
- 3 DATE 27 MAR 2022
-*/
+
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].date?.time == "15:47")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].date?.phrase == "Afternoon")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].temple == "LOGAN")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].place?.place == ["Place"])
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].status?.kind == .COMPLETED)
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].status?.date.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].status?.date.time == "15:48")
+      switch ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].notes[0] {
+      case .Note(let n):
+        #expect(n.text == "Note text")
+      default:
+        Issue.record("bad lds spouse sealing note")
+      }
+      switch ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].notes[1] {
+      case .SNote(let n):
+        #expect(n.xref == "@N1@")
+      default:
+        Issue.record("bad lds spouse sealing note")
+      }
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].citations[0].xref == "@S1@")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].citations[0].page == "1")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].citations[1].xref == "@S2@")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[0].citations[1].page == "2")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[1].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[1].status?.kind == .CANCELED)
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[1].status?.date.date == "27 MAR 2022")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[2].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[2].status?.kind == .EXCLUDED)
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[2].status?.date.date == "27 MAR 2022")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[3].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[3].status?.kind == .DNS)
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[3].status?.date.date == "27 MAR 2022")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[4].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[4].status?.kind == .DNS_CAN)
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[4].status?.date.date == "27 MAR 2022")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[5].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[5].status?.kind == .PRE_1970)
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[5].status?.date.date == "27 MAR 2022")
+
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[6].date?.date == "27 MAR 2022")
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[6].status?.kind == .UNCLEARED)
+      #expect(ged.familyRecordsMap["@F1@"]?.ldsSpouseSealings[6].status?.date.date == "27 MAR 2022")
 
       switch (ged.familyRecordsMap["@F1@"]!.identifiers[0]) {
       case .Refn(let refn):
