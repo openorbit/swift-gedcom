@@ -40,17 +40,11 @@ public class Crop : RecordProtocol {
       }
     }
   }
+  func export() -> Record? {
+    return nil
+  }
 }
 public class MultimediaLink  : RecordProtocol {
-/*
- n OBJE @<XREF:OBJE>@ {1:1} g7:OBJE
- +1 CROP {0:1} g7:CROP
- +2 TOP <Integer> {0:1} g7:TOP
- +2 LEFT <Integer> {0:1} g7:LEFT
- +2 HEIGHT <Integer> {0:1} g7:HEIGHT
- +2 WIDTH <Integer> {0:1} g7:WIDTH
- +1 TITL <Text> {0:1} g7:TITL
- */
   var xref: String
   var crop: Crop?
   var title: String?
@@ -76,6 +70,10 @@ public class MultimediaLink  : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -103,6 +101,10 @@ public class FileTranslation : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class MultimediaFileForm : RecordProtocol {
@@ -126,6 +128,9 @@ public class MultimediaFileForm : RecordProtocol {
         mutableSelf[keyPath: wkp] = try Medium(record: child)
       }
     }
+  }
+  func export() -> Record? {
+    return nil
   }
 }
 public class MultimediaFile : RecordProtocol {
@@ -163,25 +168,11 @@ public class MultimediaFile : RecordProtocol {
     }
   }
 
-
+  func export() -> Record? {
+    return nil
+  }
 }
 public class Multimedia  : RecordProtocol {
-  /*
-   n @XREF:OBJE@ OBJE {1:1} g7:record-OBJE
-   +1 RESN <List:Enum> {0:1} g7:RESN
-   +1 FILE <Special> {1:M} g7:FILE
-   +2 FORM <MediaType> {1:1} g7:FORM
-   +3 MEDI <Enum> {0:1} g7:MEDI
-   +4 PHRASE <Text> {0:1} g7:PHRASE
-   +2 TITL <Text> {0:1} g7:TITL
-   +2 TRAN <Special> {0:M} g7:FILE-TRAN
-   +3 FORM <MediaType> {1:1} g7:FORM
-   +1 <<IDENTIFIER_STRUCTURE>> {0:M}
-   +1 <<NOTE_STRUCTURE>> {0:M}
-   +1 <<SOURCE_CITATION>> {0:M}
-   +1 <<CHANGE_DATE>> {0:1}
-   +1 <<CREATION_DATE>> {0:1}
-   */
   public var xref: String
   public var restrictions: [Restriction] = []
 
@@ -235,5 +226,9 @@ public class Multimedia  : RecordProtocol {
         mutableSelf[keyPath: wkp] = try CreationDate(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }

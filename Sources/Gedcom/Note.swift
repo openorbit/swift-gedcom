@@ -42,9 +42,19 @@ public class Translation : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class Note : RecordProtocol {
+  public var text: String = ""
+  public var mimeType: String?
+  public var lang: String?
+  public var translations: [Translation] = []
+  public var citations: [SourceCitation] = []
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "MIME" : \Note.mimeType,
     "LANG" : \Note.lang,
@@ -71,12 +81,10 @@ public class Note : RecordProtocol {
       }
     }
   }
-  
-  public var text: String = ""
-  public var mimeType: String?
-  public var lang: String?
-  public var translations: [Translation] = []
-  public var citations: [SourceCitation] = []
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class SNoteRef : RecordProtocol {
@@ -88,6 +96,10 @@ public class SNoteRef : RecordProtocol {
 
   init(xref: String) {
     self.xref = xref
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -106,6 +118,10 @@ extension NoteStructure : RecordProtocol {
     default:
       throw GedcomError.badRecord
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 

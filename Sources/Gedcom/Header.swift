@@ -39,6 +39,10 @@ public class Gedc : RecordProtocol {
     "VERS" : \Gedc.vers,
   ]
   public var vers: String = ""
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 
@@ -75,6 +79,10 @@ public class Schema : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 
@@ -100,6 +108,10 @@ public class HeaderPlace : RecordProtocol {
     "FORM" : \HeaderPlace.form,
   ]
   public var form: [String] = []
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class HeaderSourceCorporation : RecordProtocol {
@@ -138,6 +150,10 @@ public class HeaderSourceCorporation : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class HeaderSourceData : RecordProtocol {
@@ -167,6 +183,10 @@ public class HeaderSourceData : RecordProtocol {
         mutableSelf[keyPath: wkp] = try DateTimeExact(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -201,6 +221,10 @@ public class HeaderSource : RecordProtocol {
         mutableSelf[keyPath: wkp] = try HeaderSourceCorporation(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -261,6 +285,10 @@ public class Header : RecordProtocol {
         mutableSelf[keyPath: wkp] = try NoteStructure(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 

@@ -42,6 +42,10 @@ public class REFN : RecordProtocol {
 
   public var refn: String = ""
   public var type: String?
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 // n UID <Special>                            {1:1}  g7:UID
@@ -51,6 +55,10 @@ public class UID : RecordProtocol {
 
   required init(record: Record) throws {
     self.uid = UUID(uuidString: record.line.value ?? "") ?? UUID()
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -84,6 +92,10 @@ public class EXID : RecordProtocol {
 
   public var exid: String = ""
   public var type: String?
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 
@@ -105,6 +117,10 @@ extension IdentifierStructure : RecordProtocol {
     default:
       throw GedcomError.badRecord
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 

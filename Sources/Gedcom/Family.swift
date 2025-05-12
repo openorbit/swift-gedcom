@@ -65,6 +65,11 @@ public class LdsSpouseSealing : RecordProtocol {
       }
     }
   }
+
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 
@@ -89,6 +94,10 @@ public class SpouseAge : RecordProtocol {
         mutableSelf[keyPath: wkp] = try Age(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -200,6 +209,10 @@ public class FamilyAttribute  : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public enum FamilyEventKind : String {
@@ -253,6 +266,10 @@ public class NonFamilyEventStructure : RecordProtocol {
         mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -364,6 +381,10 @@ public class FamilyEvent : RecordProtocol {
         mutableSelf[keyPath: wkp] = try FamilyChildAdoption(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -482,4 +503,7 @@ public class Family : RecordProtocol {
     }
   }
 
+  func export() -> Record? {
+    return nil
+  }
 }

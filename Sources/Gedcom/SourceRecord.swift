@@ -16,23 +16,6 @@
 // limitations under the License.
 //
 
-
-/*
- n SOUR @<XREF:SOUR>@ {1:1} g7:SOUR
- +1 PAGE <Text> {0:1} g7:PAGE
- +1 DATA {0:1} g7:SOUR-DATA
-  +2 <<DATE_VALUE>> {0:1}
-  +2 TEXT <Text> {0:M} g7:TEXT
-    +3 MIME <MediaType> {0:1} g7:MIME
-    +3 LANG <Language> {0:1} g7:LANG
- +1 EVEN <Enum> {0:1} g7:SOUR-EVEN
-  +2 PHRASE <Text> {0:1} g7:PHRASE
-  +2 ROLE <Enum> {0:1} g7:ROLE
-    +3 PHRASE <Text> {0:1} g7:PHRASE
- +1 QUAY <Enum> {0:1} g7:QUAY
- +1 <<MULTIMEDIA_LINK>> {0:M}
- +1 <<NOTE_STRUCTURE>> {0:M}
-*/
 public class SourceCitationData : RecordProtocol {
   var date: DateValue?
   var text: [Translation] = []
@@ -57,6 +40,9 @@ public class SourceCitationData : RecordProtocol {
     }
   }
 
+  func export() -> Record? {
+    return nil
+  }
 }
 public class SourceEventRole : RecordProtocol {
   var role: String
@@ -80,6 +66,9 @@ public class SourceEventRole : RecordProtocol {
     }
   }
 
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class SourceEventData : RecordProtocol {
@@ -106,6 +95,10 @@ public class SourceEventData : RecordProtocol {
         mutableSelf[keyPath: wkp] = try SourceEventRole(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -156,6 +149,10 @@ public class SourceCitation : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class SourceDataEventPeriod : RecordProtocol {
@@ -179,6 +176,10 @@ public class SourceDataEventPeriod : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -211,6 +212,10 @@ public class SourceDataEvents : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class SourceData : RecordProtocol {
@@ -242,15 +247,11 @@ public class SourceData : RecordProtocol {
       }
     }
   }
-}
 
-/*
-REPO @<XREF:REPO>@                       {1:1}  g7:REPO
-  +1 <<NOTE_STRUCTURE>>                    {0:M}
-  +1 CALN <Special>                        {0:M}  g7:CALN
-     +2 MEDI <Enum>                        {0:1}  g7:MEDI
-        +3 PHRASE <Text>
-*/
+  func export() -> Record? {
+    return nil
+  }
+}
 
 public enum MediumKind : String {
   case AUDIO //  An audio recording
@@ -290,6 +291,10 @@ public class Medium : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class CallNumber : RecordProtocol {
@@ -312,6 +317,10 @@ public class CallNumber : RecordProtocol {
         mutableSelf[keyPath: wkp] = try Medium(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -342,6 +351,10 @@ public class SourceRepositoryCitation : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class SourceText : RecordProtocol {
@@ -368,32 +381,12 @@ public class SourceText : RecordProtocol {
     }
   }
 
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class Source : RecordProtocol {
-  /*
-   n @XREF:SOUR@ SOUR {1:1} g7:record-SOUR
-   +1 DATA {0:1} g7:DATA
-   +2 EVEN <List:Enum> {0:M} g7:DATA-EVEN
-   +3 DATE <DatePeriod> {0:1} g7:DATA-EVEN-DATE
-   +4 PHRASE <Text> {0:1} g7:PHRASE
-   +3 <<PLACE_STRUCTURE>> {0:1}
-   +2 AGNC <Text> {0:1} g7:AGNC
-   +2 <<NOTE_STRUCTURE>> {0:M}
-   +1 AUTH <Text> {0:1} g7:AUTH
-   +1 TITL <Text> {0:1} g7:TITL
-   +1 ABBR <Text> {0:1} g7:ABBR
-   +1 PUBL <Text> {0:1} g7:PUBL
-   +1 TEXT <Text> {0:1} g7:TEXT
-   +2 MIME <MediaType> {0:1} g7:MIME
-   +2 LANG <Language> {0:1} g7:LANG
-   +1 <<SOURCE_REPOSITORY_CITATION>> {0:M}
-   +1 <<IDENTIFIER_STRUCTURE>> {0:M}
-   +1 <<NOTE_STRUCTURE>> {0:M}
-   +1 <<MULTIMEDIA_LINK>> {0:M}
-   +1 <<CHANGE_DATE>> {0:1}
-   +1 <<CREATION_DATE>> {0:1}
-   */
   public var data: SourceData?
   public var author: String?
   public var title: String?
@@ -455,5 +448,9 @@ public class Source : RecordProtocol {
         mutableSelf[keyPath: wkp] = try CreationDate(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }

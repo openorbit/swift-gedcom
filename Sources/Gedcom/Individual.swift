@@ -44,6 +44,10 @@ public class Age : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public enum IndividualAttributeKind : String {
@@ -161,6 +165,10 @@ public class IndividualAttributeStructure  : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public enum IndividualEventKind : String {
@@ -226,6 +234,10 @@ public class NonEventStructure : RecordProtocol {
         mutableSelf[keyPath: wkp].append(try SourceCitation(record: child))
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -337,6 +349,10 @@ public class IndividualEvent : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public enum LdsIndividualOrdinanceKind : String {
@@ -387,6 +403,10 @@ public class LdsOrdinanceStatus : RecordProtocol {
         mutableSelf[keyPath: wkp] = try DateTime(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -447,6 +467,10 @@ public class LdsIndividualOrdinance : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public enum NameTypeKind : String {
@@ -481,6 +505,10 @@ public class NameType : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -540,6 +568,10 @@ public class PersonalNameTranslation  : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class PersonalName  : RecordProtocol {
@@ -574,9 +606,7 @@ public class PersonalName  : RecordProtocol {
         continue
       }
 
-      if let wkp = kp as? WritableKeyPath<PersonalName, [String]?> {
-      } else if let wkp = kp as? WritableKeyPath<PersonalName, String?> {
-      } else if let wkp = kp as? WritableKeyPath<PersonalName, [PersonalNamePiece]> {
+      if let wkp = kp as? WritableKeyPath<PersonalName, [PersonalNamePiece]> {
         switch (child.line.tag) {
         case "NPFX":
           mutableSelf[keyPath: wkp].append(.NPFX(child.line.value ?? ""))
@@ -603,6 +633,10 @@ public class PersonalName  : RecordProtocol {
         mutableSelf[keyPath: wkp] = try NameType(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -638,6 +672,10 @@ public class Pedigree : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public enum ChildStatusKind : String {
@@ -672,6 +710,10 @@ public class FamilyChildAdoptionKind : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class FamilyChildAdoption : RecordProtocol {
@@ -696,6 +738,10 @@ public class FamilyChildAdoption : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class ChildStatus : RecordProtocol {
@@ -719,6 +765,10 @@ public class ChildStatus : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -754,6 +804,10 @@ public class FamilyChild : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 public class FamilySpouse : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -777,6 +831,10 @@ public class FamilySpouse : RecordProtocol {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -820,6 +878,10 @@ public class Role : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -866,6 +928,10 @@ public class AssoiciationStructure : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 public class PhraseRef : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -888,6 +954,10 @@ public class PhraseRef : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -1054,11 +1124,7 @@ public class Individual : RecordProtocol {
   }
 
 
-/*
-  n @XREF:INDI@ INDI {1:1} g7:record-INDI
-  +1 <<INDIVIDUAL_ATTRIBUTE_STRUCTURE>> {0:M}
-  +1 <<INDIVIDUAL_EVENT_STRUCTURE>> {0:M}
-  +1 <<NON_EVENT_STRUCTURE>> {0:M}
-  +1 <<LDS_INDIVIDUAL_ORDINANCE>> {0:M}
-*/
+  func export() -> Record? {
+    return nil
+  }
 }

@@ -86,5 +86,9 @@ public class Repository : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 

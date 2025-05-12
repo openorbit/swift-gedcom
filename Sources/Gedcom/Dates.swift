@@ -52,6 +52,10 @@ public class DateTime : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 public class DateTimeExact : RecordProtocol {
@@ -82,14 +86,12 @@ public class DateTimeExact : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
-
-/*
- n DATE <DateValue> {1:1} g7:DATE
- +1 TIME <Time> {0:1} g7:TIME
- +1 PHRASE <Text> {0:1} g7:PHRASE
-*/
 public class DateValue : RecordProtocol {
   var date: String = ""
   var time: String?
@@ -111,6 +113,10 @@ public class DateValue : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -136,6 +142,10 @@ public class DatePeriod : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
 
@@ -157,6 +167,10 @@ public class CreationDate : RecordProtocol {
         mutableSelf[keyPath: wkp] = try DateTime(record: child)
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 public class ChangeDate : RecordProtocol {
@@ -182,5 +196,9 @@ public class ChangeDate : RecordProtocol {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }

@@ -98,4 +98,8 @@ public class Submitter : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }

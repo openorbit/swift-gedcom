@@ -54,8 +54,11 @@ public class PlaceTranslation : RecordProtocol {
       if let wkp = kp as? WritableKeyPath<PlaceTranslation, String> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
-
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -97,6 +100,10 @@ public class PlaceCoordinates : RecordProtocol {
         }
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }
 
@@ -150,5 +157,9 @@ public class PlaceStructure : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value!
       }
     }
+  }
+
+  func export() -> Record? {
+    return nil
   }
 }

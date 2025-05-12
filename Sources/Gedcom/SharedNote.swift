@@ -75,9 +75,10 @@ public class SharedNote : RecordProtocol {
       } else if let wkp = kp as? WritableKeyPath<SharedNote, CreationDate?> {
         mutableSelf[keyPath: wkp] = try CreationDate(record: child)
       }
-
     }
-
   }
 
+  func export() -> Record? {
+    return nil
+  }
 }

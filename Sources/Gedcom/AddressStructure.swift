@@ -49,5 +49,9 @@ public class AddressStructure : RecordProtocol {
       }
     }
   }
+
+  func export() -> Record? {
+    return nil
+  }
 }
 
