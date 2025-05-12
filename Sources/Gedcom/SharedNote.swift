@@ -31,6 +31,15 @@
  */
 
 public class SharedNote : RecordProtocol {
+  public var text: String = ""
+  public var mimeType: String?
+  public var lang: String?
+  public var translation: [Translation] = []
+  public var citation: [SourceCitation] = []
+  public var identifiers: [IdentifierStructure] = []
+  public var changeDate: ChangeDate?
+  public var creationDate: CreationDate?
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "MIME" : \SharedNote.mimeType,
     "LANG" : \SharedNote.lang,
@@ -42,14 +51,6 @@ public class SharedNote : RecordProtocol {
     "CHAN" : \SharedNote.changeDate,
     "CREA" : \SharedNote.creationDate
   ]
-  public var text: String = ""
-  public var mimeType: String?
-  public var lang: String?
-  public var translation: [Translation] = []
-  public var citation: [SourceCitation] = []
-  public var identifiers: [IdentifierStructure] = []
-  public var changeDate: ChangeDate?
-  public var creationDate: CreationDate?
 
   required init(record: Record) throws {
     self.text = record.line.value ?? ""

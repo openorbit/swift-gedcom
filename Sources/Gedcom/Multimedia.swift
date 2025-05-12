@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 public class Crop : RecordProtocol {
-  var top: Int?
-  var left: Int?
-  var height: Int?
-  var width: Int?
+  public var top: Int?
+  public var left: Int?
+  public var height: Int?
+  public var width: Int?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TOP" : \Crop.top,
     "LEFT" : \Crop.left,
@@ -45,9 +45,9 @@ public class Crop : RecordProtocol {
   }
 }
 public class MultimediaLink  : RecordProtocol {
-  var xref: String
-  var crop: Crop?
-  var title: String?
+  public var xref: String
+  public var crop: Crop?
+  public var title: String?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "CROP" : \MultimediaLink.crop,
     "TITL" : \MultimediaLink.title

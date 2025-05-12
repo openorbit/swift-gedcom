@@ -17,14 +17,14 @@ n ADDR <Special> {1:1} g7:ADDR
 */
 
 public class AddressStructure : RecordProtocol {
-  var address: String
-  var adr1: String?
-  var adr2: String?
-  var adr3: String?
-  var city: String?
-  var state: String?
-  var postalCode: String?
-  var country: String?
+  public var address: String
+  public var adr1: String?
+  public var adr2: String?
+  public var adr3: String?
+  public var city: String?
+  public var state: String?
+  public var postalCode: String?
+  public var country: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "ADR1" : \AddressStructure.adr1,

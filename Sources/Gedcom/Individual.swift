@@ -379,10 +379,9 @@ public enum LdsOrdinanceStatusKind : String {
 }
 
 public class LdsOrdinanceStatus : RecordProtocol {
-  var kind: LdsOrdinanceStatusKind
+  public var kind: LdsOrdinanceStatusKind
+  public var date: DateTime
 
-  // TODO: date should be non-optional
-  var date: DateTime
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \LdsOrdinanceStatus.date,
   ]
@@ -411,16 +410,16 @@ public class LdsOrdinanceStatus : RecordProtocol {
 }
 
 public class LdsIndividualOrdinance : RecordProtocol {
-  var kind: LdsIndividualOrdinanceKind
+  public var kind: LdsIndividualOrdinanceKind
 
-  var date: DateValue?
-  var temple: String?
-  var place: PlaceStructure?
+  public var date: DateValue?
+  public var temple: String?
+  public var place: PlaceStructure?
 
-  var status: LdsOrdinanceStatus?
+  public var status: LdsOrdinanceStatus?
 
-  var notes: [NoteStructure] = []
-  var citations: [SourceCitation] = []
+  public var notes: [NoteStructure] = []
+  public var citations: [SourceCitation] = []
 
   // Only SLGC
   var familyChild: String? // XREF
@@ -484,8 +483,8 @@ public enum NameTypeKind : String {
 }
 
 public class NameType : RecordProtocol {
-  var kind: NameTypeKind
-  var phrase: String?
+  public var kind: NameTypeKind
+  public var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \NameType.phrase,
@@ -650,8 +649,8 @@ public enum PedigreeKind : String {
 }
 
 public class Pedigree : RecordProtocol {
-  var kind: PedigreeKind
-  var phrase: String?
+  public var kind: PedigreeKind
+  public var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \Pedigree.phrase,
@@ -773,6 +772,11 @@ public class ChildStatus : RecordProtocol {
 }
 
 public class FamilyChild : RecordProtocol {
+  public var xref: String
+  public var pedigree: Pedigree?
+  public var status: ChildStatus?
+  public var notes: [NoteStructure] = []
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PEDI" : \FamilyChild.pedigree,
     "STAT" : \FamilyChild.status,
@@ -780,10 +784,6 @@ public class FamilyChild : RecordProtocol {
     "NOTE" : \FamilyChild.notes,
     "SNOTE" : \FamilyChild.notes,
   ]
-  public var xref: String
-  public var pedigree: Pedigree?
-  public var status: ChildStatus?
-  public var notes: [NoteStructure] = []
 
   required init(record: Record) throws {
     self.xref = record.line.value ?? ""
@@ -810,12 +810,13 @@ public class FamilyChild : RecordProtocol {
   }
 }
 public class FamilySpouse : RecordProtocol {
+  public var xref: String
+  public var notes: [NoteStructure] = []
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "NOTE" : \FamilySpouse.notes,
     "SNOTE" : \FamilySpouse.notes,
   ]
-  public var xref: String
-  public var notes: [NoteStructure] = []
 
   required init(record: Record) throws {
     self.xref = record.line.value ?? ""
@@ -857,8 +858,8 @@ public enum RoleKind : String {
 }
 
 public class Role : RecordProtocol {
-  var kind: RoleKind
-  var phrase: String?
+  public var kind: RoleKind
+  public var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \Role.phrase,
@@ -885,15 +886,13 @@ public class Role : RecordProtocol {
   }
 }
 
-/*
-n ASSO @<XREF:INDI>@                       {1:1}  g7:ASSO
-  +1 PHRASE <Text>                         {0:1}  g7:PHRASE
-  +1 ROLE <Enum>                           {1:1}  g7:ROLE
-     +2 PHRASE <Text>                      {0:1}  g7:PHRASE
-  +1 <<NOTE_STRUCTURE>>                    {0:M}
-  +1 <<SOURCE_CITATION>>                   {0:M}
-*/
 public class AssoiciationStructure : RecordProtocol {
+  public var xref: String
+  public var phrase: String?
+  public var role: Role?
+  public var notes: [NoteStructure] = []
+  public var citations: [SourceCitation] = []
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \AssoiciationStructure.phrase,
     "ROLE" : \AssoiciationStructure.role,
@@ -901,11 +900,6 @@ public class AssoiciationStructure : RecordProtocol {
     "SNOTE" : \AssoiciationStructure.notes,
     "SOUR" : \AssoiciationStructure.citations,
   ]
-  public var xref: String
-  public var phrase: String?
-  public var role: Role?
-  public var notes: [NoteStructure] = []
-  public var citations: [SourceCitation] = []
 
   required init(record: Record) throws {
     self.xref = record.line.value ?? ""
@@ -934,11 +928,12 @@ public class AssoiciationStructure : RecordProtocol {
   }
 }
 public class PhraseRef : RecordProtocol {
+  public var xref: String
+  public var phrase: String?
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \PhraseRef.phrase,
   ]
-  public var xref: String
-  public var phrase: String?
 
   required init(record: Record) throws {
     self.xref = record.line.value ?? ""
@@ -969,6 +964,31 @@ public enum Sex : String {
 }
 
 public class Individual : RecordProtocol {
+  public var restrictions: [Restriction] = []
+  public var names: [PersonalName] = []
+  public var sex: Sex?
+
+  public var attributes: [IndividualAttributeStructure] = []
+  public var events: [IndividualEvent] = []
+  public var nonEvents: [NonEventStructure] = []
+  public var ldsDetails: [LdsIndividualOrdinance] = []
+
+  public var childOfFamilies: [FamilyChild] = []
+  public var spouseFamilies: [FamilySpouse] = []
+
+  public var submitters: [String] = []
+  public var associations: [AssoiciationStructure] = []
+  public var aliases: [PhraseRef] = []
+  public var ancestorInterest: [String] = []
+  public var decendantInterest: [String] = []
+
+  public var identifiers: [IdentifierStructure] = []
+  public var notes: [NoteStructure] = []
+  public var citations: [SourceCitation] = []
+  public var multimediaLinks: [MultimediaLink] = []
+  public var changeDate: ChangeDate?
+  public var creationDate: CreationDate?
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "RESN" : \Individual.restrictions,
     "NAME" : \Individual.names,
@@ -1045,30 +1065,6 @@ public class Individual : RecordProtocol {
     "CREA" : \Individual.creationDate
 
   ]
-  public var restrictions: [Restriction] = []
-  public var names: [PersonalName] = []
-  public var sex: Sex?
-
-  public var attributes: [IndividualAttributeStructure] = []
-  public var events: [IndividualEvent] = []
-  public var nonEvents: [NonEventStructure] = []
-  public var ldsDetails: [LdsIndividualOrdinance] = []
-
-  public var childOfFamilies: [FamilyChild] = []
-  public var spouseFamilies: [FamilySpouse] = []
-
-  public var submitters: [String] = []
-  public var associations: [AssoiciationStructure] = []
-  public var aliases: [PhraseRef] = []
-  public var ancestorInterest: [String] = []
-  public var decendantInterest: [String] = []
-
-  public var identifiers: [IdentifierStructure] = []
-  public var notes: [NoteStructure] = []
-  public var citations: [SourceCitation] = []
-  public var multimediaLinks: [MultimediaLink] = []
-  public var changeDate: ChangeDate?
-  public var creationDate: CreationDate?
 
   required init(record: Record) throws {
     var mutableSelf = self

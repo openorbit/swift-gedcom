@@ -18,14 +18,14 @@
 import Foundation
 
 public class LdsSpouseSealing : RecordProtocol {
-  var date: DateValue?
-  var temple: String?
-  var place: PlaceStructure?
+  public var date: DateValue?
+  public var temple: String?
+  public var place: PlaceStructure?
 
-  var status: LdsOrdinanceStatus?
+  public var status: LdsOrdinanceStatus?
 
-  var notes: [NoteStructure] = []
-  var citations: [SourceCitation] = []
+  public var notes: [NoteStructure] = []
+  public var citations: [SourceCitation] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \LdsSpouseSealing.date,

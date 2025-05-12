@@ -17,6 +17,11 @@
 //
 import Foundation
 public class Gedc : RecordProtocol {
+  public var vers: String = ""
+
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "VERS" : \Gedc.vers,
+  ]
   init() {
 
   }
@@ -35,11 +40,6 @@ public class Gedc : RecordProtocol {
     }
   }
 
-  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    "VERS" : \Gedc.vers,
-  ]
-  public var vers: String = ""
-
   func export() -> Record? {
     return nil
   }
@@ -47,7 +47,7 @@ public class Gedc : RecordProtocol {
 
 
 public class Schema : RecordProtocol {
-  var tags: [String: URL] = [:]
+  public var tags: [String: URL] = [:]
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TAG" : \Schema.tags,
   ]
@@ -87,6 +87,11 @@ public class Schema : RecordProtocol {
 
 
 public class HeaderPlace : RecordProtocol {
+  public var form: [String] = []
+  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
+    "FORM" : \HeaderPlace.form,
+  ]
+
   required init(record: Record) throws {
     var mutableSelf = self
 
@@ -103,11 +108,6 @@ public class HeaderPlace : RecordProtocol {
       }
     }
   }
-
-  nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
-    "FORM" : \HeaderPlace.form,
-  ]
-  public var form: [String] = []
 
   func export() -> Record? {
     return nil
@@ -229,6 +229,18 @@ public class HeaderSource : RecordProtocol {
 }
 
 public class Header : RecordProtocol {
+  public var gedc: Gedc
+  public var schema : Schema?
+  public var source: HeaderSource?
+  public var date: DateTimeExact?
+  public var destination: String?
+
+  public var place: HeaderPlace?
+  public var copyright: String?
+  public var lang: String?
+  public var submitter: String?
+  public var note: NoteStructure?
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "GEDC" : \Header.gedc,
     "SCHMA" : \Header.schema,
@@ -244,17 +256,6 @@ public class Header : RecordProtocol {
     "NOTE" : \Header.note,
     "SOTE" : \Header.note,
   ]
-  public var gedc: Gedc
-  public var schema : Schema?
-  public var source: HeaderSource?
-  public var date: DateTimeExact?
-  public var destination: String?
-
-  public var place: HeaderPlace?
-  public var copyright: String?
-  public var lang: String?
-  public var submitter: String?
-  public var note: NoteStructure?
 
   init() {
     gedc = Gedc()

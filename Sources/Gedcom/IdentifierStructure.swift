@@ -17,9 +17,10 @@
 //
 import Foundation
 
- //n REFN <Special>                           {1:1}  g7:REFN
- //  +1 TYPE <Text>                           {0:1}  g7:TYPE
 public class REFN : RecordProtocol {
+  public var refn: String = ""
+  public var type: String?
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TYPE" : \REFN.type,
   ]
@@ -40,15 +41,10 @@ public class REFN : RecordProtocol {
     }
   }
 
-  public var refn: String = ""
-  public var type: String?
-
   func export() -> Record? {
     return nil
   }
 }
-
-// n UID <Special>                            {1:1}  g7:UID
 
 public class UID : RecordProtocol {
   public var uid: UUID
@@ -62,10 +58,10 @@ public class UID : RecordProtocol {
   }
 }
 
-// n EXID <Special>                           {1:1}  g7:EXID
-// +1 TYPE <Special>                        {0:1}  g7:EXID-TYPE
-
 public class EXID : RecordProtocol {
+  public var exid: String = ""
+  public var type: String?
+
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TYPE" : \EXID.type,
   ]
@@ -84,14 +80,8 @@ public class EXID : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
-
-    //if type == nil {
-    //   Emit warning about EXID without type being deprecated
-    //}
   }
 
-  public var exid: String = ""
-  public var type: String?
 
   func export() -> Record? {
     return nil

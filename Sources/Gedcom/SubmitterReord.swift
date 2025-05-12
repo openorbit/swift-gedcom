@@ -18,35 +18,19 @@
 import Foundation
 
 public class Submitter : RecordProtocol {
-  var xref: String = ""
-  var name: String = ""
-  var address: AddressStructure?
-  var phone: [String] = []
-  var email: [String] = []
-  var fax: [String] = []
-  var www: [URL] = []
-  var multimediaLinks: [MultimediaLink] = []
-  var languages: [String] = []
-  var identifiers: [IdentifierStructure] = []
-  var notes: [NoteStructure] = []
-  var changeDate: ChangeDate?
-  var creationDate: CreationDate?
-
-  /*
-   n @XREF:SUBM@ SUBM {1:1} g7:record-SUBM
-   +1 NAME <Text> {1:1} g7:NAME
-   +1 <<ADDRESS_STRUCTURE>> {0:1}
-   +1 PHON <Special> {0:M} g7:PHON
-   +1 EMAIL <Special> {0:M} g7:EMAIL
-   +1 FAX <Special> {0:M} g7:FAX
-   +1 WWW <Special> {0:M} g7:WWW
-   +1 <<MULTIMEDIA_LINK>> {0:M}
-   +1 LANG <Language> {0:M} g7:SUBM-LANG
-   +1 <<IDENTIFIER_STRUCTURE>> {0:M}
-   +1 <<NOTE_STRUCTURE>> {0:M}
-   +1 <<CHANGE_DATE>> {0:1}
-   +1 <<CREATION_DATE>> {0:1}
-   */
+  public var xref: String = ""
+  public var name: String = ""
+  public var address: AddressStructure?
+  public var phone: [String] = []
+  public var email: [String] = []
+  public var fax: [String] = []
+  public var www: [URL] = []
+  public var multimediaLinks: [MultimediaLink] = []
+  public var languages: [String] = []
+  public var identifiers: [IdentifierStructure] = []
+  public var notes: [NoteStructure] = []
+  public var changeDate: ChangeDate?
+  public var creationDate: CreationDate?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "NAME" : \Submitter.name,

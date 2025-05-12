@@ -16,20 +16,6 @@
 // limitations under the License.
 //
 
-/*
-n PLAC <List:Text>                         {1:1}  g7:PLAC
-  +1 FORM <List:Text>                      {0:1}  g7:PLAC-FORM
-  +1 LANG <Language>                       {0:1}  g7:LANG
-  +1 TRAN <List:Text>                      {0:M}  g7:PLAC-TRAN
-     +2 LANG <Language>                    {1:1}  g7:LANG
-  +1 MAP                                   {0:1}  g7:MAP
-     +2 LATI <Special>                     {1:1}  g7:LATI
-     +2 LONG <Special>                     {1:1}  g7:LONG
-  +1 EXID <Special>                        {0:M}  g7:EXID
-     +2 TYPE <Special>                     {0:1}  g7:EXID-TYPE
-  +1 <<NOTE_STRUCTURE>>                    {0:M}
-*/
-
 public class PlaceTranslation : RecordProtocol {
   public var place: [String] = []
   public var lang: String = ""

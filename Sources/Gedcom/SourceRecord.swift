@@ -17,8 +17,8 @@
 //
 
 public class SourceCitationData : RecordProtocol {
-  var date: DateValue?
-  var text: [Translation] = []
+  public var date: DateValue?
+  public var text: [Translation] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \SourceCitationData.date,
@@ -45,8 +45,8 @@ public class SourceCitationData : RecordProtocol {
   }
 }
 public class SourceEventRole : RecordProtocol {
-  var role: String
-  var phrase: String?
+  public var role: String
+  public var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \SourceEventRole.phrase,
@@ -72,9 +72,9 @@ public class SourceEventRole : RecordProtocol {
 }
 
 public class SourceEventData : RecordProtocol {
-  var event: String
-  var phrase: String?
-  var role: SourceEventRole?
+  public var event: String
+  public var phrase: String?
+  public var role: SourceEventRole?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \SourceEventData.phrase,
@@ -103,13 +103,13 @@ public class SourceEventData : RecordProtocol {
 }
 
 public class SourceCitation : RecordProtocol {
-  var xref: String
-  var page: String?
-  var data: SourceCitationData?
-  var events: [SourceEventData] = []
-  var quality: Int?
-  var links: [MultimediaLink] = []
-  var notes: [NoteStructure] = []
+  public var xref: String
+  public var page: String?
+  public var data: SourceCitationData?
+  public var events: [SourceEventData] = []
+  public var quality: Int?
+  public var links: [MultimediaLink] = []
+  public var notes: [NoteStructure] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PAGE" : \SourceCitation.page,
@@ -271,8 +271,8 @@ public enum MediumKind : String {
 }
 
 public class Medium : RecordProtocol {
-  var kind: MediumKind
-  var phrase: String?
+  public var kind: MediumKind
+  public var phrase: String?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \Medium.phrase,
   ]
@@ -298,8 +298,8 @@ public class Medium : RecordProtocol {
 }
 
 public class CallNumber : RecordProtocol {
-  var callNumber: String
-  var medium: Medium?
+  public var callNumber: String
+  public var medium: Medium?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "MEDI" : \CallNumber.medium,
   ]
@@ -325,9 +325,9 @@ public class CallNumber : RecordProtocol {
 }
 
 public class SourceRepositoryCitation : RecordProtocol {
-  var xref: String
-  var notes: [NoteStructure] = []
-  var callNumbers: [CallNumber] = []
+  public var xref: String
+  public var notes: [NoteStructure] = []
+  public var callNumbers: [CallNumber] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "NOTE" : \SourceRepositoryCitation.notes,

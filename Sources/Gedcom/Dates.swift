@@ -25,8 +25,8 @@
 */
 
 public class DateTime : RecordProtocol {
-  var date: String = ""
-  var time: String?
+  public var date: String = ""
+  public var time: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TIME" : \DateTime.time,
@@ -59,8 +59,8 @@ public class DateTime : RecordProtocol {
 }
 
 public class DateTimeExact : RecordProtocol {
-  var date: String = ""
-  var time: String?
+  public var date: String = ""
+  public var time: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TIME" : \DateTimeExact.time,
@@ -93,9 +93,9 @@ public class DateTimeExact : RecordProtocol {
 }
 
 public class DateValue : RecordProtocol {
-  var date: String = ""
-  var time: String?
-  var phrase: String?
+  public var date: String = ""
+  public var time: String?
+  public var phrase: String?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TIME" : \DateValue.time,
     "PHRASE" : \DateValue.phrase,
@@ -121,9 +121,9 @@ public class DateValue : RecordProtocol {
 }
 
 public class DatePeriod : RecordProtocol {
-  var date: String = ""
-  var time: String?
-  var phrase: String?
+  public var date: String = ""
+  public var time: String?
+  public var phrase: String?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TIME" : \DatePeriod.time,
     "PHRASE" : \DatePeriod.phrase,
@@ -150,7 +150,7 @@ public class DatePeriod : RecordProtocol {
 
 
 public class CreationDate : RecordProtocol {
-  var date: DateTime = DateTime()
+  public var date: DateTime = DateTime()
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \CreationDate.date,
   ]
@@ -174,8 +174,8 @@ public class CreationDate : RecordProtocol {
   }
 }
 public class ChangeDate : RecordProtocol {
-  var date: DateTime = DateTime()
-  var notes: [NoteStructure] = []
+  public var date: DateTime = DateTime()
+  public var notes: [NoteStructure] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \ChangeDate.date,
