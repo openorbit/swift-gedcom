@@ -54,6 +54,8 @@ public class Schema : RecordProtocol {
     "TAG" : \Schema.tags,
   ]
 
+  init() {}
+
   required init(record: Record) throws {
     var mutableSelf = self
 
@@ -83,9 +85,9 @@ public class Schema : RecordProtocol {
   }
 
   func export() -> Record? {
-    let record = Record(level: 0, tag: "SCHEMA")
-    for (key, value) in tags {
-      record.children.append(Record(level: 1, tag: "TAG", value: key + " " + value.absoluteString))
+    let record = Record(level: 0, tag: "SCHMA")
+    for key in tags.keys.sorted() {
+      record.children.append(Record(level: 1, tag: "TAG", value: key + " " + tags[key]!.absoluteString))
     }
     return record
   }

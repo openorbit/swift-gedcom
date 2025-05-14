@@ -12,6 +12,10 @@ import Foundation
 @Suite("Export Gedcom") struct ExportTests {
   @Test("Header") func header() {
     let header = Header()
+    header.schema = Schema()
+    header.schema!.tags["_SKYPEID"] = URL(string: "http://xmlns.com/foaf/0.1/skypeID")
+    header.schema!.tags["_JABBERID"] = URL(string: "http://xmlns.com/foaf/0.1/jabberID")
+
     let exp = header.export()
     #expect(exp != nil)
 
@@ -29,7 +33,10 @@ import Foundation
       0 HEAD
       1 GEDC
       2 VERS 7.0
-      
+      1 SCHMA
+      2 TAG _JABBERID http://xmlns.com/foaf/0.1/jabberID
+      2 TAG _SKYPEID http://xmlns.com/foaf/0.1/skypeID
+
       """
     )
   }
