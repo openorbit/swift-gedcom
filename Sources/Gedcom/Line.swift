@@ -62,5 +62,26 @@ public struct Line {
     self.tag = tag
     self.value = value
   }
+
+  func export() -> String {
+    var result = "\(level)"
+    if let xref = xref {
+      result += " @\(xref)"
+    }
+    result += " \(tag)"
+    if let value = value {
+      let lines = value.split{$0.isNewline} 
+
+      result += " \(lines[0])\n"
+
+      for line in lines[1...] {
+        result += "\(level + 1) CONT \(line)\n"
+      }
+    } else {
+      result += "\n"
+    }
+
+    return result
+  }
 }
 

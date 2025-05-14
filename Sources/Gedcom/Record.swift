@@ -40,6 +40,14 @@ class Record {
       child.setLevel(level + 1)
     }
   }
+
+  func export() -> String {
+    var string = line.export()
+    for child in children {
+      string += child.export()
+    }
+    return string
+  }
 }
 
 protocol RecordProtocol {

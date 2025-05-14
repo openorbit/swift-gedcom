@@ -23,5 +23,14 @@ import Foundation
     #expect(exp?.children[0].children[0].line.level == 2)
     #expect(exp?.children[0].children[0].line.tag == "VERS")
     #expect(exp?.children[0].children[0].line.value == "7.0")
+
+    #expect(exp!.export() ==
+      """
+      0 HEAD
+      1 GEDC
+      2 VERS 7.0
+      
+      """
+    )
   }
 }
