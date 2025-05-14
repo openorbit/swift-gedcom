@@ -55,5 +55,12 @@ public struct Line {
       value = String(remainingLine[valueIndex...])
     }
   }
+
+  init(level: Int, xref: String? = nil, tag: String, value: String? = nil) {
+    self.level = level
+    self.xref = xref
+    self.tag = tag
+    self.value = value
+  }
 }
 

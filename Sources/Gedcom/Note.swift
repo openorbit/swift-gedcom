@@ -83,7 +83,30 @@ public class Note : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "NOTE", value: text)
+
+    if let mimeType {
+      let mimeRecord = Record(level: 1, tag: "MIME", value: mimeType)
+      record.children.append(mimeRecord)
+    }
+    if let lang {
+      let langRecord = Record(level: 1, tag: "LANG", value: lang)
+      record.children.append(langRecord)
+    }
+
+    for translation in translations {
+      let translationRecord = translation.export()!
+      translationRecord.line.level += 1
+      record.children.append(translationRecord)
+    }
+
+    for citation in citations {
+      let citationRecord = citation.export()!
+      citationRecord.line.level += 1
+      record.children.append(citationRecord)
+    }
+
+    return record
   }
 }
 
@@ -99,9 +122,10 @@ public class SNoteRef : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    return Record(level: 0, tag: "SNOTE", value: xref)
   }
 }
+
 
 public enum NoteStructure {
   case Note(Note)
@@ -121,7 +145,12 @@ extension NoteStructure : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    switch self {
+      case .Note(let note):
+      return note.export()
+    case .SNote(let snote):
+      return snote.export()
+    }
   }
 }
 

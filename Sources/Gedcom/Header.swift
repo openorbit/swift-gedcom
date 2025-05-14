@@ -17,7 +17,7 @@
 //
 import Foundation
 public class Gedc : RecordProtocol {
-  public var vers: String = ""
+  public var vers: String = "7.0"
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "VERS" : \Gedc.vers,
@@ -41,7 +41,9 @@ public class Gedc : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "GEDC")
+    record.children.append(Record(level: 1, tag: "VERS", value: vers))
+    return record
   }
 }
 
@@ -81,7 +83,11 @@ public class Schema : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "SCHEMA")
+    for (key, value) in tags {
+      record.children.append(Record(level: 1, tag: "TAG", value: key + " " + value.absoluteString))
+    }
+    return record
   }
 }
 
@@ -110,7 +116,12 @@ public class HeaderPlace : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "PLAC")
+    let formString = form.reduce("") { (acc, token) in
+      return acc + ", " + token
+    }
+    record.children.append(Record(level: 1, tag: "FORM", value: formString))
+    return record
   }
 }
 
@@ -152,7 +163,27 @@ public class HeaderSourceCorporation : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "CORP", value: corporation)
+
+    if let address = address {
+      if let child = address.export() {
+        record.children.append(child)
+      }
+    }
+
+    for phone in phone {
+      record.children.append(Record(level: 1, tag: "PHON", value: phone))
+    }
+    for email in email {
+      record.children.append(Record(level: 1, tag: "EMAIL", value: email))
+    }
+    for fax in fax {
+      record.children.append(Record(level: 1, tag: "FAX", value: fax))
+    }
+    for www in www {
+      record.children.append(Record(level: 1, tag: "WWW", value: www.absoluteString))
+    }
+    return record
   }
 }
 
@@ -186,7 +217,19 @@ public class HeaderSourceData : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "DATA", value: data)
+
+    if let date = date {
+      if let exportedDate = date.export() {
+        record.children.append(exportedDate)
+      }
+    }
+
+    if let copyright {
+      let copyrightRecord = Record(level: 1, tag: "COPR", value: copyright)
+      record.children.append(copyrightRecord)
+    }
+    return record
   }
 }
 
@@ -224,7 +267,26 @@ public class HeaderSource : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "SOUR", value: source)
+
+    if let version = version {
+      record.children.append(Record(level: 1, tag: "VERS", value: version))
+    }
+    if let name = name {
+      record.children.append(Record(level: 1, tag: "NAME", value: name))
+    }
+
+    if let corporation = corporation {
+      if let child = corporation.export() {
+        record.children.append(child)
+      }
+    }
+    if let data = data {
+      if let child = data.export() {
+        record.children.append(child)
+      }
+    }
+    return record
   }
 }
 
@@ -289,7 +351,53 @@ public class Header : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "HEAD")
+
+    record.children.append(gedc.export()!)
+
+    if let schema {
+      if let child = schema.export() {
+        record.children.append(child)
+      }
+    }
+
+    if let source {
+      if let child = source.export() {
+        record.children.append(child)
+      }
+    }
+
+    if let date {
+      if let child = date.export() {
+        record.children.append(child)
+      }
+    }
+
+    if let destination {
+      record.children.append(Record(level: 1, tag: "DEST", value: destination))
+    }
+    if let submitter {
+      record.children.append(Record(level: 1, tag: "SUBM", value: submitter))
+    }
+    if let copyright {
+      record.children.append(Record(level: 1, tag: "COPR", value: copyright))
+    }
+    if let lang {
+      record.children.append(Record(level: 1, tag: "LANG", value: lang))
+    }
+
+    if let place {
+      if let child = place.export() {
+        record.children.append(child)
+      }
+    }
+
+    if let note {
+      if let note = note.export() {
+        record.children.append(note)
+      }
+    }
+    return record
   }
 }
 

@@ -54,7 +54,12 @@ public class DateTime : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    var record = Record(level: 0, tag: "DATE", value: date)
+    if let time {
+      var timeRecord = Record(level: 1, tag: "TIME", value: time)
+      record.children.append(timeRecord)
+    }
+    return record
   }
 }
 
@@ -88,7 +93,12 @@ public class DateTimeExact : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    var record = Record(level: 0, tag: "DATE", value: date)
+    if let time {
+      var timeRecord = Record(level: 1, tag: "TIME", value: time)
+      record.children.append(timeRecord)
+    }
+    return record
   }
 }
 
@@ -116,7 +126,16 @@ public class DateValue : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    var record = Record(level: 0, tag: "DATE", value: date)
+    if let time {
+      var timeRecord = Record(level: 1, tag: "TIME", value: time)
+      record.children.append(timeRecord)
+    }
+    if let phrase {
+      var phraseRecord = Record(level: 1, tag: "PHRASE", value: time)
+      record.children.append(phraseRecord)
+    }
+    return record
   }
 }
 
@@ -144,7 +163,16 @@ public class DatePeriod : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    var record = Record(level: 0, tag: "DATE", value: date)
+    if let time {
+      var timeRecord = Record(level: 1, tag: "TIME", value: time)
+      record.children.append(timeRecord)
+    }
+    if let phrase {
+      var phraseRecord = Record(level: 1, tag: "PHRASE", value: time)
+      record.children.append(phraseRecord)
+    }
+    return record
   }
 }
 
@@ -170,7 +198,11 @@ public class CreationDate : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "CREA")
+    if let exportedDate = date.export() {
+      record.children.append(exportedDate)
+    }
+    return record
   }
 }
 public class ChangeDate : RecordProtocol {
@@ -199,6 +231,15 @@ public class ChangeDate : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "CHAN")
+    if let exportedDate = date.export() {
+      record.children.append(exportedDate)
+    }
+    for note in notes {
+      if let exportedNote = note.export() {
+        record.children.append(exportedNote)
+      }
+    }
+    return record
   }
 }

@@ -28,6 +28,18 @@ class Record {
   init(line: Line) {
     self.line = line
   }
+
+  init(level: Int, xref: String? = nil, tag: String, value: String? = nil) {
+    let line = Line(level: level, xref: xref, tag: tag, value: value)
+    self.line = line
+  }
+
+  func setLevel(_ level: Int) {
+    line.level = level
+    for child in children {
+      child.setLevel(level + 1)
+    }
+  }
 }
 
 protocol RecordProtocol {
