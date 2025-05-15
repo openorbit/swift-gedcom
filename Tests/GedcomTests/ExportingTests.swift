@@ -48,7 +48,13 @@ import Foundation
     header.lang = "en-US"
 
     header.place = HeaderPlace(form: ["City", "County", "State", "Country"])
-
+    let note = Note(text: "American English", mime: "text/plain", lang: "en-US")
+    note.mimeType = "text/plain"
+    note.lang = "en-US"
+    note.translations.append(Translation(text: "British English", lang: "en-GB"))
+    note.citations.append(SourceCitation(xref: "@S1@", page: "1"))
+    note.citations.append(SourceCitation(xref: "@S1@", page: "2"))
+    header.note = NoteStructure.Note(note)
 
     let exp = header.export()
     #expect(exp != nil)
@@ -97,6 +103,15 @@ import Foundation
       1 LANG en-US
       1 PLAC
       2 FORM City, County, State, Country
+      1 NOTE American English
+      2 MIME text/plain
+      2 LANG en-US
+      2 TRAN British English
+      3 LANG en-GB
+      2 SOUR @S1@
+      3 PAGE 1
+      2 SOUR @S1@
+      3 PAGE 2
 
       """
     )

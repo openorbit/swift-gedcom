@@ -124,6 +124,10 @@ public class SourceCitation : RecordProtocol {
     "SNOTE" : \SourceCitation.notes,
   ]
 
+  init(xref: String, page: String? = nil) {
+    self.xref = xref
+    self.page = page
+  }
   required init(record: Record) throws {
     xref = record.line.value ?? ""
     var mutableSelf = self
@@ -151,7 +155,30 @@ public class SourceCitation : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "SOUR", value: xref)
+    if let page {
+      record.children.append(Record(level: 1, tag: "PAGE", value: page))
+    }
+    if let data {
+      record.children.append(data.export()!)
+    }
+    for event in events {
+      record.children.append(event.export()!)
+    }
+    if let quality {
+      record.children.append(Record(level: 1, tag: "QUAY", value: "\(quality)"))
+    }
+    for link in links {
+      record.children.append(link.export()!)
+    }
+    for link in links {
+      record.children.append(link.export()!)
+    }
+    for note in notes {
+      record.children.append(note.export()!)
+    }
+
+    return record
   }
 }
 
