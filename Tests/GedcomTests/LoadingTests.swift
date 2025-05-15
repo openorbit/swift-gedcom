@@ -217,22 +217,23 @@ import Foundation
 
 
       // Shared notes loading
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.xref == "@N1@")
       #expect(ged.sharedNoteRecordsMap["@N1@"]!.text == "Shared note 1")
       #expect(ged.sharedNoteRecordsMap["@N1@"]!.mimeType == "text/plain")
       #expect(ged.sharedNoteRecordsMap["@N1@"]!.lang == "en-US")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation.count == 2)
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[0].text == "Shared note 1")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[0].mimeType == "text/plain")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[0].lang == "en-GB")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[1].text == "Shared note 1")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[1].mimeType == "text/plain")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translation[1].lang == "en-CA")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translations.count == 2)
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translations[0].text == "Shared note 1")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translations[0].mimeType == "text/plain")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translations[0].lang == "en-GB")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translations[1].text == "Shared note 1")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translations[1].mimeType == "text/plain")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.translations[1].lang == "en-CA")
 
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation.count == 2)
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[0].xref == "@S1@")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[0].page == "1")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[1].xref == "@S2@")
-      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citation[1].page == "2")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citations.count == 2)
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citations[0].xref == "@S1@")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citations[0].page == "1")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citations[1].xref == "@S2@")
+      #expect(ged.sharedNoteRecordsMap["@N1@"]!.citations[1].page == "2")
 
       #expect(ged.sharedNoteRecordsMap["@N1@"]!.identifiers.count == 6)
       switch (ged.sharedNoteRecordsMap["@N1@"]!.identifiers[0]) {

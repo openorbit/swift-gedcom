@@ -31,11 +31,12 @@
  */
 
 public class SharedNote : RecordProtocol {
+  public var xref: String
   public var text: String = ""
   public var mimeType: String?
   public var lang: String?
-  public var translation: [Translation] = []
-  public var citation: [SourceCitation] = []
+  public var translations: [Translation] = []
+  public var citations: [SourceCitation] = []
   public var identifiers: [IdentifierStructure] = []
   public var changeDate: ChangeDate?
   public var creationDate: CreationDate?
@@ -43,8 +44,8 @@ public class SharedNote : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "MIME" : \SharedNote.mimeType,
     "LANG" : \SharedNote.lang,
-    "TRAN" : \SharedNote.translation,
-    "SOUR" : \SharedNote.citation,
+    "TRAN" : \SharedNote.translations,
+    "SOUR" : \SharedNote.citations,
     "REFN" : \SharedNote.identifiers,
     "UID" : \SharedNote.identifiers,
     "EXID" : \SharedNote.identifiers,
@@ -52,7 +53,15 @@ public class SharedNote : RecordProtocol {
     "CREA" : \SharedNote.creationDate
   ]
 
+  init(xref: String, text: String, mime: String? = nil, lang: String? = nil) {
+    self.xref = xref
+    self.text = text
+    self.mimeType = mime
+    self.lang = lang
+  }
+
   required init(record: Record) throws {
+    self.xref = record.line.xref ?? ""
     self.text = record.line.value ?? ""
 
     var mutableSelf = self
@@ -80,6 +89,36 @@ public class SharedNote : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, xref: xref, tag: "SNOTE", value: text)
+
+    if let mimeType {
+      record.children += [Record(level: 1, tag: "MIME", value: mimeType)]
+    }
+
+    if let lang {
+      record.children += [Record(level: 1, tag: "LANG", value: lang)]
+    }
+
+    for translation in translations {
+      record.children += [translation.export()!]
+    }
+
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+
+    for identifier in identifiers {
+      record.children += [identifier.export()!]
+    }
+
+    if let changeDate {
+      record.children += [changeDate.export()!]
+    }
+
+    if let creationDate {
+      record.children += [creationDate.export()!]
+    }
+
+    return record
   }
 }

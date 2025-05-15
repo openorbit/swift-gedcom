@@ -199,6 +199,69 @@ import Foundation
       """)
   }
 
+  @Test("Shared Note") func sharedNote() {
+    let snote = SharedNote(xref: "@N1@", text: "Shared note 1", mime: "text/plain", lang: "en-US")
+    snote.translations += [Translation(text: "Shared note 1", mime: "text/plain", lang: "en-GB")]
+    snote.translations += [Translation(text: "Shared note 1", mime: "text/plain", lang: "en-CA")]
+
+    snote.citations += [SourceCitation(xref: "@S1@", page: "1")]
+    snote.citations += [SourceCitation(xref: "@S2@", page: "2")]
+
+    snote.identifiers.append(.Refn(REFN(ident: "1", type: "User-generated identifier")))
+    snote.identifiers.append(.Refn(REFN(ident: "10", type: "User-generated identifier")))
+    snote.identifiers.append(.Uuid(UID(ident: "6efbee0b-96a1-43ea-83c8-828ec71c54d7")))
+    snote.identifiers.append(.Uuid(UID(ident: "4094d92a-5525-44ec-973d-6c527aa5535a")))
+    snote.identifiers.append(.Exid(EXID(ident: "123", type: "http://example.com")))
+    snote.identifiers.append(.Exid(EXID(ident: "456", type: "http://example.com")))
+
+    snote.changeDate = ChangeDate(date: "27 MAR 2022", time: "08:56")
+    snote.changeDate!.notes.append(.Note(Note(text: "Change date note 1")))
+    snote.changeDate!.notes.append(.Note(Note(text: "Change date note 2")))
+
+    snote.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
+
+    let exp = snote.export()
+    #expect(exp != nil)
+
+    exp?.setLevel(0)
+
+    #expect(exp!.export() ==
+        """
+        0 @N1@ SNOTE Shared note 1
+        1 MIME text/plain
+        1 LANG en-US
+        1 TRAN Shared note 1
+        2 MIME text/plain
+        2 LANG en-GB
+        1 TRAN Shared note 1
+        2 MIME text/plain
+        2 LANG en-CA
+        1 SOUR @S1@
+        2 PAGE 1
+        1 SOUR @S2@
+        2 PAGE 2
+        1 REFN 1
+        2 TYPE User-generated identifier
+        1 REFN 10
+        2 TYPE User-generated identifier
+        1 UID 6efbee0b-96a1-43ea-83c8-828ec71c54d7
+        1 UID 4094d92a-5525-44ec-973d-6c527aa5535a
+        1 EXID 123
+        2 TYPE http://example.com
+        1 EXID 456
+        2 TYPE http://example.com
+        1 CHAN
+        2 DATE 27 MAR 2022
+        3 TIME 08:56
+        2 NOTE Change date note 1
+        2 NOTE Change date note 2
+        1 CREA
+        2 DATE 27 MAR 2022
+        3 TIME 08:55
+        
+        """)
+  }
+
   @Test("Submitter Record") func submitter() {
     let submitter = Submitter(xref: "@U1@", name: "GEDCOM Steering Committee")
     submitter.address = AddressStructure(addr: "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")
