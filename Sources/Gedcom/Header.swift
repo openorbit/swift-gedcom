@@ -100,6 +100,9 @@ public class HeaderPlace : RecordProtocol {
     "FORM" : \HeaderPlace.form,
   ]
 
+  init(form: [String]) {
+    self.form = form
+  }
   required init(record: Record) throws {
     var mutableSelf = self
 
@@ -120,7 +123,7 @@ public class HeaderPlace : RecordProtocol {
   func export() -> Record? {
     let record = Record(level: 0, tag: "PLAC")
     let formString = form.reduce("") { (acc, token) in
-      return acc + ", " + token
+      return acc + ((acc.count > 1) ? ", " : "") + token
     }
     record.children.append(Record(level: 1, tag: "FORM", value: formString))
     return record
@@ -143,6 +146,9 @@ public class HeaderSourceCorporation : RecordProtocol {
     "WWW" : \HeaderSourceCorporation.www,
   ]
 
+  init(corp: String) {
+    corporation = corp
+  }
   required init(record: Record) throws {
     corporation = record.line.value ?? ""
     var mutableSelf = self
@@ -199,6 +205,10 @@ public class HeaderSourceData : RecordProtocol {
     "COPR" : \HeaderSourceData.copyright,
   ]
 
+  init(data: String) {
+    self.data = data
+  }
+
   required init(record: Record) throws {
     data = record.line.value ?? ""
     var mutableSelf = self
@@ -247,6 +257,10 @@ public class HeaderSource : RecordProtocol {
     "CORP" : \HeaderSource.corporation,
     "DATA" : \HeaderSource.data,
   ]
+
+  init(source: String) {
+    self.source = source
+  }
 
   required init(record: Record) throws {
     source = record.line.value ?? ""
@@ -369,15 +383,16 @@ public class Header : RecordProtocol {
       }
     }
 
+    if let destination {
+      record.children.append(Record(level: 1, tag: "DEST", value: destination))
+    }
+
     if let date {
       if let child = date.export() {
         record.children.append(child)
       }
     }
 
-    if let destination {
-      record.children.append(Record(level: 1, tag: "DEST", value: destination))
-    }
     if let submitter {
       record.children.append(Record(level: 1, tag: "SUBM", value: submitter))
     }

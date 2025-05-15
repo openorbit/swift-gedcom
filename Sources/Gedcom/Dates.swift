@@ -75,6 +75,11 @@ public class DateTimeExact : RecordProtocol {
   {
 
   }
+  init(date: String, time: String? = nil)
+  {
+    self.date = date
+    self.time = time
+  }
   required init(record: Record) throws {
     date = record.line.value ?? ""
     var mutableSelf = self

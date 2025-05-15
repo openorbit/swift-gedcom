@@ -35,6 +35,11 @@ public class AddressStructure : RecordProtocol {
     "POST" : \AddressStructure.postalCode,
     "CTRY" : \AddressStructure.country,
   ]
+
+  init(addr: String)
+  {
+    address = addr
+  }
   required init(record: Record) throws {
     address = record.line.value ?? ""
     var mutableSelf = self
@@ -51,7 +56,30 @@ public class AddressStructure : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "ADDR", value: address)
+    if let adr1 {
+      record.children.append(Record(level: 1, tag: "ADR1", value: adr1))
+    }
+    if let adr2 {
+      record.children.append(Record(level: 1, tag: "ADR2", value: adr2))
+    }
+    if let adr3 {
+      record.children.append(Record(level: 1, tag: "ADR3", value: adr3))
+    }
+    if let city {
+      record.children.append(Record(level: 1, tag: "CITY", value: city))
+    }
+    if let state {
+      record.children.append(Record(level: 1, tag: "STAE", value: state))
+    }
+    if let postalCode {
+      record.children.append(Record(level: 1, tag: "POST", value: postalCode))
+    }
+    if let country {
+      record.children.append(Record(level: 1, tag: "CTRY", value: country))
+    }
+
+    return record
   }
 }
 
