@@ -66,11 +66,11 @@ public struct Line {
   func export() -> String {
     var result = "\(level)"
     if let xref = xref {
-      result += " @\(xref)"
+      result += " \(xref)"
     }
     result += " \(tag)"
     if let value = value {
-      let lines = value.split{$0.isNewline} 
+      let lines = value.split{$0.isNewline}
 
       result += " \(lines[0])\n"
 

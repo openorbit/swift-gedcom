@@ -112,8 +112,126 @@ import Foundation
       3 PAGE 1
       2 SOUR @S1@
       3 PAGE 2
-
+      
       """
+    )
+  }
+
+  @Test("Submitter Record") func submitter() {
+    let submitter = Submitter(xref: "@U1@", name: "GEDCOM Steering Committee")
+    submitter.address = AddressStructure(addr: "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")
+    submitter.address?.adr1 = "Family History Department"
+    submitter.address?.adr2 = "15 East South Temple Street"
+    submitter.address?.adr3 = "Salt Lake City, UT 84150 USA"
+    submitter.address?.city = "Salt Lake City"
+    submitter.address?.state = "UT"
+    submitter.address?.postalCode = "84150"
+    submitter.address?.country = "USA"
+
+    submitter.phone = ["+1 (555) 555-1212", "+1 (555) 555-1234"]
+    submitter.email = ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"]
+    submitter.fax = ["+1 (555) 555-1212", "+1 (555) 555-1234"]
+    submitter.www = [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!]
+
+    submitter.multimediaLinks.append(MultimediaLink(xref: "@O1@", crop: Crop(top: 0, left: 0, height: 100, width: 100), title: "Title"))
+    submitter.multimediaLinks.append(MultimediaLink(xref: "@O1@", crop: Crop(top: 100, left: 100), title: "Title"))
+
+    submitter.languages = ["en-US", "en-GB"]
+
+    submitter.identifiers.append(.Refn(REFN(ident: "1", type: "User-generated identifier")))
+    submitter.identifiers.append(.Refn(REFN(ident: "10", type: "User-generated identifier")))
+    submitter.identifiers.append(.Uuid(UID(ident: "24132fe0-26f6-4f87-9924-389a4f40f0ec")))
+    submitter.identifiers.append(.Uuid(UID(ident: "b451c8df-5550-473b-a55c-ed31e65c60c8")))
+    submitter.identifiers.append(.Exid(EXID(ident: "123", type: "http://example.com")))
+    submitter.identifiers.append(.Exid(EXID(ident: "456", type: "http://example.com")))
+
+    let n = Note(text: "American English", mime: "text/plain", lang: "en-US")
+    n.translations.append(Translation(text: "British English", lang: "en-GB"))
+    n.citations.append(SourceCitation(xref: "@S1@", page: "1"))
+    n.citations.append(SourceCitation(xref: "@S2@", page: "2"))
+    submitter.notes.append(.Note(n))
+    submitter.notes.append(.SNote(SNoteRef(xref: "@N1@")))
+
+    submitter.changeDate = ChangeDate(date: "27 MAR 2022", time: "08:56")
+    submitter.changeDate!.notes.append(.Note(Note(text: "Change date note 1")))
+    submitter.changeDate!.notes.append(.Note(Note(text: "Change date note 2")))
+
+    submitter.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
+
+    let exp = submitter.export()
+    #expect(exp != nil)
+
+    exp?.setLevel(0)
+
+    // From the first submitter example
+    #expect(exp!.export() ==
+        """
+        0 @U1@ SUBM
+        1 NAME GEDCOM Steering Committee
+        1 ADDR Family History Department
+        2 CONT 15 East South Temple Street
+        2 CONT Salt Lake City, UT 84150 USA
+        2 ADR1 Family History Department
+        2 ADR2 15 East South Temple Street
+        2 ADR3 Salt Lake City, UT 84150 USA
+        2 CITY Salt Lake City
+        2 STAE UT
+        2 POST 84150
+        2 CTRY USA
+        1 PHON +1 (555) 555-1212
+        1 PHON +1 (555) 555-1234
+        1 EMAIL GEDCOM@FamilySearch.org
+        1 EMAIL GEDCOM@example.com
+        1 FAX +1 (555) 555-1212
+        1 FAX +1 (555) 555-1234
+        1 WWW http://gedcom.io
+        1 WWW http://gedcom.info
+        1 OBJE @O1@
+        2 CROP
+        3 TOP 0
+        3 LEFT 0
+        3 HEIGHT 100
+        3 WIDTH 100
+        2 TITL Title
+        1 OBJE @O1@
+        2 CROP
+        3 TOP 100
+        3 LEFT 100
+        2 TITL Title
+        1 LANG en-US
+        1 LANG en-GB
+        1 REFN 1
+        2 TYPE User-generated identifier
+        1 REFN 10
+        2 TYPE User-generated identifier
+        1 UID 24132fe0-26f6-4f87-9924-389a4f40f0ec
+        1 UID b451c8df-5550-473b-a55c-ed31e65c60c8
+        1 EXID 123
+        2 TYPE http://example.com
+        1 EXID 456
+        2 TYPE http://example.com
+        1 NOTE American English
+        2 MIME text/plain
+        2 LANG en-US
+        2 TRAN British English
+        3 LANG en-GB
+        2 SOUR @S1@
+        3 PAGE 1
+        2 SOUR @S2@
+        3 PAGE 2
+        1 SNOTE @N1@
+        1 CHAN
+        2 DATE 27 MAR 2022
+        3 TIME 08:56
+        2 NOTE Change date note 1
+        2 NOTE Change date note 2
+        1 CREA
+        2 DATE 27 MAR 2022
+        3 TIME 08:55
+        
+        """
+        //  1 _SKYPEID example.person
+        //  1 _JABBERID person@example.com
     )
   }
 }

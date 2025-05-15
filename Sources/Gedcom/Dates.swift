@@ -36,6 +36,13 @@ public class DateTime : RecordProtocol {
   {
     
   }
+
+  init(date: String, time: String? = nil)
+  {
+    self.date = date
+    self.time = time
+  }
+
   required init(record: Record) throws {
     date = record.line.value ?? ""
     var mutableSelf = self
@@ -54,9 +61,9 @@ public class DateTime : RecordProtocol {
   }
 
   func export() -> Record? {
-    var record = Record(level: 0, tag: "DATE", value: date)
+    let record = Record(level: 0, tag: "DATE", value: date)
     if let time {
-      var timeRecord = Record(level: 1, tag: "TIME", value: time)
+      let timeRecord = Record(level: 1, tag: "TIME", value: time)
       record.children.append(timeRecord)
     }
     return record
@@ -188,6 +195,10 @@ public class CreationDate : RecordProtocol {
     "DATE" : \CreationDate.date,
   ]
 
+  init(date: String, time: String? = nil)
+  {
+    self.date = DateTime(date: date, time: time)
+  }
   required init(record: Record) throws {
     var mutableSelf = self
     for child in record.children {
@@ -219,6 +230,10 @@ public class ChangeDate : RecordProtocol {
     "NOTE" : \ChangeDate.notes,
     "SNOTE" : \ChangeDate.notes,
   ]
+
+  init(date: String, time: String? = nil) {
+    self.date = DateTime(date: date, time: time)
+  }
   required init(record: Record) throws {
     var mutableSelf = self
     for child in record.children {

@@ -50,6 +50,11 @@ public class Submitter : RecordProtocol {
     "CREA" : \Submitter.creationDate
   ]
 
+  init(xref: String, name: String)
+  {
+    self.xref = xref
+    self.name = name
+  }
   required init(record: Record) throws {
     xref = record.line.xref!
 
@@ -84,6 +89,60 @@ public class Submitter : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, xref: xref, tag: "SUBM")
+
+    record.children.append(Record(level: 1, tag: "NAME", value: name))
+
+    if let address = address {
+      if let child = address.export() {
+        record.children.append(child)
+      }
+    }
+    for phone in phone {
+      record.children.append(Record(level: 1, tag: "PHON", value: phone))
+    }
+    for email in email {
+      record.children.append(Record(level: 1, tag: "EMAIL", value: email))
+    }
+    for fax in fax {
+      record.children.append(Record(level: 1, tag: "FAX", value: fax))
+    }
+    for www in www {
+      record.children.append(Record(level: 1, tag: "WWW", value: www.absoluteString))
+    }
+
+    for multimediaLink in multimediaLinks {
+      if let child = multimediaLink.export() {
+        record.children.append(child)
+      }
+    }
+
+    for lang in languages {
+      record.children.append(Record(level: 1, tag: "LANG", value: lang))
+    }
+
+    for identifier in identifiers {
+      if let child = identifier.export() {
+        record.children.append(child)
+      }
+    }
+    for note in notes {
+      if let child = note.export() {
+        record.children.append(child)
+      }
+    }
+
+    if let changeDate {
+      if let child = changeDate.export() {
+        record.children.append(child)
+      }
+    }
+    if let creationDate {
+      if let child = creationDate.export() {
+        record.children.append(child)
+      }
+    }
+
+    return record
   }
 }

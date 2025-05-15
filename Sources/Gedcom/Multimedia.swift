@@ -26,6 +26,14 @@ public class Crop : RecordProtocol {
     "HEIGHT" : \Crop.height,
     "WIDTH" : \Crop.width,
   ]
+
+  init(top: Int? =  nil, left: Int? =  nil, height: Int? =  nil, width: Int? =  nil)
+  {
+    self.top = top
+    self.left = left
+    self.height = height
+    self.width = width
+  }
   required init(record: Record) throws {
     var mutableSelf = self
 
@@ -41,7 +49,22 @@ public class Crop : RecordProtocol {
     }
   }
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "CROP")
+
+    if let top {
+      record.children.append(Record(level: 1, tag: "TOP", value: "\(top)"))
+    }
+    if let left {
+      record.children.append(Record(level: 1, tag: "LEFT", value: "\(left)"))
+    }
+    if let height {
+      record.children.append(Record(level: 1, tag: "HEIGHT", value: "\(height)"))
+    }
+    if let width {
+      record.children.append(Record(level: 1, tag: "WIDTH", value: "\(width)"))
+    }
+
+    return record
   }
 }
 public class MultimediaLink  : RecordProtocol {
@@ -53,6 +76,12 @@ public class MultimediaLink  : RecordProtocol {
     "TITL" : \MultimediaLink.title
   ]
 
+  init(xref: String, crop: Crop?, title: String?)
+  {
+    self.xref = xref
+    self.crop = crop
+    self.title = title
+  }
   required init(record: Record) throws {
     self.xref = record.line.value!
 
@@ -73,7 +102,16 @@ public class MultimediaLink  : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "OBJE", value: xref)
+
+    if let crop {
+      record.children.append(crop.export()!)
+    }
+    if let title {
+      record.children.append(Record(level: 1, tag: "TITL", value: title))
+    }
+
+    return record
   }
 }
 

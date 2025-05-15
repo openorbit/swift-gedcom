@@ -25,6 +25,10 @@ public class REFN : RecordProtocol {
     "TYPE" : \REFN.type,
   ]
 
+  init(ident: String, type: String? = nil) {
+    self.refn = ident
+    self.type = type
+  }
   required init(record: Record) throws {
     self.refn = record.line.value ?? ""
     var mutableSelf = self
@@ -42,19 +46,28 @@ public class REFN : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "REFN", value: refn)
+    if let type {
+      record.children.append(Record(level: 1, tag: "TYPE", value: type))
+    }
+    return record
   }
 }
 
 public class UID : RecordProtocol {
   public var uid: UUID
 
+  init(ident: String) {
+    self.uid = UUID(uuidString: ident) ?? UUID()
+  }
+
   required init(record: Record) throws {
     self.uid = UUID(uuidString: record.line.value ?? "") ?? UUID()
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "UID", value: uid.uuidString.lowercased())
+    return record
   }
 }
 
@@ -65,6 +78,11 @@ public class EXID : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TYPE" : \EXID.type,
   ]
+
+  init(ident: String, type: String? = nil) {
+    self.exid = ident
+    self.type = type
+  }
 
   required init(record: Record) throws {
     self.exid = record.line.value ?? ""
@@ -84,7 +102,11 @@ public class EXID : RecordProtocol {
 
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "EXID", value: exid)
+    if let type {
+      record.children.append(Record(level: 1, tag: "TYPE", value: type))
+    }
+    return record
   }
 }
 
@@ -110,7 +132,14 @@ extension IdentifierStructure : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    switch self {
+    case .Exid(let ident):
+      return ident.export()
+    case .Refn(let ident):
+      return ident.export()
+    case .Uuid(let ident):
+      return ident.export()
+    }
   }
 }
 
