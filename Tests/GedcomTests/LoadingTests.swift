@@ -518,7 +518,7 @@ import Foundation
       #expect(ged.repositoryRecordsMap["@R1@"]!.faxNumbers
               == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
       #expect(ged.repositoryRecordsMap["@R1@"]!.www
-              == ["http://gedcom.io", "http://gedcom.info"])
+              == [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!])
       #expect(ged.repositoryRecordsMap["@R1@"]!.notes.count == 2)
       switch ged.repositoryRecordsMap["@R1@"]!.notes[0] {
       case .Note(let note):

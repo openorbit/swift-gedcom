@@ -117,6 +117,88 @@ import Foundation
     )
   }
 
+  @Test("Repository") func sourceRepo() {
+    let repo = Repository(xref: "@R1@", name: "Repository 1")
+    repo.address = AddressStructure(addr: "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")
+    repo.address!.adr1 = "Family History Department"
+    repo.address!.adr2 = "15 East South Temple Street"
+    repo.address!.adr3 = "Salt Lake City, UT 84150 USA"
+    repo.address!.city = "Salt Lake City"
+    repo.address!.state = "UT"
+    repo.address!.postalCode = "84150"
+    repo.address!.country = "USA"
+    repo.phoneNumbers = ["+1 (555) 555-1212", "+1 (555) 555-1234"]
+    repo.emails = ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"]
+    repo.faxNumbers = ["+1 (555) 555-1212", "+1 (555) 555-1234"]
+    repo.www = [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!]
+    repo.notes.append(.Note(Note(text: "Note text")))
+    repo.notes.append(.SNote(SNoteRef(xref: "@N1@")))
+
+    repo.identifiers.append(.Refn(REFN(ident: "1", type: "User-generated identifier")))
+    repo.identifiers.append(.Refn(REFN(ident: "10", type: "User-generated identifier")))
+    repo.identifiers.append(.Uuid(UID(ident: "efa7885b-c806-4590-9f1b-247797e4c96d")))
+    repo.identifiers.append(.Uuid(UID(ident: "d530f6ab-cfd4-44cd-ab2c-e40bddb76bf8")))
+    repo.identifiers.append(.Exid(EXID(ident: "123", type: "http://example.com")))
+    repo.identifiers.append(.Exid(EXID(ident: "456", type: "http://example.com")))
+
+    repo.changeDate = ChangeDate(date: "27 MAR 2022", time: "08:56")
+    repo.changeDate!.notes.append(.Note(Note(text: "Change date note 1")))
+    repo.changeDate!.notes.append(.Note(Note(text: "Change date note 2")))
+
+    repo.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
+
+
+    let exp = repo.export()
+    #expect(exp != nil)
+
+    exp?.setLevel(0)
+
+    #expect(exp!.export() ==
+      """
+      0 @R1@ REPO
+      1 NAME Repository 1
+      1 ADDR Family History Department
+      2 CONT 15 East South Temple Street
+      2 CONT Salt Lake City, UT 84150 USA
+      2 ADR1 Family History Department
+      2 ADR2 15 East South Temple Street
+      2 ADR3 Salt Lake City, UT 84150 USA
+      2 CITY Salt Lake City
+      2 STAE UT
+      2 POST 84150
+      2 CTRY USA
+      1 PHON +1 (555) 555-1212
+      1 PHON +1 (555) 555-1234
+      1 EMAIL GEDCOM@FamilySearch.org
+      1 EMAIL GEDCOM@example.com
+      1 FAX +1 (555) 555-1212
+      1 FAX +1 (555) 555-1234
+      1 WWW http://gedcom.io
+      1 WWW http://gedcom.info
+      1 NOTE Note text
+      1 SNOTE @N1@
+      1 REFN 1
+      2 TYPE User-generated identifier
+      1 REFN 10
+      2 TYPE User-generated identifier
+      1 UID efa7885b-c806-4590-9f1b-247797e4c96d
+      1 UID d530f6ab-cfd4-44cd-ab2c-e40bddb76bf8
+      1 EXID 123
+      2 TYPE http://example.com
+      1 EXID 456
+      2 TYPE http://example.com
+      1 CHAN
+      2 DATE 27 MAR 2022
+      3 TIME 08:56
+      2 NOTE Change date note 1
+      2 NOTE Change date note 2
+      1 CREA
+      2 DATE 27 MAR 2022
+      3 TIME 08:55
+
+      """)
+  }
+
   @Test("Submitter Record") func submitter() {
     let submitter = Submitter(xref: "@U1@", name: "GEDCOM Steering Committee")
     submitter.address = AddressStructure(addr: "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")

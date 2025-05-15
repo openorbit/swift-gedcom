@@ -16,6 +16,8 @@
 // limitations under the License.
 //
 
+import Foundation
+
 public class Repository : RecordProtocol {
   public var xref: String
   public var name: String = ""
@@ -23,7 +25,7 @@ public class Repository : RecordProtocol {
   public var phoneNumbers: [String] = []
   public var emails: [String] = []
   public var faxNumbers: [String] = []
-  public var www: [String] = []
+  public var www: [URL] = []
   public var notes: [NoteStructure] = []
   public var identifiers: [IdentifierStructure] = []
   public var changeDate: ChangeDate?
@@ -46,6 +48,10 @@ public class Repository : RecordProtocol {
     "CREA" : \Repository.creationDate
   ]
 
+  init(xref: String, name: String) {
+    self.xref = xref
+    self.name = name
+  }
   required init(record: Record) throws {
     self.xref = record.line.xref!
     var mutableSelf = self
@@ -62,6 +68,8 @@ public class Repository : RecordProtocol {
         mutableSelf[keyPath: wkp].append(child.line.value ?? "")
       } else if let wkp = kp as? WritableKeyPath<Repository, AddressStructure?> {
         mutableSelf[keyPath: wkp] = try AddressStructure(record: child)
+      } else if let wkp = kp as? WritableKeyPath<Repository, [URL]> {
+        mutableSelf[keyPath: wkp].append(URL(string: child.line.value!)!)
       } else if let wkp = kp as? WritableKeyPath<Repository, [NoteStructure]> {
         mutableSelf[keyPath: wkp].append(try NoteStructure(record: child))
       } else if let wkp = kp as? WritableKeyPath<Repository, [IdentifierStructure]> {
@@ -75,7 +83,44 @@ public class Repository : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, xref: xref, tag: "REPO")
+    record.children += [Record(level: 1, tag: "NAME", value: name)]
+
+    if let address {
+      record.children += [address.export()!]
+    }
+    for phoneNumber in phoneNumbers {
+      record.children += [Record(level: 1, tag: "PHON", value: phoneNumber)]
+    }
+
+    for email in emails {
+      record.children += [Record(level: 1, tag: "EMAIL", value: email)]
+    }
+
+    for faxNumber in faxNumbers {
+      record.children += [Record(level: 1, tag: "FAX", value: faxNumber)]
+    }
+    for url in www {
+      record.children += [Record(level: 1, tag: "WWW", value: url.absoluteString)]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    for identifier in identifiers {
+      record.children += [identifier.export()!]
+    }
+
+    if let changeDate {
+      record.children += [changeDate.export()!]
+    }
+
+    if let creationDate {
+      record.children += [creationDate.export()!]
+    }
+
+    return record
   }
 }
 
