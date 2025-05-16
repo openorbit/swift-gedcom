@@ -41,7 +41,14 @@ public class SourceCitationData : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "DATA")
+    if let date {
+      record.children += [date.export()!]
+    }
+    for text in self.text {
+      record.children += [text.export()!]
+    }
+    return record
   }
 }
 public class SourceEventRole : RecordProtocol {
@@ -67,7 +74,11 @@ public class SourceEventRole : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "ROLE", value: role)
+    if let phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+    return record
   }
 }
 
@@ -98,7 +109,16 @@ public class SourceEventData : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "EVEN", value: event)
+
+    if let phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+    if let role {
+      record.children += [role.export()!]
+    }
+
+    return record
   }
 }
 
@@ -189,6 +209,10 @@ public class SourceDataEventPeriod : RecordProtocol {
     "PHRASE": \SourceDataEventPeriod.phrase,
   ]
 
+  init(date: String, phrase: String? = nil) {
+    self.date = date
+    self.phrase = phrase
+  }
   required init(record: Record) throws {
     self.date = record.line.value ?? ""
     var mutableSelf = self
@@ -206,19 +230,27 @@ public class SourceDataEventPeriod : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "DATE", value: date)
+
+    if let phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+    return record
   }
 }
 
 public class SourceDataEvents : RecordProtocol {
-  public var period: SourceDataEventPeriod?
   public var eventTypes: [String] = []
+  public var period: SourceDataEventPeriod?
   public var place: PlaceStructure?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE": \SourceDataEvents.period,
     "PLAC": \SourceDataEvents.place,
   ]
 
+  init(types: [String]) {
+    eventTypes = types
+  }
   required init(record: Record) throws {
     self.eventTypes = (record.line.value ?? "")
       .components(separatedBy: ",")
@@ -241,7 +273,16 @@ public class SourceDataEvents : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "EVEN", value: eventTypes.joined(separator: ", "))
+
+    if let period {
+      record.children += [period.export()!]
+    }
+    if let place {
+      record.children += [place.export()!]
+    }
+    
+    return record
   }
 }
 
@@ -256,6 +297,9 @@ public class SourceData : RecordProtocol {
     "SNOTE": \SourceData.notes
   ]
 
+  init() {
+
+  }
   required init(record: Record) throws {
     var mutableSelf = self
 
@@ -276,7 +320,21 @@ public class SourceData : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "DATA")
+
+    for event in events {
+      record.children += [event.export()!]
+    }
+
+    if let agency {
+      record.children += [Record(level: 0, tag: "AGNC", value: agency)]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    return record
   }
 }
 
@@ -303,6 +361,13 @@ public class Medium : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "PHRASE" : \Medium.phrase,
   ]
+
+  init(kind: MediumKind, phrase: String? = nil) {
+    self.kind = kind
+    self.phrase = phrase
+  }
+
+
   required init(record: Record) throws {
     kind = MediumKind(rawValue: record.line.value ?? "OTHER") ?? .OTHER
     var mutableSelf = self
@@ -320,7 +385,11 @@ public class Medium : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "MEDI", value: kind.rawValue)
+    if let phrase = phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+    return record
   }
 }
 
@@ -330,6 +399,10 @@ public class CallNumber : RecordProtocol {
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "MEDI" : \CallNumber.medium,
   ]
+  init(callNumber: String, medium: Medium? = nil) {
+    self.callNumber = callNumber
+    self.medium = medium
+  }
   required init(record: Record) throws {
     callNumber = record.line.value ?? ""
     var mutableSelf = self
@@ -347,7 +420,11 @@ public class CallNumber : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "CALN", value: callNumber)
+    if let medium{
+      record.children += [medium.export()!]
+    }
+    return record
   }
 }
 
@@ -361,6 +438,11 @@ public class SourceRepositoryCitation : RecordProtocol {
     "SNOTE" : \SourceRepositoryCitation.notes,
     "CALN" : \SourceRepositoryCitation.callNumbers
   ]
+
+  init(xref: String) {
+    self.xref = xref
+  }
+
   required init(record: Record) throws {
     xref = record.line.value ?? ""
     var mutableSelf = self
@@ -380,7 +462,16 @@ public class SourceRepositoryCitation : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "REPO", value: xref)
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+    for callNumber in callNumbers {
+      record.children += [callNumber.export()!]
+    }
+
+    return record
   }
 }
 
@@ -393,6 +484,11 @@ public class SourceText : RecordProtocol {
     "LANG": \SourceText.lang,
   ]
 
+  init(text: String, mime: String? = nil, lang: String? = nil) {
+    self.text = text
+    self.mimeType = mime
+    self.lang = lang
+  }
   required init(record: Record) throws {
     text = record.line.value ?? ""
     var mutableSelf = self
@@ -409,11 +505,21 @@ public class SourceText : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "TEXT", value: text)
+
+    if let mimeType {
+      record.children += [Record(level: 0, tag: "MIME", value: mimeType)]
+    }
+    if let lang {
+      record.children += [Record(level: 0, tag: "LANG", value: lang)]
+    }
+
+    return record
   }
 }
 
 public class Source : RecordProtocol {
+  public var xref: String
   public var data: SourceData?
   public var author: String?
   public var title: String?
@@ -446,7 +552,15 @@ public class Source : RecordProtocol {
     "CREA" : \Source.creationDate
   ]
 
+  init(xref: String) {
+    self.xref = xref
+  }
   required init(record: Record) throws {
+    if record.line.xref == nil {
+      throw GedcomError.badRecord
+    }
+
+    xref = record.line.xref!
     var mutableSelf = self
 
     for child in record.children {
@@ -478,6 +592,51 @@ public class Source : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, xref: xref, tag: "SOUR")
+
+    if let data {
+      record.children += [data.export()!]
+    }
+    if let author {
+      record.children += [Record(level: 1, tag: "AUTH", value: author)]
+    }
+
+    if let title {
+      record.children += [Record(level: 1, tag: "TITL", value: title)]
+    }
+    if let abbreviation {
+      record.children += [Record(level: 1, tag: "ABBR", value: abbreviation)]
+    }
+    if let publication {
+      record.children += [Record(level: 1, tag: "PUBL", value: publication)]
+    }
+
+    if let text {
+      record.children += [text.export()!]
+    }
+
+    for citation in sourceRepoCitation {
+      record.children += [citation.export()!]
+    }
+    for identifier in identifiers {
+      record.children += [identifier.export()!]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    for multimediaLink in multimediaLinks {
+      record.children += [multimediaLink.export()!]
+    }
+
+    if let changeDate {
+      record.children += [changeDate.export()!]
+    }
+    if let creationDate {
+      record.children += [creationDate.export()!]
+    }
+
+    return record
   }
 }

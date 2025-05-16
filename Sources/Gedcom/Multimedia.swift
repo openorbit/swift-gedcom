@@ -76,7 +76,7 @@ public class MultimediaLink  : RecordProtocol {
     "TITL" : \MultimediaLink.title
   ]
 
-  init(xref: String, crop: Crop?, title: String?)
+  init(xref: String, crop: Crop? = nil, title: String? = nil)
   {
     self.xref = xref
     self.crop = crop

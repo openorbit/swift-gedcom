@@ -24,6 +24,11 @@ public class PlaceTranslation : RecordProtocol {
     "LANG" : \PlaceTranslation.lang
   ]
 
+  init(place: [String], lang: String) {
+    self.place = place
+    self.lang = lang
+  }
+
   required init(record: Record) throws {
     self.place = (record.line.value ?? "")
       .components(separatedBy: ",")
@@ -44,7 +49,9 @@ public class PlaceTranslation : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "TRAN", value: place.joined(separator: ", "))
+    record.children += [Record(level: 1, tag: "LANG", value: lang)]
+    return record
   }
 }
 
@@ -57,6 +64,10 @@ public class PlaceCoordinates : RecordProtocol {
     "LONG" : \PlaceCoordinates.lon,
   ]
 
+  init(lat: Double, lon: Double) {
+    self.lat = lat
+    self.lon = lon
+  }
   required init(record: Record) throws {
     var mutableSelf = self
 
@@ -89,7 +100,12 @@ public class PlaceCoordinates : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "MAP")
+    record.children += [
+      Record(level: 1, tag: "LATI", value: "\(lat >= 0 ? "N\(lat)" : "S\(lat * -1)")"),
+      Record(level: 1, tag: "LONG", value: "\(lon >= 0 ? "E\(lon)" : "W\(lon * -1)")")
+    ]
+    return record
   }
 }
 
@@ -113,6 +129,12 @@ public class PlaceStructure : RecordProtocol {
     "SNOTE" : \PlaceStructure.notes,
 
   ]
+
+  init(place: [String], form: [String] = [], lang: String?) {
+    self.place = place
+    self.form = form
+    self.lang = lang
+  }
 
   required init(record: Record) throws {
     self.place = (record.line.value ?? "")
@@ -146,6 +168,31 @@ public class PlaceStructure : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "PLAC", value: place.joined(separator: ", "))
+
+    if form.count > 0 {
+      record.children += [Record(level: 1, tag: "FORM", value: form.joined(separator: ", "))]
+    }
+
+    if let lang {
+      record.children += [Record(level: 1, tag: "LANG", value: lang)]
+    }
+
+    for translation in translations {
+      record.children += [translation.export()!]
+    }
+
+    if let map {
+      record.children += [map.export()!]
+    }
+
+    for exid in exids {
+      record.children += [exid.export()!]
+    }
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    return record
   }
 }
