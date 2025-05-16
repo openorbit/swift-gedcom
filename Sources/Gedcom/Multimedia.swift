@@ -124,6 +124,11 @@ public class FileTranslation : RecordProtocol {
     "FORM" : \FileTranslation.form,
   ]
 
+  init(path: String, form: String)
+  {
+    self.path = path
+    self.form = form
+  }
   required init(record: Record) throws {
     self.path = record.line.value ?? ""
     var mutableSelf = self
@@ -141,17 +146,23 @@ public class FileTranslation : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "TRAN", value: path)
+    record.children += [Record(level: 1, tag: "FORM", value: form)]
+    return record
   }
 }
 
 public class MultimediaFileForm : RecordProtocol {
-  public var form: String
+  public var form: String = ""
   public var medium: Medium?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "MEDI" : \MultimediaFileForm.medium,
   ]
 
+  init(form: String, medium: Medium? = nil) {
+    self.form = form
+    self.medium = medium
+  }
   required init(record: Record) throws {
     self.form = record.line.value ?? ""
     var mutableSelf = self
@@ -168,13 +179,19 @@ public class MultimediaFileForm : RecordProtocol {
     }
   }
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "FORM", value: form)
+
+    if let medium {
+      record.children += [medium.export()!]
+    }
+
+    return record
   }
 }
 public class MultimediaFile : RecordProtocol {
   public var path: String
-  // TODO: Should have cardinality 1
-  public var form: MultimediaFileForm?
+
+  public var form: MultimediaFileForm = MultimediaFileForm(form: "")
   public var title: String?
   public var translations: [FileTranslation] = []
 
@@ -184,6 +201,11 @@ public class MultimediaFile : RecordProtocol {
     "TRAN" : \MultimediaFile.translations,
   ]
 
+  init(path: String, form: MultimediaFileForm, title: String? = nil) {
+    self.path = path
+    self.form = form
+    self.title = title
+  }
   required init(record: Record) throws {
     self.path = record.line.value ?? ""
     var mutableSelf = self
@@ -198,7 +220,7 @@ public class MultimediaFile : RecordProtocol {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       } else if let wkp = kp as? WritableKeyPath<MultimediaFile, String?> {
         mutableSelf[keyPath: wkp] = child.line.value
-      } else if let wkp = kp as? WritableKeyPath<MultimediaFile, MultimediaFileForm?> {
+      } else if let wkp = kp as? WritableKeyPath<MultimediaFile, MultimediaFileForm> {
         mutableSelf[keyPath: wkp] = try MultimediaFileForm(record: child)
       } else if let wkp = kp as? WritableKeyPath<MultimediaFile,  [FileTranslation]> {
         mutableSelf[keyPath: wkp].append(try FileTranslation(record: child))
@@ -207,7 +229,19 @@ public class MultimediaFile : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "FILE", value: path)
+
+    record.children += [form.export()!]
+
+    if let title {
+      record.children += [Record(level: 1, tag: "TITL", value: title)]
+    }
+
+    for translation in translations {
+      record.children += [translation.export()!]
+    }
+
+    return record
   }
 }
 public class Multimedia  : RecordProtocol {
@@ -235,6 +269,9 @@ public class Multimedia  : RecordProtocol {
     "CREA" : \Multimedia.creationDate
   ]
 
+  init(xref: String) {
+    self.xref = xref
+  }
   required init(record: Record) throws {
     self.xref = record.line.xref!
     var mutableSelf = self
@@ -267,6 +304,35 @@ public class Multimedia  : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, xref: xref, tag: "OBJE")
+
+    if restrictions.count > 0 {
+      record.children += [Record(level: 1, tag: "RESN",
+                                 value: restrictions.map({$0.rawValue}).joined(separator: ", "))]
+    }
+
+    for file in files {
+      record.children += [file.export()!]
+    }
+
+    for identifer in identifiers {
+      record.children += [identifer.export()!]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+
+    if let changeDate {
+      record.children += [changeDate.export()!]
+    }
+    if let creationDate {
+      record.children += [creationDate.export()!]
+    }
+    return record
   }
 }

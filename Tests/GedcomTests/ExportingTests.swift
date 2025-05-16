@@ -262,6 +262,203 @@ import Foundation
         """)
   }
 
+  @Test("Multimedia Record") func multimedia() {
+    let media = Multimedia(xref: "@O1@")
+    media.restrictions = [.CONFIDENTIAL, .LOCKED]
+    media.files += [MultimediaFile(path: "path/to/file1",
+                                   form: MultimediaFileForm(form: "text/plain",
+                                                            medium: Medium(kind: .OTHER,
+                                                                           phrase: "Transcript")
+                                                           )
+                                  )
+    ]
+
+    media.files += [
+      MultimediaFile(path: "media/original.mp3",
+                     form: MultimediaFileForm(form: "audio/mp3",
+                                              medium: Medium(kind: .AUDIO)),
+                     title: "Object title")
+    ]
+    media.files[1].translations  += [
+      FileTranslation(path: "media/derived.oga", form: "audio/ogg"),
+      FileTranslation(path: "media/transcript.vtt", form: "text/vtt")
+    ]
+
+    media.identifiers.append(.Refn(REFN(ident: "1", type: "User-generated identifier")))
+    media.identifiers.append(.Refn(REFN(ident: "10", type: "User-generated identifier")))
+    media.identifiers.append(.Uuid(UID(ident: "69ebdd0e-c78c-4b81-873f-dc8ac30a48b9")))
+    media.identifiers.append(.Uuid(UID(ident: "79cae8c4-e673-4e4f-bc5d-13b02d931302")))
+    media.identifiers.append(.Exid(EXID(ident: "123", type: "http://example.com")))
+    media.identifiers.append(.Exid(EXID(ident: "456", type: "http://example.com")))
+
+    let n = Note(text: "American English", mime: "text/plain", lang: "en-US")
+    n.translations.append(Translation(text: "British English", mime: "text/plain", lang: "en-GB"))
+    n.translations.append(Translation(text: "Canadian English", mime: "text/plain", lang: "en-CA"))
+    n.citations.append(SourceCitation(xref: "@S1@", page: "1"))
+    n.citations.append(SourceCitation(xref: "@S2@", page: "2"))
+    media.notes.append(.Note(n))
+    media.notes.append(.SNote(SNoteRef(xref: "@N1@")))
+
+    media.citations += [SourceCitation(xref: "@S1@", page: "1")]
+    media.citations[0].data =
+      SourceCitationData(date: DateValue(date: "28 MAR 2022",
+                                           time: "10:29",
+                                           phrase: "Morning"))
+
+    media.citations[0].data?.text += [
+      SourceText(text: "Text 1", mime: "text/plain", lang: "en-US"),
+      SourceText(text: "Text 2", mime: "text/plain", lang: "en-US")
+    ]
+    media.citations[0].events += [
+      SourceEventData(event: "BIRT", phrase: "Event phrase",
+                      role: SourceEventRole(role: "OTHER", phrase: "Role phrase"))
+    ]
+
+    media.citations[0].quality = 0
+    media.citations[0].links = [
+      MultimediaLink(xref: "@O1@",
+                     crop: Crop(top: 0, left: 0, height: 100, width: 100),
+                     title: "Title"),
+      MultimediaLink(xref: "@O1@",
+                     crop: Crop(top: 100, left: 100),
+                     title: "Title")
+    ]
+    let n2 = Note(text: "American English", mime: "text/plain", lang: "en-US")
+    n2.translations += [Translation(text: "British English", lang: "en-GB")]
+    n2.citations += [SourceCitation(xref: "@S1@", page: "1")]
+    n2.citations += [SourceCitation(xref: "@S2@", page: "2")]
+
+    media.citations[0].notes += [
+      .Note(n2),
+      .SNote(SNoteRef(xref: "@N1@"))
+    ]
+
+    media.citations += [SourceCitation(xref: "@S1@", page: "2")]
+
+///XXXX
+
+
+    media.changeDate = ChangeDate(date: "27 MAR 2022", time: "08:56")
+    media.changeDate?.notes = [
+      .Note(Note(text: "Change date note 1")),
+      .Note(Note(text: "Change date note 2")),
+    ]
+    media.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
+
+    let exp = media.export()
+    #expect(exp != nil)
+
+    exp?.setLevel(0)
+
+    // From the first submitter example
+
+    let expected =
+        """
+        0 @O1@ OBJE
+        1 RESN CONFIDENTIAL, LOCKED
+        1 FILE path/to/file1
+        2 FORM text/plain
+        3 MEDI OTHER
+        4 PHRASE Transcript
+        1 FILE media/original.mp3
+        2 FORM audio/mp3
+        3 MEDI AUDIO
+        2 TITL Object title
+        2 TRAN media/derived.oga
+        3 FORM audio/ogg
+        2 TRAN media/transcript.vtt
+        3 FORM text/vtt
+        1 REFN 1
+        2 TYPE User-generated identifier
+        1 REFN 10
+        2 TYPE User-generated identifier
+        1 UID 69ebdd0e-c78c-4b81-873f-dc8ac30a48b9
+        1 UID 79cae8c4-e673-4e4f-bc5d-13b02d931302
+        1 EXID 123
+        2 TYPE http://example.com
+        1 EXID 456
+        2 TYPE http://example.com
+        1 NOTE American English
+        2 MIME text/plain
+        2 LANG en-US
+        2 TRAN British English
+        3 MIME text/plain
+        3 LANG en-GB
+        2 TRAN Canadian English
+        3 MIME text/plain
+        3 LANG en-CA
+        2 SOUR @S1@
+        3 PAGE 1
+        2 SOUR @S2@
+        3 PAGE 2
+        1 SNOTE @N1@
+        1 SOUR @S1@
+        2 PAGE 1
+        2 DATA
+        3 DATE 28 MAR 2022
+        4 TIME 10:29
+        4 PHRASE Morning
+        3 TEXT Text 1
+        4 MIME text/plain
+        4 LANG en-US
+        3 TEXT Text 2
+        4 MIME text/plain
+        4 LANG en-US
+        2 EVEN BIRT
+        3 PHRASE Event phrase
+        3 ROLE OTHER
+        4 PHRASE Role phrase
+        2 QUAY 0
+        2 OBJE @O1@
+        3 CROP
+        4 TOP 0
+        4 LEFT 0
+        4 HEIGHT 100
+        4 WIDTH 100
+        3 TITL Title
+        2 OBJE @O1@
+        3 CROP
+        4 TOP 100
+        4 LEFT 100
+        3 TITL Title
+        2 NOTE American English
+        3 MIME text/plain
+        3 LANG en-US
+        3 TRAN British English
+        4 LANG en-GB
+        3 SOUR @S1@
+        4 PAGE 1
+        3 SOUR @S2@
+        4 PAGE 2
+        2 SNOTE @N1@
+        1 SOUR @S1@
+        2 PAGE 2
+        1 CHAN
+        2 DATE 27 MAR 2022
+        3 TIME 08:56
+        2 NOTE Change date note 1
+        2 NOTE Change date note 2
+        1 CREA
+        2 DATE 27 MAR 2022
+        3 TIME 08:55
+
+        """.split(separator: "\n")
+
+    let exported = exp!.export().split(separator: "\n")
+
+    for (v, e) in zip(exported, expected) {
+      #expect(v == e)
+    }
+
+    print(exp!.export())
+
+//    0 @O2@ OBJE
+//    1 RESN PRIVACY
+//    1 FILE http://host.example.com/path/to/file2
+//    2 FORM text/plain
+//    3 MEDI ELECTRONIC
+
+  }
   @Test("Source Record") func source() {
     let source = Source(xref: "@S1@")
     source.data = SourceData()

@@ -596,12 +596,12 @@ import Foundation
       #expect(ged.multimediaRecordsMap["@O1@"]!.files.count == 2)
       // In the GDZ the path is not a file url, otherwise a file: url
       #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].path == "path/to/file1")
-      #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.form == "text/plain")
-      #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.medium?.kind == .OTHER)
-      #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form!.medium?.phrase == "Transcript")
+      #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form.form == "text/plain")
+      #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form.medium?.kind == .OTHER)
+      #expect(ged.multimediaRecordsMap["@O1@"]!.files[0].form.medium?.phrase == "Transcript")
       #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].path == "media/original.mp3")
-      #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form!.form == "audio/mp3")
-      #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form!.medium?.kind == .AUDIO)
+      #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form.form == "audio/mp3")
+      #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].form.medium?.kind == .AUDIO)
       #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].title == "Object title")
       #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations.count == 2)
       #expect(ged.multimediaRecordsMap["@O1@"]!.files[1].translations[0].path == "media/derived.oga")
@@ -747,8 +747,8 @@ import Foundation
 
       #expect(ged.multimediaRecordsMap["@O2@"]!.restrictions == [.PRIVACY])
       #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].path == "http://host.example.com/path/to/file2")
-      #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].form?.form == "text/plain")
-      #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].form?.medium?.kind == .ELECTRONIC)
+      #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].form.form == "text/plain")
+      #expect(ged.multimediaRecordsMap["@O2@"]!.files[0].form.medium?.kind == .ELECTRONIC)
 
 
     }

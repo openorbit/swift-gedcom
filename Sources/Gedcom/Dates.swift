@@ -122,6 +122,11 @@ public class DateValue : RecordProtocol {
     "TIME" : \DateValue.time,
     "PHRASE" : \DateValue.phrase,
   ]
+  init(date: String, time: String? = nil, phrase: String? = nil) {
+    self.date = date
+    self.time = time
+    self.phrase = phrase
+  }
   required init(record: Record) throws {
     date = record.line.value ?? ""
     var mutableSelf = self
@@ -138,13 +143,13 @@ public class DateValue : RecordProtocol {
   }
 
   func export() -> Record? {
-    var record = Record(level: 0, tag: "DATE", value: date)
+    let record = Record(level: 0, tag: "DATE", value: date)
     if let time {
-      var timeRecord = Record(level: 1, tag: "TIME", value: time)
+      let timeRecord = Record(level: 1, tag: "TIME", value: time)
       record.children.append(timeRecord)
     }
     if let phrase {
-      var phraseRecord = Record(level: 1, tag: "PHRASE", value: time)
+      let phraseRecord = Record(level: 1, tag: "PHRASE", value: phrase)
       record.children.append(phraseRecord)
     }
     return record

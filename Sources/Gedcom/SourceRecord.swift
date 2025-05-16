@@ -18,13 +18,16 @@
 
 public class SourceCitationData : RecordProtocol {
   public var date: DateValue?
-  public var text: [Translation] = []
+  public var text: [SourceText] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \SourceCitationData.date,
     "TEXT" : \SourceCitationData.text,
   ]
 
+  init(date: DateValue? = nil) {
+    self.date = date
+  }
   required init(record: Record) throws {
     var mutableSelf = self
     for child in record.children {
@@ -34,8 +37,8 @@ public class SourceCitationData : RecordProtocol {
       }
       if let wkp = kp as? WritableKeyPath<SourceCitationData, DateValue?> {
         mutableSelf[keyPath: wkp] = try DateValue(record: child)
-      } else if let wkp = kp as? WritableKeyPath<SourceCitationData,[Translation]> {
-        mutableSelf[keyPath: wkp].append(try Translation(record: child))
+      } else if let wkp = kp as? WritableKeyPath<SourceCitationData,[SourceText]> {
+        mutableSelf[keyPath: wkp].append(try SourceText(record: child))
       }
     }
   }
@@ -59,6 +62,10 @@ public class SourceEventRole : RecordProtocol {
     "PHRASE" : \SourceEventRole.phrase,
   ]
 
+  init(role: String, phrase: String? = nil) {
+    self.role = role
+    self.phrase = phrase
+  }
   required init(record: Record) throws {
     self.role = record.line.value ?? ""
     var mutableSelf = self
@@ -92,6 +99,11 @@ public class SourceEventData : RecordProtocol {
     "ROLE" : \SourceEventData.role,
   ]
 
+  init(event: String, phrase: String? = nil, role: SourceEventRole? = nil) {
+    self.event = event
+    self.phrase = phrase
+    self.role = role
+  }
   required init(record: Record) throws {
     self.event = record.line.value ?? ""
     var mutableSelf = self
@@ -187,9 +199,6 @@ public class SourceCitation : RecordProtocol {
     }
     if let quality {
       record.children.append(Record(level: 1, tag: "QUAY", value: "\(quality)"))
-    }
-    for link in links {
-      record.children.append(link.export()!)
     }
     for link in links {
       record.children.append(link.export()!)
