@@ -130,7 +130,7 @@ public class PlaceStructure : RecordProtocol {
 
   ]
 
-  init(place: [String], form: [String] = [], lang: String?) {
+  init(place: [String], form: [String] = [], lang: String? = nil) {
     self.place = place
     self.form = form
     self.lang = lang

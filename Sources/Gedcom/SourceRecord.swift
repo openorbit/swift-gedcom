@@ -140,7 +140,7 @@ public class SourceCitation : RecordProtocol {
   public var data: SourceCitationData?
   public var events: [SourceEventData] = []
   public var quality: Int?
-  public var links: [MultimediaLink] = []
+  public var multimediaLinks: [MultimediaLink] = []
   public var notes: [NoteStructure] = []
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -150,15 +150,25 @@ public class SourceCitation : RecordProtocol {
     "EVEN" : \SourceCitation.events,
 
     "QUAY" : \SourceCitation.quality,
-    "OBJE" : \SourceCitation.links,
+    "OBJE" : \SourceCitation.multimediaLinks,
 
     "NOTE" : \SourceCitation.notes,
     "SNOTE" : \SourceCitation.notes,
   ]
 
-  init(xref: String, page: String? = nil) {
+  init(xref: String, page: String? = nil,
+       data: SourceCitationData? = nil,
+       events: [SourceEventData] = [],
+       quality: Int? = nil,
+       links: [MultimediaLink] = [],
+       notes: [NoteStructure] = []) {
     self.xref = xref
     self.page = page
+    self.data = data
+    self.events = events
+    self.quality = quality
+    self.multimediaLinks = links
+    self.notes = notes
   }
   required init(record: Record) throws {
     xref = record.line.value ?? ""
@@ -200,7 +210,7 @@ public class SourceCitation : RecordProtocol {
     if let quality {
       record.children.append(Record(level: 1, tag: "QUAY", value: "\(quality)"))
     }
-    for link in links {
+    for link in multimediaLinks {
       record.children.append(link.export()!)
     }
     for note in notes {

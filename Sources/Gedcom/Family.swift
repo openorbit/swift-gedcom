@@ -40,7 +40,19 @@ public class LdsSpouseSealing : RecordProtocol {
     "SOUR" : \LdsSpouseSealing.citations,
   ]
 
-
+  init(date: DateValue? = nil,
+       temple: String? = nil,
+       place: PlaceStructure? = nil,
+       status: LdsOrdinanceStatus? = nil,
+       notes: [NoteStructure] = [],
+       citations: [SourceCitation] = []) {
+    self.date = date
+    self.temple = temple
+    self.place = place
+    self.status = status
+    self.notes = notes
+    self.citations = citations
+  }
   required init(record: Record) throws {
     var mutableSelf = self
 
@@ -68,19 +80,47 @@ public class LdsSpouseSealing : RecordProtocol {
 
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "SLGS")
+
+    if let date {
+      record.children += [date.export()!]
+    }
+    if let temple {
+      record.children += [Record(level: 1, tag: "TEMP", value: temple)]
+    }
+    if let place {
+      record.children += [place.export()!]
+    }
+    if let status {
+      record.children += [status.export()!]
+    }
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+
+    return record
   }
 }
 
 
 public class SpouseAge : RecordProtocol {
+  var kind: String
   public var age: Age
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "AGE" : \SpouseAge.age,
   ]
-
+  init(kind: String, age: String, phrase: String? = nil)
+  {
+    self.kind = kind
+    self.age = Age(age: age, phrase: phrase)
+  }
   required init(record: Record) throws {
+    kind = record.line.tag
     age = Age()
     var mutableSelf = self
 
@@ -97,7 +137,11 @@ public class SpouseAge : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: kind)
+
+    record.children += [age.export()!]
+
+    return record
   }
 }
 
@@ -122,8 +166,8 @@ public class FamilyAttribute  : RecordProtocol {
   public var sdate: DateValue?
   public var place: PlaceStructure?
   public var address: AddressStructure?
-  public var phone: [String] = []
-  public var email: [String] = []
+  public var phones: [String] = []
+  public var emails: [String] = []
   public var fax: [String] = []
   public var www: [URL] = []
   public var agency: String?
@@ -145,8 +189,8 @@ public class FamilyAttribute  : RecordProtocol {
     "DATE" : \FamilyAttribute.date,
     "ADDR" : \FamilyAttribute.address,
     "PLACE" : \FamilyAttribute.place,
-    "PHON" : \FamilyAttribute.phone,
-    "EMAIL" : \FamilyAttribute.email,
+    "PHON" : \FamilyAttribute.phones,
+    "EMAIL" : \FamilyAttribute.emails,
     "FAX" : \FamilyAttribute.fax,
     "WWW" : \FamilyAttribute.www,
 
@@ -163,6 +207,19 @@ public class FamilyAttribute  : RecordProtocol {
     "UID" : \FamilyAttribute.uid,
   ]
 
+
+  init(kind: FamilyAttributeKind, text: String? = nil, type: String? = nil,
+       husband: SpouseAge? = nil, wife: SpouseAge? = nil,
+       agency: String? = nil, religion: String? = nil, cause: String? = nil) {
+    self.kind = kind
+    self.text = text
+    self.type = type
+    self.husbandInfo = husband
+    self.wifeInfo = wife
+    self.agency = agency
+    self.religion = religion
+    self.cause = cause
+  }
   required init(record: Record) throws {
     self.kind = FamilyAttributeKind(rawValue: record.line.tag)!
     var mutableSelf = self
@@ -211,7 +268,78 @@ public class FamilyAttribute  : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: kind.rawValue, value: text)
+
+    if let type {
+      record.children += [Record(level: 1, tag: "TYPE", value: type)]
+    }
+
+    if let husbandInfo {
+      record.children += [husbandInfo.export()!]
+    }
+    if let wifeInfo {
+      record.children += [wifeInfo.export()!]
+    }
+
+    if let date {
+      record.children += [date.export()!]
+    }
+    if let sdate {
+      record.children += [sdate.export()!]
+    }
+    if let place {
+      record.children += [place.export()!]
+    }
+    if let address {
+      record.children += [address.export()!]
+    }
+    for phone in phones {
+      record.children += [Record(level: 1, tag: "PHON", value: phone)]
+    }
+    for email in emails {
+      record.children += [Record(level: 1, tag: "EMAIL", value: email)]
+    }
+    for fax in fax {
+      record.children += [Record(level: 1, tag: "FAX", value: fax)]
+    }
+    for www in www {
+      record.children += [Record(level: 1, tag: "WWW", value: www.absoluteString)]
+    }
+    if let agency {
+      record.children += [Record(level: 1, tag: "AGNC", value: agency)]
+    }
+    if let religion {
+      record.children += [Record(level: 1, tag: "RELI", value: religion)]
+    }
+    if let cause {
+      record.children += [Record(level: 1, tag: "CAUS", value: cause)]
+    }
+
+    if restrictions.count > 0 {
+      record.children += [Record(level: 1, tag: "RESN", value: restrictions.map({$0.rawValue}).joined(separator: ", "))]
+    }
+
+    for association in associations {
+      record.children += [association.export()!]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+
+    for link in multimediaLinks {
+      record.children += [link.export()!]
+    }
+
+    for uuid in uid {
+      record.children += [Record(level: 1, tag: "UID", value: uuid.uuidString.lowercased())]
+    }
+
+    return record
   }
 }
 
@@ -242,7 +370,15 @@ public class NonFamilyEventStructure : RecordProtocol {
     "SOUR" : \NonFamilyEventStructure.citations,
   ]
 
-
+  init(kind: FamilyEventKind,
+       date: DatePeriod? = nil,
+       notes: [NoteStructure] = [],
+       citations: [SourceCitation] = []) {
+    self.kind = kind
+    self.date = date
+    self.notes = notes
+    self.citations = citations
+  }
   required init(record: Record) throws {
     self.kind = FamilyEventKind(rawValue: record.line.value ?? "") ?? .EVEN
 
@@ -269,7 +405,21 @@ public class NonFamilyEventStructure : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "NO", value: kind.rawValue)
+
+    if let date {
+      record.children += [date.export()!]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+
+    return record
   }
 }
 
@@ -288,8 +438,8 @@ public class FamilyEvent : RecordProtocol {
   public var sdate: DateValue?
   public var place: PlaceStructure?
   public var address: AddressStructure?
-  public var phone: [String] = []
-  public var email: [String] = []
+  public var phones: [String] = []
+  public var emails: [String] = []
   public var fax: [String] = []
   public var www: [URL] = []
   public var agency: String?
@@ -310,8 +460,8 @@ public class FamilyEvent : RecordProtocol {
 
     "ADDR" : \FamilyEvent.address,
     "DATE" : \FamilyEvent.date,
-    "PHON" : \FamilyEvent.phone,
-    "EMAIL" : \FamilyEvent.email,
+    "PHON" : \FamilyEvent.phones,
+    "EMAIL" : \FamilyEvent.emails,
     "FAX" : \FamilyEvent.fax,
     "WWW" : \FamilyEvent.www,
     "SDATE" : \FamilyEvent.sdate,
@@ -328,7 +478,53 @@ public class FamilyEvent : RecordProtocol {
     "UID" : \FamilyEvent.uid,
   ]
 
-
+  init(kind: FamilyEventKind, occured: Bool? = nil, text: String? = nil,
+       type: String? = nil,
+       husband: SpouseAge? = nil,
+       wife: SpouseAge? = nil,
+       date: DateValue? = nil,
+       sdate: DateValue? = nil,
+       place: PlaceStructure? = nil,
+       address: AddressStructure? = nil,
+       phones: [String] = [],
+       emails: [String] = [],
+       faxes: [String] = [],
+       urls: [URL] = [],
+       agency: String? = nil,
+       religion: String? = nil,
+       cause: String? = nil,
+       restrictions: [Restriction] = [],
+       associations: [AssoiciationStructure] = [],
+       notes: [NoteStructure] = [],
+       citations: [SourceCitation] = [],
+       multimediaLinks: [MultimediaLink] = [],
+       uids: [UUID] = []
+  )
+  {
+    self.kind = kind
+    self.text = text
+    self.occured = occured ?? false
+    self.type = type
+    self.husbandInfo = husband
+    self.wifeInfo = wife
+    self.date = date
+    self.sdate = sdate
+    self.place = place
+    self.address = address
+    self.phones = phones
+    self.emails = emails
+    self.fax = faxes
+    self.www = urls
+    self.agency = agency
+    self.religion = religion
+    self.cause = cause
+    self.restrictions = restrictions
+    self.associations = associations
+    self.notes = notes
+    self.citations = citations
+    self.multimediaLinks = multimediaLinks
+    self.uid = uids
+  }
   required init(record: Record) throws {
     self.kind = FamilyEventKind(rawValue: record.line.tag) ?? .EVEN
     if record.line.value == "Y" {
@@ -384,11 +580,92 @@ public class FamilyEvent : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: kind.rawValue)
+    if kind == .EVEN {
+      record.line.value = text
+    } else if occured {
+      record.line.value = "Y"
+    }
+
+    if let type {
+      record.children += [Record(level: 1, tag: "TYPE", value: type)]
+    }
+
+    if let husbandInfo {
+      record.children += [husbandInfo.export()!]
+    }
+    if let wifeInfo {
+      record.children += [wifeInfo.export()!]
+    }
+
+    if let date {
+      record.children += [date.export()!]
+    }
+
+    if let place {
+      record.children += [place.export()!]
+    }
+    if let address {
+      record.children += [address.export()!]
+    }
+    for phone in phones {
+      record.children += [Record(level: 1, tag: "PHON", value: phone)]
+    }
+    for email in emails {
+      record.children += [Record(level: 1, tag: "EMAIL", value: email)]
+    }
+    for fax in fax {
+      record.children += [Record(level: 1, tag: "FAX", value: fax)]
+    }
+    for www in www {
+      record.children += [Record(level: 1, tag: "WWW", value: www.absoluteString)]
+    }
+    if let agency {
+      record.children += [Record(level: 1, tag: "AGNC", value: agency)]
+    }
+    if let religion {
+      record.children += [Record(level: 1, tag: "RELI", value: religion)]
+    }
+    if let cause {
+      record.children += [Record(level: 1, tag: "CAUS", value: cause)]
+    }
+
+    if restrictions.count > 0 {
+      record.children += [Record(level: 1, tag: "RESN", value: restrictions.map({$0.rawValue}).joined(separator: ", "))]
+    }
+
+    if let sdate {
+      let sdate = sdate.export()!
+      sdate.line.tag = "SDATE" // Override default export tag
+      record.children += [sdate]
+    }
+
+    for association in associations {
+      record.children += [association.export()!]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+
+    for link in multimediaLinks {
+      record.children += [link.export()!]
+    }
+
+    for uuid in uid {
+      record.children += [Record(level: 1, tag: "UID", value: uuid.uuidString.lowercased())]
+    }
+
+    return record
   }
 }
 
 public class Family : RecordProtocol {
+  public var xref: String
   public var restrictions: [Restriction] = []
 
   public var attributes: [FamilyAttribute] = []
@@ -454,7 +731,13 @@ public class Family : RecordProtocol {
     "CREA" : \Family.creationDate
   ]
 
+
+  init(xref: String) {
+    self.xref = xref
+  }
+
   required init(record: Record) throws {
+    self.xref = record.line.xref ?? ""
     var mutableSelf = self
 
     for child in record.children {
@@ -504,6 +787,69 @@ public class Family : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, xref: xref, tag: "FAM")
+
+    if restrictions.count > 0 {
+      record.children += [Record(level: 1, tag: "RESN",
+                                 value: restrictions.map({$0.rawValue}).joined(separator: ", "))]
+
+    }
+
+    for attribute in attributes {
+      record.children += [attribute.export()!]
+    }
+    for event in events {
+      record.children += [event.export()!]
+    }
+    for nonEvent in nonEvents {
+      record.children += [nonEvent.export()!]
+    }
+
+    if let husband {
+      record.children += [husband.export()!]
+    }
+
+    if let wife {
+      record.children += [wife.export()!]
+    }
+
+    for child in children {
+      record.children += [child.export()!]
+    }
+
+    for association in associations {
+      record.children += [association.export()!]
+    }
+
+    for submitter in submitters {
+      record.children += [Record(level: 1, tag: "SUBM", value: submitter)]
+    }
+
+    for ldsSpouseSealing in ldsSpouseSealings {
+      record.children += [ldsSpouseSealing.export()!]
+    }
+
+    for identifier in identifiers {
+      record.children += [identifier.export()!]
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+    for multimediaLink in multimediaLinks {
+      record.children += [multimediaLink.export()!]
+    }
+
+    if let changeDate {
+      record.children += [changeDate.export()!]
+    }
+    if let creationDate {
+      record.children += [creationDate.export()!]
+    }
+
+    return record
   }
 }

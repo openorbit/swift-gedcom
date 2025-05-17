@@ -117,6 +117,370 @@ import Foundation
     )
   }
 
+  @Test("Family") func family() {
+    let family = Family(xref: "@F1@")
+    family.restrictions = [.CONFIDENTIAL, .LOCKED]
+
+    family.attributes += [
+      FamilyAttribute(kind: .NCHI, text: "2", type: "Type of children",
+                      husband: SpouseAge(kind: "HUSB", age: "25y", phrase: "Adult"),
+                      wife: SpouseAge(kind: "WIFE", age: "25y", phrase: "Adult")),
+      FamilyAttribute(kind: .RESI, text: "Residence", type: "Type of residence",
+                      husband: SpouseAge(kind: "HUSB", age: "25y", phrase: "Adult"),
+                      wife: SpouseAge(kind: "WIFE", age: "25y", phrase: "Adult")),
+      FamilyAttribute(kind: .FACT, text: "Fact", type: "Type of fact",
+                      husband: SpouseAge(kind: "HUSB", age: "25y", phrase: "Adult"),
+                      wife: SpouseAge(kind: "WIFE", age: "25y", phrase: "Adult")),
+    ]
+    family.events += [
+      FamilyEvent(kind: .ANUL, occured: true),
+      FamilyEvent(kind: .CENS, occured: true),
+      FamilyEvent(kind: .DIV, occured: true),
+      FamilyEvent(kind: .DIVF, occured: true),
+      FamilyEvent(kind: .ENGA, occured: true),
+      FamilyEvent(kind: .MARB, occured: true),
+      FamilyEvent(kind: .MARC, occured: true),
+      FamilyEvent(kind: .MARL, occured: true),
+      FamilyEvent(kind: .MARS, occured: true),
+      FamilyEvent(kind: .MARR, occured: true,
+                  husband: SpouseAge(kind: "HUSB", age: "25y", phrase: "Adult"),
+                  wife: SpouseAge(kind: "WIFE", age: "25y", phrase: "Adult"),
+                  date: DateValue(date: "27 MAR 2022", time: "16:02", phrase: "Afternoon"),
+                  sdate: DateValue(date: "27 MAR 2022", time: "16:03", phrase: "Afternoon"),
+                  place: PlaceStructure(place: ["Place"]),
+                  address: AddressStructure(addr: "Address"),
+                  phones: ["+1 (555) 555-1212", "+1 (555) 555-1234"],
+                  emails: ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"],
+                  faxes: ["+1 (555) 555-1212", "+1 (555) 555-1234"],
+                  urls: [URL(string: "http://gedcom.io")!,
+                         URL(string: "http://gedcom.info")!],
+                  agency: "Agency",
+                  religion: "Religion",
+                  cause: "Cause",
+                  restrictions: [.CONFIDENTIAL, .LOCKED],
+                  associations: [AssoiciationStructure(xref: "@VOID@",
+                                                       role: Role(kind: .OFFICIATOR)),
+                                 AssoiciationStructure(xref: "@VOID@",
+                                                       role: Role(kind: .WITN),
+                                                       notes: [
+                                                        .Note(Note(text: "Note text"))
+                                                       ]),
+                  ],
+                  notes: [
+                    .SNote(SNoteRef(xref: "@N1@"))
+                  ],
+                  citations: [
+                    SourceCitation(xref: "@S1@", page: "1"),
+                    SourceCitation(xref: "@S1@", page: "2"),
+                  ],
+                  multimediaLinks: [
+                    MultimediaLink(xref: "@O1@"),
+                    MultimediaLink(xref: "@O2@"),
+                  ],
+                  uids: [
+                    UUID(uuidString: "bbcc0025-34cb-4542-8cfb-45ba201c9c2c")!,
+                    UUID(uuidString: "9ead4205-5bad-4c05-91c1-0aecd3f5127d")!
+                  ]
+      ),
+      FamilyEvent(kind: .EVEN, text: "Event", type: "Event type"),
+    ]
+    family.nonEvents += [
+      NonFamilyEventStructure(kind: .DIV,
+                              date: DatePeriod(date: "FROM 1700 TO 1800",
+                                               phrase: "No date phrase"),
+                              notes: [
+                                .Note(Note(text: "Note text")),
+                                .SNote(SNoteRef(xref: "@N2@")),
+                              ],
+                              citations: [
+                                SourceCitation(xref: "@S1@", page: "1"),
+                                SourceCitation(xref: "@S1@", page: "2"),
+                              ]),
+      .init(kind: .ANUL),
+    ]
+    family.husband = PhraseRef(tag: "HUSB", xref: "@I1@", phrase: "Husband phrase")
+    family.wife = PhraseRef(tag: "WIFE", xref: "@I2@", phrase: "Wife phrase")
+    family.children = [
+      PhraseRef(tag: "CHIL", xref: "@I4@", phrase: "First child"),
+      PhraseRef(tag: "CHIL", xref: "@VOID@", phrase: "Second child")
+    ]
+    family.associations = [
+      AssoiciationStructure(xref: "@I3@",
+                            phrase: "Association text",
+                            role: Role(kind: .OTHER, phrase: "Role text"),
+                            notes: [
+                              .Note(Note(text: "Note text")),
+                              .SNote(SNoteRef(xref: "@N1@"))
+                            ],
+                            citations: [
+                              SourceCitation(xref: "@S1@", page: "1"),
+                              SourceCitation(xref: "@S2@", page: "2")
+                            ]),
+      AssoiciationStructure(xref: "@VOID@",
+                            role: Role(kind: .CLERGY))
+    ]
+    family.submitters = ["@U1@", "@U2@", "@VOID@"]
+    family.ldsSpouseSealings = [
+      .init(date: .init(date: "27 MAR 2022", time: "15:47", phrase: "Afternoon"),
+            temple: "LOGAN",
+            place: .init(place: ["Place"]),
+            status: .init(kind: .COMPLETED,
+                          date: .init(date: "27 MAR 2022", time: "15:48")),
+            notes: [
+              .Note(Note(text: "Note text")),
+              .SNote(SNoteRef(xref: "@N1@"))
+            ],
+            citations: [
+              .init(xref: "@S1@", page: "1"),
+              .init(xref: "@S2@", page: "2")
+            ]),
+      .init(date: .init(date: "27 MAR 2022"),
+            status: .init(kind: .CANCELED,
+                          date: .init(date: "27 MAR 2022"))),
+      .init(date: .init(date: "27 MAR 2022"),
+            status: .init(kind: .EXCLUDED,
+                          date: .init(date: "27 MAR 2022"))),
+      .init(date: .init(date: "27 MAR 2022"),
+            status: .init(kind: .DNS,
+                          date: .init(date: "27 MAR 2022"))),
+      .init(date: .init(date: "27 MAR 2022"),
+            status: .init(kind: .DNS_CAN,
+                          date: .init(date: "27 MAR 2022"))),
+      .init(date: .init(date: "27 MAR 2022"),
+            status: .init(kind: .PRE_1970,
+                          date: .init(date: "27 MAR 2022"))),
+      .init(date: .init(date: "27 MAR 2022"),
+            status: .init(kind: .UNCLEARED,
+                          date: .init(date: "27 MAR 2022")))
+    ]
+
+    family.identifiers = [
+      .Refn(REFN(ident: "1", type: "User-generated identifier")),
+      .Refn(REFN(ident: "10", type: "User-generated identifier")),
+      .Uuid(UID(ident: "f096b664-5e40-40e2-bb72-c1664a46fe45")),
+      .Uuid(UID(ident: "1f76f868-8a36-449c-af0d-a29247b3ab50")),
+      .Exid(EXID(ident: "123", type: "http://example.com")),
+      .Exid(EXID(ident: "456", type: "http://example.com")),
+    ]
+
+    family.notes = [
+      .Note(Note(text: "Note text")),
+      .SNote(SNoteRef(xref: "@N1@")),
+    ]
+
+    family.citations = [
+      SourceCitation(xref: "@S1@", page: "1", quality: 1),
+      SourceCitation(xref: "@S2@", page: "2", quality: 2),
+    ]
+    family.multimediaLinks = [
+      .init(xref: "@O1@"),
+      .init(xref: "@O2@"),
+      .init(xref: "@VOID@", title: "Title"),
+    ]
+    family.changeDate = ChangeDate(date: "27 MAR 2022", time: "08:56",
+                                   notes: [
+                                    .Note(Note(text: "Change date note 1")),
+                                    .Note(Note(text: "Change date note 2")),
+                                   ])
+    family.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
+    
+    let exp = family.export()
+    #expect(exp != nil)
+
+    exp?.setLevel(0)
+
+    let exported = exp!.export().split(separator: "\n")
+    let expected =
+      """
+      0 @F1@ FAM
+      1 RESN CONFIDENTIAL, LOCKED
+      1 NCHI 2
+      2 TYPE Type of children
+      2 HUSB
+      3 AGE 25y
+      4 PHRASE Adult
+      2 WIFE
+      3 AGE 25y
+      4 PHRASE Adult
+      1 RESI Residence
+      2 TYPE Type of residence
+      2 HUSB
+      3 AGE 25y
+      4 PHRASE Adult
+      2 WIFE
+      3 AGE 25y
+      4 PHRASE Adult
+      1 FACT Fact
+      2 TYPE Type of fact
+      2 HUSB
+      3 AGE 25y
+      4 PHRASE Adult
+      2 WIFE
+      3 AGE 25y
+      4 PHRASE Adult
+      1 ANUL Y
+      1 CENS Y
+      1 DIV Y
+      1 DIVF Y
+      1 ENGA Y
+      1 MARB Y
+      1 MARC Y
+      1 MARL Y
+      1 MARS Y
+      1 MARR Y
+      2 HUSB
+      3 AGE 25y
+      4 PHRASE Adult
+      2 WIFE
+      3 AGE 25y
+      4 PHRASE Adult
+      2 DATE 27 MAR 2022
+      3 TIME 16:02
+      3 PHRASE Afternoon
+      2 PLAC Place
+      2 ADDR Address
+      2 PHON +1 (555) 555-1212
+      2 PHON +1 (555) 555-1234
+      2 EMAIL GEDCOM@FamilySearch.org
+      2 EMAIL GEDCOM@example.com
+      2 FAX +1 (555) 555-1212
+      2 FAX +1 (555) 555-1234
+      2 WWW http://gedcom.io
+      2 WWW http://gedcom.info
+      2 AGNC Agency
+      2 RELI Religion
+      2 CAUS Cause
+      2 RESN CONFIDENTIAL, LOCKED
+      2 SDATE 27 MAR 2022
+      3 TIME 16:03
+      3 PHRASE Afternoon
+      2 ASSO @VOID@
+      3 ROLE OFFICIATOR
+      2 ASSO @VOID@
+      3 ROLE WITN
+      3 NOTE Note text
+      2 SNOTE @N1@
+      2 SOUR @S1@
+      3 PAGE 1
+      2 SOUR @S1@
+      3 PAGE 2
+      2 OBJE @O1@
+      2 OBJE @O2@
+      2 UID bbcc0025-34cb-4542-8cfb-45ba201c9c2c
+      2 UID 9ead4205-5bad-4c05-91c1-0aecd3f5127d
+      1 EVEN Event
+      2 TYPE Event type
+      1 NO DIV
+      2 DATE FROM 1700 TO 1800
+      3 PHRASE No date phrase
+      2 NOTE Note text
+      2 SNOTE @N2@
+      2 SOUR @S1@
+      3 PAGE 1
+      2 SOUR @S1@
+      3 PAGE 2
+      1 NO ANUL
+      1 HUSB @I1@
+      2 PHRASE Husband phrase
+      1 WIFE @I2@
+      2 PHRASE Wife phrase
+      1 CHIL @I4@
+      2 PHRASE First child
+      1 CHIL @VOID@
+      2 PHRASE Second child
+      1 ASSO @I3@
+      2 PHRASE Association text
+      2 ROLE OTHER
+      3 PHRASE Role text
+      2 NOTE Note text
+      2 SNOTE @N1@
+      2 SOUR @S1@
+      3 PAGE 1
+      2 SOUR @S2@
+      3 PAGE 2
+      1 ASSO @VOID@
+      2 ROLE CLERGY
+      1 SUBM @U1@
+      1 SUBM @U2@
+      1 SUBM @VOID@
+      1 SLGS
+      2 DATE 27 MAR 2022
+      3 TIME 15:47
+      3 PHRASE Afternoon
+      2 TEMP LOGAN
+      2 PLAC Place
+      2 STAT COMPLETED
+      3 DATE 27 MAR 2022
+      4 TIME 15:48
+      2 NOTE Note text
+      2 SNOTE @N1@
+      2 SOUR @S1@
+      3 PAGE 1
+      2 SOUR @S2@
+      3 PAGE 2
+      1 SLGS
+      2 DATE 27 MAR 2022
+      2 STAT CANCELED
+      3 DATE 27 MAR 2022
+      1 SLGS
+      2 DATE 27 MAR 2022
+      2 STAT EXCLUDED
+      3 DATE 27 MAR 2022
+      1 SLGS
+      2 DATE 27 MAR 2022
+      2 STAT DNS
+      3 DATE 27 MAR 2022
+      1 SLGS
+      2 DATE 27 MAR 2022
+      2 STAT DNS_CAN
+      3 DATE 27 MAR 2022
+      1 SLGS
+      2 DATE 27 MAR 2022
+      2 STAT PRE_1970
+      3 DATE 27 MAR 2022
+      1 SLGS
+      2 DATE 27 MAR 2022
+      2 STAT UNCLEARED
+      3 DATE 27 MAR 2022
+      1 REFN 1
+      2 TYPE User-generated identifier
+      1 REFN 10
+      2 TYPE User-generated identifier
+      1 UID f096b664-5e40-40e2-bb72-c1664a46fe45
+      1 UID 1f76f868-8a36-449c-af0d-a29247b3ab50
+      1 EXID 123
+      2 TYPE http://example.com
+      1 EXID 456
+      2 TYPE http://example.com
+      1 NOTE Note text
+      1 SNOTE @N1@
+      1 SOUR @S1@
+      2 PAGE 1
+      2 QUAY 1
+      1 SOUR @S2@
+      2 PAGE 2
+      2 QUAY 2
+      1 OBJE @O1@
+      1 OBJE @O2@
+      1 OBJE @VOID@
+      2 TITL Title
+      1 CHAN
+      2 DATE 27 MAR 2022
+      3 TIME 08:56
+      2 NOTE Change date note 1
+      2 NOTE Change date note 2
+      1 CREA
+      2 DATE 27 MAR 2022
+      3 TIME 08:55
+      
+      """
+
+    for (v, e) in zip(exported, expected.split(separator: "\n")) {
+      #expect(v == e)
+    }
+
+  }
+
   @Test("Repository") func sourceRepo() {
     let repo = Repository(xref: "@R1@", name: "Repository 1")
     repo.address = AddressStructure(addr: "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")
@@ -315,7 +679,7 @@ import Foundation
     ]
 
     media.citations[0].quality = 0
-    media.citations[0].links = [
+    media.citations[0].multimediaLinks = [
       MultimediaLink(xref: "@O1@",
                      crop: Crop(top: 0, left: 0, height: 100, width: 100),
                      title: "Title"),
@@ -449,8 +813,6 @@ import Foundation
     for (v, e) in zip(exported, expected) {
       #expect(v == e)
     }
-
-    print(exp!.export())
 
 //    0 @O2@ OBJE
 //    1 RESN PRIVACY

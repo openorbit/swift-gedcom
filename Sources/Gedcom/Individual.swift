@@ -28,6 +28,11 @@ public class Age : RecordProtocol {
   init() {
     age = ""
   }
+  init(age: String, phrase: String? = nil)
+  {
+    self.age = age
+    self.phrase = phrase
+  }
 
   required init(record: Record) throws {
     age = record.line.value ?? ""
@@ -46,7 +51,13 @@ public class Age : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "AGE", value: age)
+
+    if let phrase = phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+
+    return record
   }
 }
 
@@ -386,6 +397,10 @@ public class LdsOrdinanceStatus : RecordProtocol {
     "DATE" : \LdsOrdinanceStatus.date,
   ]
 
+  init(kind: LdsOrdinanceStatusKind, date: DateTime) {
+    self.kind = kind
+    self.date = date
+  }
   required init(record: Record) throws {
     self.date = DateTime()
     self.kind = LdsOrdinanceStatusKind(rawValue: record.line.value ?? "")!
@@ -405,7 +420,9 @@ public class LdsOrdinanceStatus : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "STAT", value: kind.rawValue)
+    record.children += [date.export()!]
+    return record
   }
 }
 
@@ -865,6 +882,10 @@ public class Role : RecordProtocol {
     "PHRASE" : \Role.phrase,
   ]
 
+  init(kind: RoleKind, phrase: String? = nil) {
+    self.kind = kind
+    self.phrase = phrase
+  }
   required init(record: Record) throws {
     self.kind = RoleKind(rawValue: record.line.value ?? "OTHER") ?? .OTHER
     var mutableSelf = self
@@ -882,7 +903,11 @@ public class Role : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "ROLE", value: kind.rawValue)
+    if let phrase = phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+    return record
   }
 }
 
@@ -900,6 +925,17 @@ public class AssoiciationStructure : RecordProtocol {
     "SNOTE" : \AssoiciationStructure.notes,
     "SOUR" : \AssoiciationStructure.citations,
   ]
+
+  init(xref: String, phrase: String? = nil,
+       role: Role? = nil,
+       notes: [NoteStructure] = [],
+       citations: [SourceCitation] = []) {
+    self.xref = xref
+    self.phrase = phrase
+    self.role = role
+    self.notes = notes
+    self.citations = citations
+  }
 
   required init(record: Record) throws {
     self.xref = record.line.value ?? ""
@@ -924,10 +960,29 @@ public class AssoiciationStructure : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: "ASSO", value: xref)
+
+    if let phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+
+    if let role {
+      record.children += [role.export()!]
+
+    }
+
+    for note in notes {
+      record.children += [note.export()!]
+    }
+    for citation in citations {
+      record.children += [citation.export()!]
+    }
+
+    return record
   }
 }
 public class PhraseRef : RecordProtocol {
+  public var tag: String
   public var xref: String
   public var phrase: String?
 
@@ -935,7 +990,13 @@ public class PhraseRef : RecordProtocol {
     "PHRASE" : \PhraseRef.phrase,
   ]
 
+  init(tag: String, xref: String, phrase: String? = nil) {
+    self.tag = tag
+    self.xref = xref
+    self.phrase = phrase
+  }
   required init(record: Record) throws {
+    self.tag = record.line.tag
     self.xref = record.line.value ?? ""
     var mutableSelf = self
 
@@ -952,7 +1013,13 @@ public class PhraseRef : RecordProtocol {
   }
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, tag: tag, value: xref)
+
+    if let phrase {
+      record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
+    }
+
+    return record
   }
 }
 
@@ -964,6 +1031,8 @@ public enum Sex : String {
 }
 
 public class Individual : RecordProtocol {
+  public var xref: String
+
   public var restrictions: [Restriction] = []
   public var names: [PersonalName] = []
   public var sex: Sex?
@@ -1066,7 +1135,11 @@ public class Individual : RecordProtocol {
 
   ]
 
+  init(xref: String) {
+    self.xref = xref
+  }
   required init(record: Record) throws {
+    self.xref = record.line.xref ?? ""
     var mutableSelf = self
 
     for child in record.children {
@@ -1121,6 +1194,8 @@ public class Individual : RecordProtocol {
 
 
   func export() -> Record? {
-    return nil
+    let record = Record(level: 0, xref: xref, tag: "INDI")
+
+    return record
   }
 }
