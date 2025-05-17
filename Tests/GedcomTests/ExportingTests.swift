@@ -481,6 +481,580 @@ import Foundation
 
   }
 
+  @Test("Individual") func individual() {
+    let individual = Individual(xref: "@I1@")
+
+    individual.restrictions = [.CONFIDENTIAL, .LOCKED]
+    individual.names += [
+      PersonalName(name: "Lt. Cmndr. Joseph \"John\" /de Allen/ jr.",
+                   type: NameType(kind: .OTHER, phrase: "Name type phrase"),
+                   namePieces: [
+                    .NPFX("Lt. Cmndr."),
+                    .GIVN("Joseph"),
+                    .NICK("John"),
+                    .SPFX("de"),
+                    .SURN("Allen"),
+                    .NSFX("jr.")
+                   ],
+                   translations: [
+                    PersonalNameTranslation(name: "npfx John /spfx Doe/ nsfx",
+                                            lang: "en-GB",
+                                            namePieces: [
+                                              .NPFX("npfx"),
+                                              .GIVN("John"),
+                                              .NICK("John"),
+                                              .SPFX ("spfx"),
+                                              .SURN ("Doe"),
+                                              .NSFX("nsfx")]),
+                    PersonalNameTranslation(name: "John /Doe/",
+                                            lang: "en-CA")
+                   ],
+                   notes: [
+                    .Note(Note(text: "Note text")),
+                    .SNote(SNoteRef(xref: "@N1@")),
+                    .SNote(SNoteRef(xref: "@VOID@"))
+                   ],
+                   citations: [
+                    SourceCitation(xref: "@S1@", page: "1"),
+                    SourceCitation(xref: "@S2@")
+                   ]
+                  ),
+      PersonalName(name: "John /Doe/", type: NameType(kind: .BIRTH)),
+      PersonalName(name: "Aka", type: NameType(kind: .AKA)),
+      PersonalName(name: "Immigrant Name", type: NameType(kind: .IMMIGRANT))
+    ]
+    individual.sex = .male
+    individual.attributes = [
+      .init(kind: .CAST, text: "Caste", type: "Caste type"),
+      .init(kind: .DSCR, text: "Description", type: "Description type",
+            citations: [
+              SourceCitation(xref: "@VOID@", page: "Entire source")
+            ]),
+      .init(kind: .EDUC, text: "Education", type: "Education type"),
+      .init(kind: .IDNO, text: "ID number", type: "ID number type"),
+      .init(kind: .NATI, text: "Nationality", type: "Nationality type"),
+      .init(kind: .NCHI, text: "2", type: "nchi type"),
+      .init(kind: .NMR, text: "2", type: "nmr type"),
+      .init(kind: .OCCU, text: "occu", type: "occu type"),
+      .init(kind: .PROP, text: "prop", type: "prop type"),
+      .init(kind: .RELI, text: "reli", type: "reli type"),
+      .init(kind: .RESI, text: "resi", type: "resi type"),
+      .init(kind: .SSN, text: "ssn", type: "ssn type"),
+      .init(kind: .TITL, text: "titl", type: "titl type"),
+      .init(kind: .FACT, text: "fact", type: "fact type"),
+    ]
+    individual.events = [
+      .init(kind: .BAPM, type: "bapm type"),
+      .init(kind: .BAPM, occurred: true),
+      .init(kind: .BARM, type: "barm type"),
+      .init(kind: .BASM, type: "basm type"),
+      .init(kind: .BLES, type: "bles type"),
+      .init(kind: .BURI, type: "buri type", date: DateValue(date: "30 MAR 2022")),
+      .init(kind: .CENS, type: "cens type"),
+      .init(kind: .CHRA, type: "chra type"),
+      .init(kind: .CONF, type: "conf type"),
+      .init(kind: .CREM, type: "crem type"),
+      .init(kind: .DEAT, type: "deat type",
+            date: .init(date: "28 MAR 2022"),
+            sdate: .init(date: "28 MAR 2022", time: "16:47", phrase: "sdate phrase"),
+            place: .init(place: ["Somewhere"]),
+            address: .init(addr: "Address"),
+            phones: ["+1 (555) 555-1212", "+1 (555) 555-1234"],
+            emails: ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"],
+            fax: ["+1 (555) 555-1212", "+1 (555) 555-1234"],
+            www: [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!],
+            agency: "Agency",
+            religion: "Religion",
+            cause: "Cause of death",
+            restrictions: [.CONFIDENTIAL, .LOCKED],
+            associations: [
+              .init(xref: "@I3@", role: Role(kind: .CHIL)),
+              .init(xref: "@VOID@", role: Role(kind: .PARENT))
+            ],
+            notes: [
+              .Note(Note(text: "Note text")),
+              .SNote(SNoteRef(xref: "@N1@"))
+            ],
+            citations: [
+              .init(xref: "@S1@", page: "1"),
+              .init(xref: "@S2@", page: "2"),
+            ],
+            multimediaLinks: [
+              .init(xref: "@O1@"),
+              .init(xref: "@O2@"),
+            ],
+            uid: [
+              UUID(uuidString: "82092878-6f4f-4bca-ad59-d1ae87c5e521")!,
+              UUID(uuidString: "daf4b8c0-4141-42c4-bec8-01d1d818dfaf")!
+            ]
+          ),
+
+      .init(kind: .EMIG, type: "emig type"),
+      .init(kind: .FCOM, type: "fcom type"),
+      .init(kind: .GRAD, type: "grad type"),
+      .init(kind: .IMMI, type: "immi type"),
+      .init(kind: .NATU, type: "natu type"),
+      .init(kind: .ORDN, type: "ordn type"),
+      .init(kind: .PROB, type: "prob type"),
+      .init(kind: .RETI, type: "reti type"),
+      .init(kind: .WILL, type: "will type"),
+      .init(kind: .ADOP, type: "adop type",
+            familyChild: .init(xref: "@VOID@",
+                               adoption: .init(kind: .BOTH,
+                                               phrase: "Adoption phrase"))),
+      .init(kind: .ADOP,
+            familyChild: .init(xref: "@VOID@",
+                               adoption: .init(kind: .HUSB))),
+      .init(kind: .ADOP,
+            familyChild: .init(xref: "@VOID@",
+                               adoption: .init(kind: .WIFE))),
+      .init(kind: .BIRT, type: "birth type", date: .init(date: "1 JAN 2000")),
+      .init(kind: .CHR, type: "chr type",
+            age: Age(age: "8d", phrase: "Age phrase"),
+            date: .init(date: "9 JAN 2000")
+            ),
+      .init(kind: .EVEN, text: "Event", type: "Event type"),
+    ]
+    individual.nonEvents = [
+      .init(kind: .NATU, date: DatePeriod(date: "FROM 1700 TO 1800",
+                                          phrase: "No date phrase"),
+            notes: [
+              .Note(Note(text: "Note text")),
+              .SNote(SNoteRef(xref: "@N1@")),
+            ],
+            citations: [
+              .init(xref: "@S1@", page: "1"),
+              .init(xref: "@S1@", page: "2"),
+            ]
+      ),
+      .init(kind: .EMIG)
+    ]
+
+    individual.ldsDetails = [
+      .init(kind: .BAPL,
+            status: .init(kind: .STILLBORN,
+                          date: .init(date: "27 MAR 2022"))),
+
+      .init(kind: .BAPL,
+            status: .init(kind: .SUBMITTED,
+                          date: .init(date: "27 MAR 2022"))),
+
+      .init(kind: .BAPL,
+              date: .init(date: "27 MAR 2022")),
+
+      .init(kind: .CONL,
+            status: .init(kind: .INFANT,
+                          date: .init(date: "27 MAR 2022"))),
+
+      .init(kind: .CONL,
+            date: .init(date: "27 MAR 2022")),
+
+      .init(kind: .ENDL,
+            status: .init(kind: .CHILD,
+                          date: .init(date: "27 MAR 2022"))),
+
+      .init(kind: .ENDL,
+            date: .init(date: "27 MAR 2022")),
+
+      .init(kind: .INIL,
+            status: .init(kind: .EXCLUDED,
+                          date: .init(date: "27 MAR 2022"))),
+      .init(kind: .INIL,
+            date: .init(date: "27 MAR 2022")),
+
+      .init(kind: .SLGC,
+            date: .init(date: "27 MAR 2022", time: "15:47", phrase: "Afternoon"),
+            temple: "SLAKE",
+            familyChild: "@VOID@"
+           ),
+      .init(kind: .SLGC,
+            familyChild: "@VOID@",
+            place: .init(place: ["Place"]),
+            status: .init(kind: .BIC,
+                          date: .init(date: "27 MAR 2022", time: "15:48")),
+            notes: [
+              .Note(Note(text: "Note text")),
+              .SNote(SNoteRef(xref: "@N1@"))
+            ],
+            citations: [
+              .init(xref: "@S1@", page: "1"),
+              .init(xref: "@S2@", page: "2"),
+            ]
+           ),
+      .init(kind: .SLGC, familyChild: "@F2@"),
+    ]
+    individual.childOfFamilies = [
+      .init(xref: "@VOID@",
+            pedigree: .init(kind: .OTHER, phrase: "Other type"),
+            status: .init(kind: .CHALLENGED, phrase: "Phrase")),
+      .init(xref: "@VOID@",
+            pedigree: .init(kind: .FOSTER)),
+      .init(xref: "@VOID@",
+            pedigree: .init(kind: .SEALING)),
+      .init(xref: "@F2@",
+            pedigree: .init(kind: .ADOPTED),
+            status: .init(kind: .PROVEN)),
+      .init(xref: "@F2@",
+            pedigree: .init(kind: .BIRTH),
+            status: .init(kind: .DISPROVEN)),
+    ]
+    individual.spouseFamilies = [
+      .init(xref: "@VOID@", notes: [
+        .Note(.init(text: "Note text")),
+        .SNote(.init(xref: "@N1@"))
+      ]),
+      .init(xref: "@F1@")
+    ]
+    individual.submitters = ["@U1@", "@U2@"]
+    individual.associations = [
+      .init(xref: "@VOID@", phrase: "Mr Stockdale", role: .init(kind: .FRIEND)),
+      .init(xref: "@VOID@", role: .init(kind: .NGHBR)),
+      .init(xref: "@VOID@", role: .init(kind: .FATH)),
+      .init(xref: "@VOID@", role: .init(kind: .GODP)),
+      .init(xref: "@VOID@", role: .init(kind: .HUSB)),
+      .init(xref: "@VOID@", role: .init(kind: .MOTH)),
+      .init(xref: "@VOID@", role: .init(kind: .MULTIPLE)),
+      .init(xref: "@VOID@", role: .init(kind: .SPOU)),
+      .init(xref: "@VOID@", role: .init(kind: .WIFE)),
+    ]
+
+    individual.aliases = [
+      .init(tag: "ALIA", xref: "@VOID@"),
+      .init(tag: "ALIA", xref: "@I3@", phrase: "Alias"),
+    ]
+    individual.ancestorInterest = ["@U1@", "@VOID@"]
+    individual.decendantInterest = ["@U1@", "@VOID@"]
+
+    individual.identifiers = [
+      .Refn(REFN(ident: "1", type: "User-generated identifier")),
+      .Refn(REFN(ident: "10", type: "User-generated identifier")),
+      .Uuid(UID(ident: "3d75b5eb-36e9-40b3-b79f-f088b5c18595")),
+      .Uuid(UID(ident: "cb49c361-7124-447e-b587-4c6d36e51825")),
+      .Exid(EXID(ident: "123", type: "http://example.com")),
+      .Exid(EXID(ident: "456", type: "http://example.com")),
+    ]
+    individual.notes = [
+      .Note(Note(text: "me@example.com is an example email address.\n@@me and @I are example social media handles.\n@@@@@ has four @ characters where only the first is escaped.")),
+      .SNote(SNoteRef(xref: "@N1@"))
+    ]
+    individual.citations = [
+      .init(xref: "@S1@", page: "1", quality: 3),
+      .init(xref: "@S2@"),
+    ]
+
+    individual.multimediaLinks = [
+      .init(xref: "@O1@"),
+      .init(xref: "@O2@"),
+    ]
+
+    individual.changeDate = .init(date: "27 MAR 2022", time: "08:56", notes: [
+      .Note(Note(text: "Change date note 1")),
+      .Note(Note(text: "Change date note 2"))
+    ])
+    individual.creationDate = .init(date: "27 MAR 2022", time: "08:55")
+
+    let exp = individual.export()
+    #expect(exp != nil)
+
+    exp?.setLevel(0)
+
+    let exported = exp!.export()
+    print(exported)
+    let expected = """
+          0 @I1@ INDI
+          1 RESN CONFIDENTIAL, LOCKED
+          1 NAME Lt. Cmndr. Joseph "John" /de Allen/ jr.
+          2 TYPE OTHER
+          3 PHRASE Name type phrase
+          2 NPFX Lt. Cmndr.
+          2 GIVN Joseph
+          2 NICK John
+          2 SPFX de
+          2 SURN Allen
+          2 NSFX jr.
+          2 TRAN npfx John /spfx Doe/ nsfx
+          3 LANG en-GB
+          3 NPFX npfx
+          3 GIVN John
+          3 NICK John
+          3 SPFX spfx
+          3 SURN Doe
+          3 NSFX nsfx
+          2 TRAN John /Doe/
+          3 LANG en-CA
+          2 NOTE Note text
+          2 SNOTE @N1@
+          2 SNOTE @VOID@
+          2 SOUR @S1@
+          3 PAGE 1
+          2 SOUR @S2@
+          1 NAME John /Doe/
+          2 TYPE BIRTH
+          1 NAME Aka
+          2 TYPE AKA
+          1 NAME Immigrant Name
+          2 TYPE IMMIGRANT
+          1 SEX M
+          1 CAST Caste
+          2 TYPE Caste type
+          1 DSCR Description
+          2 TYPE Description type
+          2 SOUR @VOID@
+          3 PAGE Entire source
+          1 EDUC Education
+          2 TYPE Education type
+          1 IDNO ID number
+          2 TYPE ID number type
+          1 NATI Nationality
+          2 TYPE Nationality type
+          1 NCHI 2
+          2 TYPE nchi type
+          1 NMR 2
+          2 TYPE nmr type
+          1 OCCU occu
+          2 TYPE occu type
+          1 PROP prop
+          2 TYPE prop type
+          1 RELI reli
+          2 TYPE reli type
+          1 RESI resi
+          2 TYPE resi type
+          1 SSN ssn
+          2 TYPE ssn type
+          1 TITL titl
+          2 TYPE titl type
+          1 FACT fact
+          2 TYPE fact type
+          1 BAPM
+          2 TYPE bapm type
+          1 BAPM Y
+          1 BARM
+          2 TYPE barm type
+          1 BASM
+          2 TYPE basm type
+          1 BLES
+          2 TYPE bles type
+          1 BURI
+          2 TYPE buri type
+          2 DATE 30 MAR 2022
+          1 CENS
+          2 TYPE cens type
+          1 CHRA
+          2 TYPE chra type
+          1 CONF
+          2 TYPE conf type
+          1 CREM
+          2 TYPE crem type
+          1 DEAT
+          2 TYPE deat type
+          2 DATE 28 MAR 2022
+          2 PLAC Somewhere
+          2 ADDR Address
+          2 PHON +1 (555) 555-1212
+          2 PHON +1 (555) 555-1234
+          2 EMAIL GEDCOM@FamilySearch.org
+          2 EMAIL GEDCOM@example.com
+          2 FAX +1 (555) 555-1212
+          2 FAX +1 (555) 555-1234
+          2 WWW http://gedcom.io
+          2 WWW http://gedcom.info
+          2 AGNC Agency
+          2 RELI Religion
+          2 CAUS Cause of death
+          2 RESN CONFIDENTIAL, LOCKED
+          2 SDATE 28 MAR 2022
+          3 TIME 16:47
+          3 PHRASE sdate phrase
+          2 ASSO @I3@
+          3 ROLE CHIL
+          2 ASSO @VOID@
+          3 ROLE PARENT
+          2 NOTE Note text
+          2 SNOTE @N1@
+          2 SOUR @S1@
+          3 PAGE 1
+          2 SOUR @S2@
+          3 PAGE 2
+          2 OBJE @O1@
+          2 OBJE @O2@
+          2 UID 82092878-6f4f-4bca-ad59-d1ae87c5e521
+          2 UID daf4b8c0-4141-42c4-bec8-01d1d818dfaf
+          1 EMIG
+          2 TYPE emig type
+          1 FCOM
+          2 TYPE fcom type
+          1 GRAD
+          2 TYPE grad type
+          1 IMMI
+          2 TYPE immi type
+          1 NATU
+          2 TYPE natu type
+          1 ORDN
+          2 TYPE ordn type
+          1 PROB
+          2 TYPE prob type
+          1 RETI
+          2 TYPE reti type
+          1 WILL
+          2 TYPE will type
+          1 ADOP
+          2 TYPE adop type
+          2 FAMC @VOID@
+          3 ADOP BOTH
+          4 PHRASE Adoption phrase
+          1 ADOP
+          2 FAMC @VOID@
+          3 ADOP HUSB
+          1 ADOP
+          2 FAMC @VOID@
+          3 ADOP WIFE
+          1 BIRT
+          2 TYPE birth type
+          2 DATE 1 JAN 2000
+          1 CHR
+          2 TYPE chr type
+          2 DATE 9 JAN 2000
+          2 AGE 8d
+          3 PHRASE Age phrase
+          1 EVEN Event
+          2 TYPE Event type
+          1 NO NATU
+          2 DATE FROM 1700 TO 1800
+          3 PHRASE No date phrase
+          2 NOTE Note text
+          2 SNOTE @N1@
+          2 SOUR @S1@
+          3 PAGE 1
+          2 SOUR @S1@
+          3 PAGE 2
+          1 NO EMIG
+          1 BAPL
+          2 STAT STILLBORN
+          3 DATE 27 MAR 2022
+          1 BAPL
+          2 STAT SUBMITTED
+          3 DATE 27 MAR 2022
+          1 BAPL
+          2 DATE 27 MAR 2022
+          1 CONL
+          2 STAT INFANT
+          3 DATE 27 MAR 2022
+          1 CONL
+          2 DATE 27 MAR 2022
+          1 ENDL
+          2 STAT CHILD
+          3 DATE 27 MAR 2022
+          1 ENDL
+          2 DATE 27 MAR 2022
+          1 INIL
+          2 STAT EXCLUDED
+          3 DATE 27 MAR 2022
+          1 INIL
+          2 DATE 27 MAR 2022
+          1 SLGC
+          2 DATE 27 MAR 2022
+          3 TIME 15:47
+          3 PHRASE Afternoon
+          2 TEMP SLAKE
+          2 FAMC @VOID@
+          1 SLGC
+          2 PLAC Place
+          2 STAT BIC
+          3 DATE 27 MAR 2022
+          4 TIME 15:48
+          2 NOTE Note text
+          2 SNOTE @N1@
+          2 SOUR @S1@
+          3 PAGE 1
+          2 SOUR @S2@
+          3 PAGE 2
+          2 FAMC @VOID@
+          1 SLGC
+          2 FAMC @F2@
+          1 FAMC @VOID@
+          2 PEDI OTHER
+          3 PHRASE Other type
+          2 STAT CHALLENGED
+          3 PHRASE Phrase
+          1 FAMC @VOID@
+          2 PEDI FOSTER
+          1 FAMC @VOID@
+          2 PEDI SEALING
+          1 FAMC @F2@
+          2 PEDI ADOPTED
+          2 STAT PROVEN
+          1 FAMC @F2@
+          2 PEDI BIRTH
+          2 STAT DISPROVEN
+          1 FAMS @VOID@
+          2 NOTE Note text
+          2 SNOTE @N1@
+          1 FAMS @F1@
+          1 SUBM @U1@
+          1 SUBM @U2@
+          1 ASSO @VOID@
+          2 PHRASE Mr Stockdale
+          2 ROLE FRIEND
+          1 ASSO @VOID@
+          2 ROLE NGHBR
+          1 ASSO @VOID@
+          2 ROLE FATH
+          1 ASSO @VOID@
+          2 ROLE GODP
+          1 ASSO @VOID@
+          2 ROLE HUSB
+          1 ASSO @VOID@
+          2 ROLE MOTH
+          1 ASSO @VOID@
+          2 ROLE MULTIPLE
+          1 ASSO @VOID@
+          2 ROLE SPOU
+          1 ASSO @VOID@
+          2 ROLE WIFE
+          1 ALIA @VOID@
+          1 ALIA @I3@
+          2 PHRASE Alias
+          1 ANCI @U1@
+          1 ANCI @VOID@
+          1 DESI @U1@
+          1 DESI @VOID@
+          1 REFN 1
+          2 TYPE User-generated identifier
+          1 REFN 10
+          2 TYPE User-generated identifier
+          1 UID 3d75b5eb-36e9-40b3-b79f-f088b5c18595
+          1 UID cb49c361-7124-447e-b587-4c6d36e51825
+          1 EXID 123
+          2 TYPE http://example.com
+          1 EXID 456
+          2 TYPE http://example.com
+          1 NOTE me@example.com is an example email address.
+          2 CONT @@me and @I are example social media handles.
+          2 CONT @@@@@ has four @ characters where only the first is escaped.
+          1 SNOTE @N1@
+          1 OBJE @O1@
+          1 OBJE @O2@
+          1 SOUR @S1@
+          2 PAGE 1
+          2 QUAY 3
+          1 SOUR @S2@
+          1 CHAN
+          2 DATE 27 MAR 2022
+          3 TIME 08:56
+          2 NOTE Change date note 1
+          2 NOTE Change date note 2
+          1 CREA
+          2 DATE 27 MAR 2022
+          3 TIME 08:55
+
+          """
+
+    for (v, e) in zip(exported.split(separator: "\n"), expected.split(separator: "\n")) {
+      #expect(v == e)
+    }
+  }
+
+
   @Test("Repository") func sourceRepo() {
     let repo = Repository(xref: "@R1@", name: "Repository 1")
     repo.address = AddressStructure(addr: "Family History Department\n15 East South Temple Street\nSalt Lake City, UT 84150 USA")

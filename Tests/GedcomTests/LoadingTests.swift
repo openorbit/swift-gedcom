@@ -886,7 +886,7 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.events[0].type == "bapm type")
 
       #expect(ged.individualRecordsMap["@I1@"]?.events[1].kind == .BAPM)
-      #expect(ged.individualRecordsMap["@I1@"]?.events[1].occured == true)
+      #expect(ged.individualRecordsMap["@I1@"]?.events[1].occurred == true)
 
 
       #expect(ged.individualRecordsMap["@I1@"]?.events[2].kind == .BARM)
@@ -916,8 +916,8 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.events[10].date?.date == "28 MAR 2022")
       #expect(ged.individualRecordsMap["@I1@"]?.events[10].place?.place == ["Somewhere"])
       #expect(ged.individualRecordsMap["@I1@"]?.events[10].address?.address == "Address")
-      #expect(ged.individualRecordsMap["@I1@"]?.events[10].phone == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
-      #expect(ged.individualRecordsMap["@I1@"]?.events[10].email == ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"])
+      #expect(ged.individualRecordsMap["@I1@"]?.events[10].phones == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
+      #expect(ged.individualRecordsMap["@I1@"]?.events[10].emails == ["GEDCOM@FamilySearch.org", "GEDCOM@example.com"])
       #expect(ged.individualRecordsMap["@I1@"]?.events[10].fax == ["+1 (555) 555-1212", "+1 (555) 555-1234"])
       #expect(ged.individualRecordsMap["@I1@"]?.events[10].www == [URL(string: "http://gedcom.io")!, URL(string: "http://gedcom.info")!])
       #expect(ged.individualRecordsMap["@I1@"]?.events[10].agency == "Agency")
