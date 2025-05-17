@@ -759,7 +759,7 @@ import Foundation
     exp?.setLevel(0)
 
     let exported = exp!.export()
-    print(exported)
+
     let expected = """
           0 @I1@ INDI
           1 RESN CONFIDENTIAL, LOCKED
