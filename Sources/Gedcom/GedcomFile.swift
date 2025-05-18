@@ -20,12 +20,12 @@ import Foundation
 import ZIPFoundation
 
 class GedcomFile {
-  let url: URL
-  let archive: Archive?
-  var data: Data
+  var url: URL?
+  var archive: Archive?
+  var data: Data?
   var recordLines: [Record] = []
 
-  var header: Header = Header()
+  public var header: Header = Header()
   var familyRecords: [Family] = []
   var individualRecords: [Individual] = []
   var multimediaRecords: [Multimedia] = []
@@ -55,12 +55,12 @@ class GedcomFile {
 
     data = Data()
     try _ = archive.extract(entry) { data in
-      self.data.append(data)
+      self.data!.append(data)
     }
 
-    if data.starts(with: [0xef, 0xbb, 0xbf]) {
+    if data!.starts(with: [0xef, 0xbb, 0xbf]) {
       // File starts with a BOM, drop it
-      data.removeFirst(3)
+      data!.removeFirst(3)
     }
 
     try parse(encoding: encoding)
@@ -72,17 +72,26 @@ class GedcomFile {
     self.archive = nil
     self.data = try Data(contentsOf: path)
 
-    if data.starts(with: [0xef, 0xbb, 0xbf]) {
+    if data!.starts(with: [0xef, 0xbb, 0xbf]) {
       // File starts with a BOM, drop it
-      data.removeFirst(3)
+      data!.removeFirst(3)
     }
 
     try parse(encoding: encoding)
     try build()
   }
 
+  init() {
+  }
+
+  func dataAsString(encoding: String.Encoding) -> String? {
+    guard let data else {
+      return nil
+    }
+    return String(data: data, encoding: encoding)
+  }
   func parse(encoding: String.Encoding) throws {
-    let gedcom = String(data: self.data, encoding: encoding)!
+    let gedcom = dataAsString(encoding: encoding)!
     var recordStack: [Record] = []
 
     var errorOnLine: Int?
@@ -189,7 +198,7 @@ class GedcomFile {
     }
   }
 
-  func export() -> String {
+  public func exportContent() -> String {
     var records: [Record] = []
 
     records += [header.export()]
@@ -230,6 +239,58 @@ class GedcomFile {
     }
 
     return result
+  }
+
+  public func export(archive path: URL, encoding: String.Encoding = .utf8) throws {
+    let content = exportContent()
+    let data = content.data(using: encoding)!
+
+    let archive = try Archive(url: path, accessMode: .create)
+
+    try archive.addEntry(with: "gedcom.ged", type: .file, uncompressedSize: Int64(data.count), bufferSize: 4, provider: { (position, size) -> Data in
+      // This will be called until `data` is exhausted (3x in this case).
+      return data.subdata(in: Data.Index(position)..<Int(position)+size)
+    })
+  }
+
+  public func export(file path: URL, encoding: String.Encoding = .utf8) throws {
+    let content = exportContent()
+    let data = content.data(using: encoding)!
+    try data.write(to: path)
+  }
+
+  public func add(individual: Individual) {
+    individualRecords += [individual]
+    individualRecordsMap[individual.xref] = individual
+  }
+
+  public func add(family: Family) {
+    familyRecords += [family]
+    familyRecordsMap[family.xref] = family
+  }
+  public func add(media: Multimedia) {
+    multimediaRecords += [media]
+    multimediaRecordsMap[media.xref] = media
+  }
+
+  public func add(repo: Repository) {
+    repositoryRecords += [repo]
+    repositoryRecordsMap[repo.xref] = repo
+  }
+
+  public func add(note: SharedNote) {
+    sharedNoteRecords += [note]
+    sharedNoteRecordsMap[note.xref] = note
+  }
+
+  public func add(source: Source) {
+    sourceRecords += [source]
+    sourceRecordsMap[source.xref] = source
+  }
+
+  public func add(submitter: Submitter) {
+    submitterRecords += [submitter]
+    submitterRecordsMap[submitter.xref] = submitter
   }
 }
 
