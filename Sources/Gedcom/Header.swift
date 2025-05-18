@@ -40,7 +40,7 @@ public class Gedc : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "GEDC")
     record.children.append(Record(level: 1, tag: "VERS", value: vers))
     return record
@@ -84,7 +84,7 @@ public class Schema : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "SCHMA")
     for key in tags.keys.sorted() {
       record.children.append(Record(level: 1, tag: "TAG", value: key + " " + tags[key]!.absoluteString))
@@ -120,7 +120,7 @@ public class HeaderPlace : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "PLAC")
     let formString = form.reduce("") { (acc, token) in
       return acc + ((acc.count > 1) ? ", " : "") + token
@@ -170,13 +170,12 @@ public class HeaderSourceCorporation : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "CORP", value: corporation)
 
     if let address = address {
-      if let child = address.export() {
-        record.children.append(child)
-      }
+      let child = address.export()
+      record.children.append(child)
     }
 
     for phone in phone {
@@ -228,13 +227,12 @@ public class HeaderSourceData : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "DATA", value: data)
 
     if let date = date {
-      if let exportedDate = date.export() {
-        record.children.append(exportedDate)
-      }
+      let exportedDate = date.export()
+      record.children.append(exportedDate)
     }
 
     if let copyright {
@@ -282,7 +280,7 @@ public class HeaderSource : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "SOUR", value: source)
 
     if let version = version {
@@ -293,14 +291,12 @@ public class HeaderSource : RecordProtocol {
     }
 
     if let corporation = corporation {
-      if let child = corporation.export() {
-        record.children.append(child)
-      }
+      let child = corporation.export()
+      record.children.append(child)
     }
     if let data = data {
-      if let child = data.export() {
-        record.children.append(child)
-      }
+      let child = data.export()
+      record.children.append(child)
     }
     return record
   }
@@ -366,21 +362,19 @@ public class Header : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "HEAD")
 
-    record.children.append(gedc.export()!)
+    record.children.append(gedc.export())
 
     if let schema {
-      if let child = schema.export() {
-        record.children.append(child)
-      }
+      let child = schema.export()
+      record.children.append(child)
     }
 
     if let source {
-      if let child = source.export() {
-        record.children.append(child)
-      }
+      let child = source.export()
+      record.children.append(child)
     }
 
     if let destination {
@@ -388,9 +382,8 @@ public class Header : RecordProtocol {
     }
 
     if let date {
-      if let child = date.export() {
-        record.children.append(child)
-      }
+      let child = date.export()
+      record.children.append(child)
     }
 
     if let submitter {
@@ -404,16 +397,16 @@ public class Header : RecordProtocol {
     }
 
     if let place {
-      if let child = place.export() {
-        record.children.append(child)
-      }
+      let child = place.export()
+      record.children.append(child)
     }
 
     if let note {
-      if let note = note.export() {
-        record.children.append(note)
-      }
+      let note = note.export()
+      record.children.append(note)
     }
+
+    record.setLevel(0)
     return record
   }
 }

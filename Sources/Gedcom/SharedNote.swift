@@ -88,7 +88,7 @@ public class SharedNote : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, xref: xref, tag: "SNOTE", value: text)
 
     if let mimeType {
@@ -100,25 +100,26 @@ public class SharedNote : RecordProtocol {
     }
 
     for translation in translations {
-      record.children += [translation.export()!]
+      record.children += [translation.export()]
     }
 
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     for identifier in identifiers {
-      record.children += [identifier.export()!]
+      record.children += [identifier.export()]
     }
 
     if let changeDate {
-      record.children += [changeDate.export()!]
+      record.children += [changeDate.export()]
     }
 
     if let creationDate {
-      record.children += [creationDate.export()!]
+      record.children += [creationDate.export()]
     }
 
+    record.setLevel(0)
     return record
   }
 }

@@ -57,11 +57,8 @@ import Foundation
     header.note = NoteStructure.Note(note)
 
     let exp = header.export()
-    #expect(exp != nil)
 
-    exp?.setLevel(0)
-
-    #expect(exp!.export() ==
+    #expect(exp.export() ==
       """
       0 HEAD
       1 GEDC
@@ -285,11 +282,8 @@ import Foundation
     family.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
     
     let exp = family.export()
-    #expect(exp != nil)
 
-    exp?.setLevel(0)
-
-    let exported = exp!.export().split(separator: "\n")
+    let exported = exp.export().split(separator: "\n")
     let expected =
       """
       0 @F1@ FAM
@@ -754,11 +748,8 @@ import Foundation
     individual.creationDate = .init(date: "27 MAR 2022", time: "08:55")
 
     let exp = individual.export()
-    #expect(exp != nil)
 
-    exp?.setLevel(0)
-
-    let exported = exp!.export()
+    let exported = exp.export()
 
     let expected = """
           0 @I1@ INDI
@@ -1087,11 +1078,8 @@ import Foundation
 
 
     let exp = repo.export()
-    #expect(exp != nil)
 
-    exp?.setLevel(0)
-
-    #expect(exp!.export() ==
+    #expect(exp.export() ==
       """
       0 @R1@ REPO
       1 NAME Repository 1
@@ -1159,11 +1147,8 @@ import Foundation
     snote.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
 
     let exp = snote.export()
-    #expect(exp != nil)
 
-    exp?.setLevel(0)
-
-    #expect(exp!.export() ==
+    #expect(exp.export() ==
         """
         0 @N1@ SNOTE Shared note 1
         1 MIME text/plain
@@ -1284,9 +1269,6 @@ import Foundation
     media.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
 
     let exp = media.export()
-    #expect(exp != nil)
-
-    exp?.setLevel(0)
 
     // From the first submitter example
 
@@ -1382,7 +1364,7 @@ import Foundation
 
         """.split(separator: "\n")
 
-    let exported = exp!.export().split(separator: "\n")
+    let exported = exp.export().split(separator: "\n")
 
     for (v, e) in zip(exported, expected) {
       #expect(v == e)
@@ -1478,9 +1460,6 @@ import Foundation
     source.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
 
     let exp = source.export()
-    #expect(exp != nil)
-
-    exp?.setLevel(0)
 
     // From the first submitter example
 
@@ -1588,7 +1567,7 @@ import Foundation
         
         """.split(separator: "\n")
 
-    let exported = exp!.export().split(separator: "\n")
+    let exported = exp.export().split(separator: "\n")
 
     for (v, e) in zip(exported, expected) {
       #expect(v == e)
@@ -1637,12 +1616,9 @@ import Foundation
     submitter.creationDate = CreationDate(date: "27 MAR 2022", time: "08:55")
 
     let exp = submitter.export()
-    #expect(exp != nil)
-
-    exp?.setLevel(0)
 
     // From the first submitter example
-    #expect(exp!.export() ==
+    #expect(exp.export() ==
         """
         0 @U1@ SUBM
         1 NAME GEDCOM Steering Committee

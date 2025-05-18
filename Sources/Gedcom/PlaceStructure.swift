@@ -48,7 +48,7 @@ public class PlaceTranslation : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "TRAN", value: place.joined(separator: ", "))
     record.children += [Record(level: 1, tag: "LANG", value: lang)]
     return record
@@ -99,7 +99,7 @@ public class PlaceCoordinates : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "MAP")
     record.children += [
       Record(level: 1, tag: "LATI", value: "\(lat >= 0 ? "N\(lat)" : "S\(lat * -1)")"),
@@ -167,7 +167,7 @@ public class PlaceStructure : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "PLAC", value: place.joined(separator: ", "))
 
     if form.count > 0 {
@@ -179,18 +179,18 @@ public class PlaceStructure : RecordProtocol {
     }
 
     for translation in translations {
-      record.children += [translation.export()!]
+      record.children += [translation.export()]
     }
 
     if let map {
-      record.children += [map.export()!]
+      record.children += [map.export()]
     }
 
     for exid in exids {
-      record.children += [exid.export()!]
+      record.children += [exid.export()]
     }
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     return record

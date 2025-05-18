@@ -50,7 +50,7 @@ public class Age : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "AGE", value: age)
 
     if let phrase = phrase {
@@ -220,7 +220,7 @@ public class IndividualAttributeStructure  : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: kind.rawValue, value: text)
 
     if let type {
@@ -228,20 +228,20 @@ public class IndividualAttributeStructure  : RecordProtocol {
     }
 
     if let age {
-      record.children += [age.export()!]
+      record.children += [age.export()]
     }
 
     if let date {
-      record.children += [date.export()!]
+      record.children += [date.export()]
     }
     if let sdate {
-      record.children += [sdate.export()!]
+      record.children += [sdate.export()]
     }
     if let place {
-      record.children += [place.export()!]
+      record.children += [place.export()]
     }
     if let address {
-      record.children += [address.export()!]
+      record.children += [address.export()]
     }
     for phone in phones {
       record.children += [Record(level: 1, tag: "PHON", value: phone)]
@@ -270,19 +270,19 @@ public class IndividualAttributeStructure  : RecordProtocol {
     }
 
     for association in associations {
-      record.children += [association.export()!]
+      record.children += [association.export()]
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     for link in multimediaLinks {
-      record.children += [link.export()!]
+      record.children += [link.export()]
     }
 
     for uuid in uid {
@@ -366,19 +366,19 @@ public class NonEventStructure : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "NO", value: kind.rawValue)
 
     if let date {
-      record.children += [date.export()!]
+      record.children += [date.export()]
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     return record
@@ -542,7 +542,7 @@ public class IndividualEvent : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: kind.rawValue)
     if kind == .EVEN {
       record.line.value = text
@@ -555,23 +555,23 @@ public class IndividualEvent : RecordProtocol {
     }
 
     if let familyChild {
-      record.children += [familyChild.export()!]
+      record.children += [familyChild.export()]
 
     }
 
     if let date {
-      record.children += [date.export()!]
+      record.children += [date.export()]
     }
 
     if let age {
-      record.children += [age.export()!]
+      record.children += [age.export()]
     }
     
     if let place {
-      record.children += [place.export()!]
+      record.children += [place.export()]
     }
     if let address {
-      record.children += [address.export()!]
+      record.children += [address.export()]
     }
     for phone in phones {
       record.children += [Record(level: 1, tag: "PHON", value: phone)]
@@ -600,25 +600,25 @@ public class IndividualEvent : RecordProtocol {
     }
 
     if let sdate {
-      let sdate = sdate.export()!
+      let sdate = sdate.export()
       sdate.line.tag = "SDATE" // Override default export tag
       record.children += [sdate]
     }
 
     for association in associations {
-      record.children += [association.export()!]
+      record.children += [association.export()]
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     for link in multimediaLinks {
-      record.children += [link.export()!]
+      record.children += [link.export()]
     }
 
     for uuid in uid {
@@ -682,9 +682,9 @@ public class LdsOrdinanceStatus : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "STAT", value: kind.rawValue)
-    record.children += [date.export()!]
+    record.children += [date.export()]
     return record
   }
 }
@@ -765,28 +765,28 @@ public class LdsIndividualOrdinance : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: kind.rawValue)
 
     if let date {
-      record.children += [date.export()!]
+      record.children += [date.export()]
     }
     if let temple {
       record.children += [Record(level: 1, tag: "TEMP", value: temple)]
     }
 
     if let place {
-      record.children += [place.export()!]
+      record.children += [place.export()]
     }
 
     if let status {
-      record.children += [status.export()!]
+      record.children += [status.export()]
     }
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     if let familyChild {
@@ -836,7 +836,7 @@ public class NameType : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "TYPE", value: kind.rawValue)
 
     if let phrase {
@@ -857,7 +857,7 @@ public enum PersonalNamePiece : Equatable {
 }
 
 extension PersonalNamePiece {
-  func export() -> Record? {
+  func export() -> Record {
     switch self {
     case .NPFX(let s):
       return Record(level: 0, tag: "NPFX", value: s)
@@ -929,12 +929,12 @@ public class PersonalNameTranslation  : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "TRAN", value: name)
     record.children += [Record(level: 1, tag: "LANG", value: lang)]
 
     for namePiece in namePieces {
-      record.children += [namePiece.export()!]
+      record.children += [namePiece.export()]
     }
 
     return record
@@ -1014,27 +1014,27 @@ public class PersonalName  : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "NAME", value: name)
 
     if let type {
-      record.children += [type.export()!]
+      record.children += [type.export()]
     }
 
     for namePiece in namePieces {
-      record.children += [namePiece.export()!]
+      record.children += [namePiece.export()]
     }
 
     for translation in translations {
-      record.children += [translation.export()!]
+      record.children += [translation.export()]
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     return record
@@ -1079,7 +1079,7 @@ public class Pedigree : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "PEDI", value: kind.rawValue)
     if let phrase {
       record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
@@ -1125,7 +1125,7 @@ public class FamilyChildAdoptionKind : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "ADOP", value: kind.rawValue)
     if let phrase {
       record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
@@ -1161,10 +1161,10 @@ public class FamilyChildAdoption : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "FAMC", value: xref)
     if let adoption {
-      record.children += [adoption.export()!]
+      record.children += [adoption.export()]
     }
     return record
   }
@@ -1197,7 +1197,7 @@ public class ChildStatus : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "STAT", value: kind.rawValue)
     if let phrase {
       record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
@@ -1249,18 +1249,18 @@ public class FamilyChild : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "FAMC", value: xref)
 
     if let pedigree {
-      record.children += [pedigree.export()!]
+      record.children += [pedigree.export()]
     }
     if let status {
-      record.children += [status.export()!]
+      record.children += [status.export()]
     }
 
     for note in notes  {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
     return record
   }
@@ -1295,10 +1295,10 @@ public class FamilySpouse : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "FAMS", value: xref)
     for note in notes  {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
     return record
   }
@@ -1350,7 +1350,7 @@ public class Role : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "ROLE", value: kind.rawValue)
     if let phrase = phrase {
       record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
@@ -1407,7 +1407,7 @@ public class AssoiciationStructure : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "ASSO", value: xref)
 
     if let phrase {
@@ -1415,15 +1415,15 @@ public class AssoiciationStructure : RecordProtocol {
     }
 
     if let role {
-      record.children += [role.export()!]
+      record.children += [role.export()]
 
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     return record
@@ -1460,7 +1460,7 @@ public class PhraseRef : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: tag, value: xref)
 
     if let phrase {
@@ -1641,7 +1641,7 @@ public class Individual : RecordProtocol {
   }
 
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, xref: xref, tag: "INDI")
 
 
@@ -1652,7 +1652,7 @@ public class Individual : RecordProtocol {
     }
 
     for name in names {
-      record.children += [name.export()!]
+      record.children += [name.export()]
     }
 
     if let sex {
@@ -1660,27 +1660,27 @@ public class Individual : RecordProtocol {
     }
 
     for attribute in attributes {
-      record.children += [attribute.export()!]
+      record.children += [attribute.export()]
     }
 
     for event in events {
-      record.children += [event.export()!]
+      record.children += [event.export()]
     }
 
     for nonEvent in nonEvents {
-      record.children += [nonEvent.export()!]
+      record.children += [nonEvent.export()]
     }
 
     for ldsDetail in ldsDetails {
-      record.children += [ldsDetail.export()!]
+      record.children += [ldsDetail.export()]
     }
 
     for childOfFamily in childOfFamilies {
-      record.children += [childOfFamily.export()!]
+      record.children += [childOfFamily.export()]
     }
 
     for spouseOfFamily in spouseFamilies {
-      record.children += [spouseOfFamily.export()!]
+      record.children += [spouseOfFamily.export()]
     }
 
     for submitter in submitters {
@@ -1688,11 +1688,11 @@ public class Individual : RecordProtocol {
     }
 
     for association in associations {
-      record.children += [association.export()!]
+      record.children += [association.export()]
     }
 
     for alias in aliases {
-      record.children += [alias.export()!]
+      record.children += [alias.export()]
     }
 
     for ancestorInterest in ancestorInterest {
@@ -1704,29 +1704,30 @@ public class Individual : RecordProtocol {
     }
 
     for identifier in identifiers {
-      record.children += [identifier.export()!]
+      record.children += [identifier.export()]
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for multimediaLink in multimediaLinks {
-      record.children += [multimediaLink.export()!]
+      record.children += [multimediaLink.export()]
     }
 
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     if let changeDate {
-      record.children += [changeDate.export()!]
+      record.children += [changeDate.export()]
     }
 
     if let creationDate {
-      record.children += [creationDate.export()!]
+      record.children += [creationDate.export()]
     }
 
+    record.setLevel(0)
     return record
   }
 }

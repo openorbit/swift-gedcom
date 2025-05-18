@@ -60,7 +60,7 @@ public class DateTime : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "DATE", value: date)
     if let time {
       let timeRecord = Record(level: 1, tag: "TIME", value: time)
@@ -104,10 +104,10 @@ public class DateTimeExact : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
-    var record = Record(level: 0, tag: "DATE", value: date)
+  func export() -> Record {
+    let record = Record(level: 0, tag: "DATE", value: date)
     if let time {
-      var timeRecord = Record(level: 1, tag: "TIME", value: time)
+      let timeRecord = Record(level: 1, tag: "TIME", value: time)
       record.children.append(timeRecord)
     }
     return record
@@ -142,7 +142,7 @@ public class DateValue : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "DATE", value: date)
     if let time {
       let timeRecord = Record(level: 1, tag: "TIME", value: time)
@@ -184,7 +184,7 @@ public class DatePeriod : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "DATE", value: date)
     if let time {
       let timeRecord = Record(level: 1, tag: "TIME", value: time)
@@ -223,11 +223,10 @@ public class CreationDate : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "CREA")
-    if let exportedDate = date.export() {
-      record.children.append(exportedDate)
-    }
+    let exportedDate = date.export()
+    record.children.append(exportedDate)
     return record
   }
 }
@@ -261,15 +260,13 @@ public class ChangeDate : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "CHAN")
-    if let exportedDate = date.export() {
-      record.children.append(exportedDate)
-    }
+    let exportedDate = date.export()
+    record.children.append(exportedDate)
     for note in notes {
-      if let exportedNote = note.export() {
-        record.children.append(exportedNote)
-      }
+      let exportedNote = note.export()
+      record.children.append(exportedNote)
     }
     return record
   }

@@ -55,7 +55,7 @@ public class AddressStructure : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "ADDR", value: address)
     if let adr1 {
       record.children.append(Record(level: 1, tag: "ADR1", value: adr1))

@@ -188,5 +188,48 @@ class GedcomFile {
       }
     }
   }
+
+  func export() -> String {
+    var records: [Record] = []
+
+    records += [header.export()]
+
+    for fam in familyRecords {
+      records += [fam.export()]
+    }
+
+    for ind in individualRecords {
+      records += [ind.export()]
+    }
+
+    for multi in multimediaRecords {
+      records += [multi.export()]
+    }
+
+    for repo in repositoryRecords {
+      records += [repo.export()]
+    }
+
+    for note in sharedNoteRecords {
+      records += [note.export()]
+    }
+
+    for source in sourceRecords {
+      records += [source.export()]
+    }
+
+    for submitter in submitterRecords {
+      records += [submitter.export()]
+    }
+
+    records += [Record(level: 0, tag: "TRLR")]
+
+    var result = ""
+    for record in records {
+      result += record.export()
+    }
+
+    return result
+  }
 }
 

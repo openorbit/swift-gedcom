@@ -45,7 +45,7 @@ public class REFN : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "REFN", value: refn)
     if let type {
       record.children.append(Record(level: 1, tag: "TYPE", value: type))
@@ -65,7 +65,7 @@ public class UID : RecordProtocol {
     self.uid = UUID(uuidString: record.line.value ?? "") ?? UUID()
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "UID", value: uid.uuidString.lowercased())
     return record
   }
@@ -101,7 +101,7 @@ public class EXID : RecordProtocol {
   }
 
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "EXID", value: exid)
     if let type {
       record.children.append(Record(level: 1, tag: "TYPE", value: type))
@@ -131,7 +131,7 @@ extension IdentifierStructure : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     switch self {
     case .Exid(let ident):
       return ident.export()

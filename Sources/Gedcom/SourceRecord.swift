@@ -43,13 +43,13 @@ public class SourceCitationData : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "DATA")
     if let date {
-      record.children += [date.export()!]
+      record.children += [date.export()]
     }
     for text in self.text {
-      record.children += [text.export()!]
+      record.children += [text.export()]
     }
     return record
   }
@@ -80,7 +80,7 @@ public class SourceEventRole : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "ROLE", value: role)
     if let phrase {
       record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
@@ -120,14 +120,14 @@ public class SourceEventData : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "EVEN", value: event)
 
     if let phrase {
       record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
     }
     if let role {
-      record.children += [role.export()!]
+      record.children += [role.export()]
     }
 
     return record
@@ -196,25 +196,25 @@ public class SourceCitation : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "SOUR", value: xref)
     if let page {
       record.children.append(Record(level: 1, tag: "PAGE", value: page))
     }
     if let data {
-      record.children.append(data.export()!)
+      record.children.append(data.export())
     }
     for event in events {
-      record.children.append(event.export()!)
+      record.children.append(event.export())
     }
     if let quality {
       record.children.append(Record(level: 1, tag: "QUAY", value: "\(quality)"))
     }
     for link in multimediaLinks {
-      record.children.append(link.export()!)
+      record.children.append(link.export())
     }
     for note in notes {
-      record.children.append(note.export()!)
+      record.children.append(note.export())
     }
 
     return record
@@ -248,7 +248,7 @@ public class SourceDataEventPeriod : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "DATE", value: date)
 
     if let phrase {
@@ -291,14 +291,14 @@ public class SourceDataEvents : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "EVEN", value: eventTypes.joined(separator: ", "))
 
     if let period {
-      record.children += [period.export()!]
+      record.children += [period.export()]
     }
     if let place {
-      record.children += [place.export()!]
+      record.children += [place.export()]
     }
     
     return record
@@ -338,11 +338,11 @@ public class SourceData : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "DATA")
 
     for event in events {
-      record.children += [event.export()!]
+      record.children += [event.export()]
     }
 
     if let agency {
@@ -350,7 +350,7 @@ public class SourceData : RecordProtocol {
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     return record
@@ -403,7 +403,7 @@ public class Medium : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "MEDI", value: kind.rawValue)
     if let phrase = phrase {
       record.children += [Record(level: 1, tag: "PHRASE", value: phrase)]
@@ -438,10 +438,10 @@ public class CallNumber : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "CALN", value: callNumber)
     if let medium{
-      record.children += [medium.export()!]
+      record.children += [medium.export()]
     }
     return record
   }
@@ -480,14 +480,14 @@ public class SourceRepositoryCitation : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "REPO", value: xref)
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
     for callNumber in callNumbers {
-      record.children += [callNumber.export()!]
+      record.children += [callNumber.export()]
     }
 
     return record
@@ -523,7 +523,7 @@ public class SourceText : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "TEXT", value: text)
 
     if let mimeType {
@@ -610,11 +610,11 @@ public class Source : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, xref: xref, tag: "SOUR")
 
     if let data {
-      record.children += [data.export()!]
+      record.children += [data.export()]
     }
     if let author {
       record.children += [Record(level: 1, tag: "AUTH", value: author)]
@@ -631,31 +631,32 @@ public class Source : RecordProtocol {
     }
 
     if let text {
-      record.children += [text.export()!]
+      record.children += [text.export()]
     }
 
     for citation in sourceRepoCitation {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
     for identifier in identifiers {
-      record.children += [identifier.export()!]
+      record.children += [identifier.export()]
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for multimediaLink in multimediaLinks {
-      record.children += [multimediaLink.export()!]
+      record.children += [multimediaLink.export()]
     }
 
     if let changeDate {
-      record.children += [changeDate.export()!]
+      record.children += [changeDate.export()]
     }
     if let creationDate {
-      record.children += [creationDate.export()!]
+      record.children += [creationDate.export()]
     }
 
+    record.setLevel(0)
     return record
   }
 }

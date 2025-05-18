@@ -48,7 +48,7 @@ public class Crop : RecordProtocol {
       }
     }
   }
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "CROP")
 
     if let top {
@@ -101,11 +101,11 @@ public class MultimediaLink  : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "OBJE", value: xref)
 
     if let crop {
-      record.children.append(crop.export()!)
+      record.children.append(crop.export())
     }
     if let title {
       record.children.append(Record(level: 1, tag: "TITL", value: title))
@@ -145,7 +145,7 @@ public class FileTranslation : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "TRAN", value: path)
     record.children += [Record(level: 1, tag: "FORM", value: form)]
     return record
@@ -178,11 +178,11 @@ public class MultimediaFileForm : RecordProtocol {
       }
     }
   }
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "FORM", value: form)
 
     if let medium {
-      record.children += [medium.export()!]
+      record.children += [medium.export()]
     }
 
     return record
@@ -228,17 +228,17 @@ public class MultimediaFile : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "FILE", value: path)
 
-    record.children += [form.export()!]
+    record.children += [form.export()]
 
     if let title {
       record.children += [Record(level: 1, tag: "TITL", value: title)]
     }
 
     for translation in translations {
-      record.children += [translation.export()!]
+      record.children += [translation.export()]
     }
 
     return record
@@ -303,7 +303,7 @@ public class Multimedia  : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, xref: xref, tag: "OBJE")
 
     if restrictions.count > 0 {
@@ -312,27 +312,29 @@ public class Multimedia  : RecordProtocol {
     }
 
     for file in files {
-      record.children += [file.export()!]
+      record.children += [file.export()]
     }
 
     for identifer in identifiers {
-      record.children += [identifer.export()!]
+      record.children += [identifer.export()]
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for citation in citations {
-      record.children += [citation.export()!]
+      record.children += [citation.export()]
     }
 
     if let changeDate {
-      record.children += [changeDate.export()!]
+      record.children += [changeDate.export()]
     }
     if let creationDate {
-      record.children += [creationDate.export()!]
+      record.children += [creationDate.export()]
     }
+
+    record.setLevel(0)
     return record
   }
 }

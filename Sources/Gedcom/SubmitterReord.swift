@@ -88,15 +88,14 @@ public class Submitter : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, xref: xref, tag: "SUBM")
 
     record.children.append(Record(level: 1, tag: "NAME", value: name))
 
     if let address = address {
-      if let child = address.export() {
-        record.children.append(child)
-      }
+      let child = address.export()
+      record.children.append(child)
     }
     for phone in phone {
       record.children.append(Record(level: 1, tag: "PHON", value: phone))
@@ -112,9 +111,8 @@ public class Submitter : RecordProtocol {
     }
 
     for multimediaLink in multimediaLinks {
-      if let child = multimediaLink.export() {
+      let child = multimediaLink.export()
         record.children.append(child)
-      }
     }
 
     for lang in languages {
@@ -122,27 +120,24 @@ public class Submitter : RecordProtocol {
     }
 
     for identifier in identifiers {
-      if let child = identifier.export() {
-        record.children.append(child)
-      }
+      let child = identifier.export()
+      record.children.append(child)
     }
     for note in notes {
-      if let child = note.export() {
-        record.children.append(child)
-      }
+      let child = note.export()
+      record.children.append(child)
     }
 
     if let changeDate {
-      if let child = changeDate.export() {
-        record.children.append(child)
-      }
+      let child = changeDate.export()
+      record.children.append(child)
     }
     if let creationDate {
-      if let child = creationDate.export() {
-        record.children.append(child)
-      }
+      let child = creationDate.export()
+      record.children.append(child)
     }
 
+    record.setLevel(0)
     return record
   }
 }

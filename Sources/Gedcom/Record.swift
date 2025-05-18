@@ -52,5 +52,5 @@ class Record {
 
 protocol RecordProtocol {
   init(record: Record) throws
-  func export() -> Record?
+  func export() -> Record
 }

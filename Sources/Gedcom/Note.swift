@@ -49,7 +49,7 @@ public class Translation : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "TRAN", value: text)
 
     if let mimeType {
@@ -105,7 +105,7 @@ public class Note : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, tag: "NOTE", value: text)
 
     if let mimeType {
@@ -118,13 +118,13 @@ public class Note : RecordProtocol {
     }
 
     for translation in translations {
-      let translationRecord = translation.export()!
+      let translationRecord = translation.export()
       translationRecord.line.level += 1
       record.children.append(translationRecord)
     }
 
     for citation in citations {
-      let citationRecord = citation.export()!
+      let citationRecord = citation.export()
       citationRecord.line.level += 1
       record.children.append(citationRecord)
     }
@@ -144,7 +144,7 @@ public class SNoteRef : RecordProtocol {
     self.xref = xref
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     return Record(level: 0, tag: "SNOTE", value: xref)
   }
 }
@@ -167,7 +167,7 @@ extension NoteStructure : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     switch self {
       case .Note(let note):
       return note.export()

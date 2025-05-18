@@ -82,12 +82,12 @@ public class Repository : RecordProtocol {
     }
   }
 
-  func export() -> Record? {
+  func export() -> Record {
     let record = Record(level: 0, xref: xref, tag: "REPO")
     record.children += [Record(level: 1, tag: "NAME", value: name)]
 
     if let address {
-      record.children += [address.export()!]
+      record.children += [address.export()]
     }
     for phoneNumber in phoneNumbers {
       record.children += [Record(level: 1, tag: "PHON", value: phoneNumber)]
@@ -105,21 +105,22 @@ public class Repository : RecordProtocol {
     }
 
     for note in notes {
-      record.children += [note.export()!]
+      record.children += [note.export()]
     }
 
     for identifier in identifiers {
-      record.children += [identifier.export()!]
+      record.children += [identifier.export()]
     }
 
     if let changeDate {
-      record.children += [changeDate.export()!]
+      record.children += [changeDate.export()]
     }
 
     if let creationDate {
-      record.children += [creationDate.export()!]
+      record.children += [creationDate.export()]
     }
 
+    record.setLevel(0)
     return record
   }
 }
