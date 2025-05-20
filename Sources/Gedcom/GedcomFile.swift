@@ -293,4 +293,3 @@ public class GedcomFile {
     submitterRecordsMap[submitter.xref] = submitter
   }
 }
-

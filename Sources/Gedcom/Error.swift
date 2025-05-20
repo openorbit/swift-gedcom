@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-enum GedcomError : Error {
+public enum GedcomError : Error {
   case missingManifest
   case unknownVersion
   case badLine(Int)
