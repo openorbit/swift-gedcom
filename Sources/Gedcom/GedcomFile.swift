@@ -19,28 +19,28 @@
 import Foundation
 import ZIPFoundation
 
-class GedcomFile {
+public class GedcomFile {
   var url: URL?
   var archive: Archive?
   var data: Data?
   var recordLines: [Record] = []
 
   public var header: Header = Header()
-  var familyRecords: [Family] = []
-  var individualRecords: [Individual] = []
-  var multimediaRecords: [Multimedia] = []
-  var repositoryRecords: [Repository] = []
-  var sharedNoteRecords: [SharedNote] = []
-  var sourceRecords: [Source] = []
-  var submitterRecords: [Submitter] = []
+  public var familyRecords: [Family] = []
+  public var individualRecords: [Individual] = []
+  public var multimediaRecords: [Multimedia] = []
+  public var repositoryRecords: [Repository] = []
+  public var sharedNoteRecords: [SharedNote] = []
+  public var sourceRecords: [Source] = []
+  public var submitterRecords: [Submitter] = []
 
-  var familyRecordsMap: [String: Family] = [:]
-  var individualRecordsMap: [String: Individual] = [:]
-  var multimediaRecordsMap: [String: Multimedia] = [:]
-  var repositoryRecordsMap: [String: Repository] = [:]
-  var sharedNoteRecordsMap: [String: SharedNote] = [:]
-  var sourceRecordsMap: [String: Source] = [:]
-  var submitterRecordsMap: [String: Submitter] = [:]
+  public var familyRecordsMap: [String: Family] = [:]
+  public var individualRecordsMap: [String: Individual] = [:]
+  public var multimediaRecordsMap: [String: Multimedia] = [:]
+  public var repositoryRecordsMap: [String: Repository] = [:]
+  public var sharedNoteRecordsMap: [String: SharedNote] = [:]
+  public var sourceRecordsMap: [String: Source] = [:]
+  public var submitterRecordsMap: [String: Submitter] = [:]
 
   init(withArchive path: URL, encoding: String.Encoding = .utf8) throws {
     self.url = path
