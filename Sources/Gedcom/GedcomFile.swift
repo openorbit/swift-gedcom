@@ -42,7 +42,7 @@ public class GedcomFile {
   public var sourceRecordsMap: [String: Source] = [:]
   public var submitterRecordsMap: [String: Submitter] = [:]
 
-  init(withArchive path: URL, encoding: String.Encoding = .utf8) throws {
+  public init(withArchive path: URL, encoding: String.Encoding = .utf8) throws {
     self.url = path
     self.archive = try Archive(url: path, accessMode: .read, pathEncoding: nil)
 
@@ -67,7 +67,7 @@ public class GedcomFile {
     try build()
   }
 
-  init(withFile path: URL, encoding: String.Encoding = .utf8) throws {
+  public init(withFile path: URL, encoding: String.Encoding = .utf8) throws {
     self.url = path
     self.archive = nil
     self.data = try Data(contentsOf: path)
@@ -81,7 +81,7 @@ public class GedcomFile {
     try build()
   }
 
-  init() {
+  public init() {
   }
 
   func dataAsString(encoding: String.Encoding) -> String? {
