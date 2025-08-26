@@ -943,6 +943,8 @@ public class PersonalNameTranslation  : RecordProtocol {
 
 public class PersonalName  : RecordProtocol {
   public var name: String
+  public var parsedName: GedcomPersonalName?
+
   public var type: NameType?
   public var namePieces : [PersonalNamePiece] = []
   public var translations : [PersonalNameTranslation] = []
@@ -969,6 +971,7 @@ public class PersonalName  : RecordProtocol {
        notes: [NoteStructure] = [],
        citations: [SourceCitation] = []) {
     self.name = name
+    self.parsedName = GedcomPersonalNameParser.parse(name)
     self.type = type
     self.namePieces = namePieces
     self.translations = translations
@@ -977,6 +980,8 @@ public class PersonalName  : RecordProtocol {
   }
   required init(record: Record) throws {
     self.name = record.line.value ?? ""
+    self.parsedName = GedcomPersonalNameParser.parse(self.name)
+
     var mutableSelf = self
 
     for child in record.children {
