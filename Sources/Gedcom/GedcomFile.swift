@@ -292,4 +292,26 @@ public class GedcomFile {
     submitterRecords += [submitter]
     submitterRecordsMap[submitter.xref] = submitter
   }
+
+  public func data(forRelativePath path: String) throws -> Data? {
+    if let archive = archive {
+      // GEDZ: Look in ZIP
+      // Note: GEDZ requires paths to be relative.
+      // Normalize path separators?
+      let cleanPath = path.replacingOccurrences(of: "\\", with: "/")
+      guard let entry = archive[cleanPath] else { return nil }
+      var res = Data()
+      _ = try archive.extract(entry) { d in res.append(d) }
+      return res
+    } else if let baseUrl = url {
+      // GED: Relative to file
+      let fileUrl = baseUrl.deletingLastPathComponent().appendingPathComponent(path)
+      return try Data(contentsOf: fileUrl)
+    }
+    return nil
+  }
+
+  public func data(for media: MultimediaFile) throws -> Data? {
+    return try data(forRelativePath: media.path)
+  }
 }

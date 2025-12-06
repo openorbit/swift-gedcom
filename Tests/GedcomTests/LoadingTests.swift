@@ -1231,7 +1231,7 @@ import Foundation
       #expect(ged.individualRecordsMap["@I1@"]?.notes.count == 2)
       switch ged.individualRecordsMap["@I1@"]?.notes[0] {
       case .Note(let n):
-        #expect(n.text == "me@example.com is an example email address.\n@@me and @I are example social media handles.\n@@@@@ has four @ characters where only the first is escaped.")
+        #expect(n.text == "me@example.com is an example email address.\n@me and @I are example social media handles.\n@@@@ has four @ characters where only the first is escaped.")
       default:
         Issue.record("bad note in individual")
       }

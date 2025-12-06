@@ -12,7 +12,7 @@ let package = Package(
             targets: ["Gedcom"]),
     ],
     dependencies: [
-      .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.0"))
+      .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.19"))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

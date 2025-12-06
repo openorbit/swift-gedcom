@@ -52,7 +52,12 @@ public struct Line {
 
     if endOfTag != remainingLine.endIndex {
       let valueIndex = remainingLine.index(endOfTag, offsetBy: 1)
-      value = String(remainingLine[valueIndex...])
+      let rawValue = String(remainingLine[valueIndex...])
+      if rawValue.hasPrefix("@@") {
+        value = String(rawValue.dropFirst())
+      } else {
+        value = rawValue
+      }
     }
   }
 
@@ -70,12 +75,27 @@ public struct Line {
     }
     result += " \(tag)"
     if let value = value {
-      let lines = value.split{$0.isNewline}
+      let lines = value.split(omittingEmptySubsequences: false, whereSeparator: { $0.isNewline })
 
-      result += " \(lines[0])\n"
+      func escape(_ s: Substring) -> String {
+        if s.first == "@" {
+            // Check if pointer: @[A-Z0-9_]+@
+            if s.hasSuffix("@"), s.count >= 3 {
+                 let inner = s.dropFirst().dropLast()
+                 let isPtr = inner.allSatisfy {
+                     ($0 >= "A" && $0 <= "Z") || ($0 >= "0" && $0 <= "9") || $0 == "_"
+                 }
+                 if isPtr { return String(s) }
+            }
+            return "@" + s
+        }
+        return String(s)
+      }
+
+      result += " \(escape(lines[0]))\n"
 
       for line in lines[1...] {
-        result += "\(level + 1) CONT \(line)\n"
+        result += "\(level + 1) CONT \(escape(line))\n"
       }
     } else {
       result += "\n"

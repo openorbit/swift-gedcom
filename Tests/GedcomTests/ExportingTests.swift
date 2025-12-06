@@ -1020,8 +1020,8 @@ import Foundation
           1 EXID 456
           2 TYPE http://example.com
           1 NOTE me@example.com is an example email address.
-          2 CONT @@me and @I are example social media handles.
-          2 CONT @@@@@ has four @ characters where only the first is escaped.
+          2 CONT @@@me and @I are example social media handles.
+          2 CONT @@@@@@ has four @ characters where only the first is escaped.
           1 SNOTE @N1@
           1 OBJE @O1@
           1 OBJE @O2@

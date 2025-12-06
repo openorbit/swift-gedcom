@@ -26,6 +26,7 @@
 
 public class DateTime : RecordProtocol {
   public var date: String = ""
+  public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -72,6 +73,7 @@ public class DateTime : RecordProtocol {
 
 public class DateTimeExact : RecordProtocol {
   public var date: String = ""
+  public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -116,6 +118,7 @@ public class DateTimeExact : RecordProtocol {
 
 public class DateValue : RecordProtocol {
   public var date: String = ""
+  public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
   public var phrase: String?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -158,6 +161,7 @@ public class DateValue : RecordProtocol {
 
 public class DatePeriod : RecordProtocol {
   public var date: String = ""
+  public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
   public var phrase: String?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
