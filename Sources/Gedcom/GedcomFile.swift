@@ -109,11 +109,11 @@ public class GedcomFile {
           recordStack = [record]
         } else {
           if recordStack.last!.line.level == gedLine.level - 1 && gedLine.tag == "CONT" {
-            //
             if recordStack[recordStack.count - 1].line.value == nil {
               recordStack[recordStack.count - 1].line.value = ""
             }
-            recordStack[recordStack.count - 1].line.value!.append("\n\(gedLine.value!)")
+            let value = gedLine.value ?? ""
+            recordStack[recordStack.count - 1].line.value!.append("\n\(value)")
 
           } else if recordStack.last!.line.level < gedLine.level {
             recordStack.last!.children.append(record)
