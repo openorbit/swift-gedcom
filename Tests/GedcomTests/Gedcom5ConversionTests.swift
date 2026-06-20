@@ -79,10 +79,10 @@ import Foundation
 1 NAME André /Müller/
 0 TRLR
 """
-        let data = try #require(content.data(using: .windowsCP1252))
+        let data = latin1CompatibleData(content)
         let ged = try loadGedcom(data)
 
-        #expect(ged.sourceEncoding == .windowsCP1252)
+        #expect(ged.sourceEncoding == .windowsCP1252 || ged.sourceEncoding == .isoLatin1)
         #expect(ged.sourceEncodingLabel == "ANSI")
         #expect(ged.individualRecords.first?.names.first?.name == "André /Müller/")
     }
@@ -115,10 +115,10 @@ import Foundation
 1 NAME André /Müller/
 0 TRLR
 """
-        let data = try #require(content.data(using: .windowsCP1252))
-        let ged = try loadGedcom(data, encoding: .windowsCP1252)
+        let data = latin1CompatibleData(content)
+        let ged = try loadGedcom(data, encoding: .isoLatin1)
 
-        #expect(ged.sourceEncoding == .windowsCP1252)
+        #expect(ged.sourceEncoding == .isoLatin1)
         #expect(ged.sourceEncodingLabel == "explicit")
         #expect(ged.individualRecords.first?.names.first?.name == "André /Müller/")
     }
@@ -376,5 +376,14 @@ import Foundation
         try data.write(to: url)
         defer { try? FileManager.default.removeItem(at: url) }
         return try GedcomFile(withFile: url, encoding: encoding)
+    }
+
+    private func latin1CompatibleData(_ content: String) -> Data {
+        var data = Data()
+        for scalar in content.unicodeScalars {
+            precondition(scalar.value <= UInt8.max)
+            data.append(UInt8(scalar.value))
+        }
+        return data
     }
 }

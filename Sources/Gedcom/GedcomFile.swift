@@ -140,16 +140,45 @@ public class GedcomFile {
 
   private func declaredCharacterEncoding(in data: Data) -> String? {
     let prefix = data.prefix(8192)
-    guard let headerText = String(data: prefix, encoding: .isoLatin1) else {
-      return nil
-    }
+    var lineStart = prefix.startIndex
 
-    for line in headerText.split(whereSeparator: { $0 == "\n" || $0 == "\r" }) {
-      let parts = line.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
+    func scanLine(upTo lineEnd: Data.Index) -> String? {
+      let line = prefix[lineStart..<lineEnd]
+      defer {
+        lineStart = lineEnd < prefix.endIndex ? prefix.index(after: lineEnd) : prefix.endIndex
+      }
+
+      guard let asciiLine = String(bytes: line.filter { $0 < 0x80 }, encoding: .ascii) else {
+        return nil
+      }
+
+      let parts = asciiLine.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
       guard parts.count >= 3, parts[0] == "1", parts[1] == "CHAR" else {
-        continue
+        return nil
       }
       return parts[2].trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    }
+
+    var index = prefix.startIndex
+    while index < prefix.endIndex {
+      let byte = prefix[index]
+      if byte == 0x0a || byte == 0x0d {
+        if let encoding = scanLine(upTo: index) {
+          return encoding
+        }
+        if byte == 0x0d {
+          let nextIndex = prefix.index(after: index)
+          if nextIndex < prefix.endIndex, prefix[nextIndex] == 0x0a {
+            index = nextIndex
+            lineStart = prefix.index(after: nextIndex)
+          }
+        }
+      }
+      index = prefix.index(after: index)
+    }
+
+    if lineStart < prefix.endIndex {
+      return scanLine(upTo: prefix.endIndex)
     }
 
     return nil
@@ -165,14 +194,22 @@ public class GedcomFile {
     case "UNICODE", "UTF-16", "UTF16":
       return .utf16
     case "ASCII", "US-ASCII":
-      return .ascii
+      return usableEncoding(.ascii, sample: [0x41])
     case "ANSI", "WINDOWS-1252", "CP1252":
-      return .windowsCP1252
+      return firstUsableEncoding([.windowsCP1252, .isoLatin1], sample: [0xe9])
     case "MACROMAN", "MAC-ROMAN", "MACOSROMAN":
-      return .macOSRoman
+      return usableEncoding(.macOSRoman, sample: [0x8e])
     default:
       return nil
     }
+  }
+
+  private func firstUsableEncoding(_ encodings: [String.Encoding], sample: [UInt8]) -> String.Encoding? {
+    encodings.first { usableEncoding($0, sample: sample) != nil }
+  }
+
+  private func usableEncoding(_ encoding: String.Encoding, sample: [UInt8]) -> String.Encoding? {
+    String(data: Data(sample), encoding: encoding) == nil ? nil : encoding
   }
 
   func parse(encoding: String.Encoding) throws {
