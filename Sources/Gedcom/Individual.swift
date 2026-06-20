@@ -19,6 +19,7 @@ import Foundation
 
 public class Age : RecordProtocol {
   public var age: String
+  public var parsedAge: GedcomAge? { GedcomAgeParser.parse(age) }
   public var phrase: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
