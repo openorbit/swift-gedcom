@@ -27,4 +27,6 @@ public enum GedcomError : Error {
   case badNamePiece
   case badURL
   case badSchema
+  case badEncoding
+  case unsupportedEncoding(String)
 }

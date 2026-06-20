@@ -69,6 +69,81 @@ import Foundation
         #expect(exported.contains("1 DEAT\n2 DATE 2 FEB 1711\n3 PHRASE 2 FEB 1711/12\n"))
     }
 
+    @Test func testGedcom551AutoDetectsAnsiEncoding() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+1 CHAR ANSI
+0 @I1@ INDI
+1 NAME André /Müller/
+0 TRLR
+"""
+        let data = try #require(content.data(using: .windowsCP1252))
+        let ged = try loadGedcom(data)
+
+        #expect(ged.sourceEncoding == .windowsCP1252)
+        #expect(ged.sourceEncodingLabel == "ANSI")
+        #expect(ged.individualRecords.first?.names.first?.name == "André /Müller/")
+    }
+
+    @Test func testGedcom551AutoDetectsUnicodeEncoding() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+1 CHAR UNICODE
+0 @I1@ INDI
+1 NAME Unicode /Tester/
+0 TRLR
+"""
+        let data = try #require(content.data(using: .utf16))
+        let ged = try loadGedcom(data)
+
+        #expect(ged.sourceEncoding == .utf16)
+        #expect(ged.sourceEncodingLabel == "UNICODE")
+        #expect(ged.individualRecords.first?.names.first?.name == "Unicode /Tester/")
+    }
+
+    @Test func testGedcom551ExplicitEncodingOverrideIsStillSupported() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME André /Müller/
+0 TRLR
+"""
+        let data = try #require(content.data(using: .windowsCP1252))
+        let ged = try loadGedcom(data, encoding: .windowsCP1252)
+
+        #expect(ged.sourceEncoding == .windowsCP1252)
+        #expect(ged.sourceEncodingLabel == "explicit")
+        #expect(ged.individualRecords.first?.names.first?.name == "André /Müller/")
+    }
+
+    @Test func testGedcom551AnselEncodingIsReportedUnsupported() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+1 CHAR ANSEL
+0 @I1@ INDI
+1 NAME Ansel /Tester/
+0 TRLR
+"""
+
+        do {
+            _ = try loadGedcom(content)
+            #expect(Bool(false), "ANSEL should not be reported as supported without a portable decoder")
+        } catch GedcomError.unsupportedEncoding(let encoding) {
+            #expect(encoding == "ANSEL")
+        } catch {
+            throw error
+        }
+    }
+
     @Test func testGedcom551InlineMultimediaLiftedToRecord() throws {
         let content = """
 0 HEAD
@@ -290,11 +365,16 @@ import Foundation
     }
 
     private func loadGedcom(_ content: String) throws -> GedcomFile {
+        let data = try #require(content.data(using: .utf8))
+        return try loadGedcom(data)
+    }
+
+    private func loadGedcom(_ data: Data, encoding: String.Encoding? = nil) throws -> GedcomFile {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("ged")
-        try content.write(to: url, atomically: true, encoding: .utf8)
+        try data.write(to: url)
         defer { try? FileManager.default.removeItem(at: url) }
-        return try GedcomFile(withFile: url)
+        return try GedcomFile(withFile: url, encoding: encoding)
     }
 }

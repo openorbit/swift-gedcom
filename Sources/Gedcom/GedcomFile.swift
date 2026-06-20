@@ -35,6 +35,8 @@ public class GedcomFile {
   public var submitterRecords: [Submitter] = []
   public var extensionRecords: [GedcomExtensionNode] = []
   public var sourceDialect: GedcomDialect = .unknown(version: nil)
+  public private(set) var sourceEncoding: String.Encoding?
+  public private(set) var sourceEncodingLabel: String?
   public var exportDialect: GedcomDialect { .gedcom7(version: "7.0") }
 
   public var familyRecordsMap: [String: Family] = [:]
@@ -49,7 +51,7 @@ public class GedcomFile {
   private var generatedSourceRecordIndex = 1
   private var liftedGedcom5Records: [Record] = []
 
-  public init(withArchive path: URL, encoding: String.Encoding = .utf8) throws {
+  public init(withArchive path: URL, encoding: String.Encoding? = nil) throws {
     self.url = path
     self.archive = try Archive(url: path, accessMode: .read, pathEncoding: nil)
 
@@ -65,27 +67,17 @@ public class GedcomFile {
       self.data!.append(data)
     }
 
-    if data!.starts(with: [0xef, 0xbb, 0xbf]) {
-      // File starts with a BOM, drop it
-      data!.removeFirst(3)
-    }
-
-    try parse(encoding: encoding)
+    try parse(encoding: resolveImportEncoding(preferred: encoding))
     try prepareRecordsForBuild()
     try build()
   }
 
-  public init(withFile path: URL, encoding: String.Encoding = .utf8) throws {
+  public init(withFile path: URL, encoding: String.Encoding? = nil) throws {
     self.url = path
     self.archive = nil
     self.data = try Data(contentsOf: path)
 
-    if data!.starts(with: [0xef, 0xbb, 0xbf]) {
-      // File starts with a BOM, drop it
-      data!.removeFirst(3)
-    }
-
-    try parse(encoding: encoding)
+    try parse(encoding: resolveImportEncoding(preferred: encoding))
     try prepareRecordsForBuild()
     try build()
   }
@@ -99,8 +91,94 @@ public class GedcomFile {
     }
     return String(data: data, encoding: encoding)
   }
+
+  private func resolveImportEncoding(preferred encoding: String.Encoding?) throws -> String.Encoding {
+    if let encoding {
+      removeUTF8ByteOrderMarkIfNeeded(for: encoding)
+      sourceEncoding = encoding
+      sourceEncodingLabel = "explicit"
+      return encoding
+    }
+
+    guard let data else {
+      throw GedcomError.badEncoding
+    }
+
+    if data.starts(with: [0xef, 0xbb, 0xbf]) {
+      self.data?.removeFirst(3)
+      sourceEncoding = .utf8
+      sourceEncodingLabel = "UTF-8"
+      return .utf8
+    }
+
+    if data.starts(with: [0xff, 0xfe]) || data.starts(with: [0xfe, 0xff]) {
+      sourceEncoding = .utf16
+      sourceEncodingLabel = "UNICODE"
+      return .utf16
+    }
+
+    if let characterEncoding = declaredCharacterEncoding(in: data) {
+      guard let encoding = swiftEncoding(forGedcomCharacterEncoding: characterEncoding) else {
+        throw GedcomError.unsupportedEncoding(characterEncoding)
+      }
+      sourceEncoding = encoding
+      sourceEncodingLabel = characterEncoding
+      return encoding
+    }
+
+    sourceEncoding = .utf8
+    sourceEncodingLabel = "UTF-8"
+    return .utf8
+  }
+
+  private func removeUTF8ByteOrderMarkIfNeeded(for encoding: String.Encoding) {
+    guard encoding == .utf8, data?.starts(with: [0xef, 0xbb, 0xbf]) == true else {
+      return
+    }
+    data?.removeFirst(3)
+  }
+
+  private func declaredCharacterEncoding(in data: Data) -> String? {
+    let prefix = data.prefix(8192)
+    guard let headerText = String(data: prefix, encoding: .isoLatin1) else {
+      return nil
+    }
+
+    for line in headerText.split(whereSeparator: { $0 == "\n" || $0 == "\r" }) {
+      let parts = line.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
+      guard parts.count >= 3, parts[0] == "1", parts[1] == "CHAR" else {
+        continue
+      }
+      return parts[2].trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    }
+
+    return nil
+  }
+
+  private func swiftEncoding(forGedcomCharacterEncoding encoding: String) -> String.Encoding? {
+    switch encoding
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+      .uppercased()
+      .replacingOccurrences(of: "_", with: "-") {
+    case "UTF-8", "UTF8":
+      return .utf8
+    case "UNICODE", "UTF-16", "UTF16":
+      return .utf16
+    case "ASCII", "US-ASCII":
+      return .ascii
+    case "ANSI", "WINDOWS-1252", "CP1252":
+      return .windowsCP1252
+    case "MACROMAN", "MAC-ROMAN", "MACOSROMAN":
+      return .macOSRoman
+    default:
+      return nil
+    }
+  }
+
   func parse(encoding: String.Encoding) throws {
-    let gedcom = dataAsString(encoding: encoding)!
+    guard let gedcom = dataAsString(encoding: encoding) else {
+      throw GedcomError.badEncoding
+    }
     var recordStack: [Record] = []
 
     var errorOnLine: Int?
