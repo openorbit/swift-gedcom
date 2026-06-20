@@ -16,7 +16,8 @@
 // limitations under the License.
 //
 import Foundation
-public class Gedc : RecordProtocol {
+public class Gedc : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var vers: String = "7.0"
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -30,7 +31,7 @@ public class Gedc : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -43,13 +44,31 @@ public class Gedc : RecordProtocol {
   func export() -> Record {
     let record = Record(level: 0, tag: "GEDC")
     record.children.append(Record(level: 1, tag: "VERS", value: vers))
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
 
-public class Schema : RecordProtocol {
+public class Schema : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var tags: [String: URL] = [:]
+
+  public func uri(forExtensionTag tag: String) -> URL? {
+    tags[tag]
+  }
+
+  public func extensionTag(forURI uri: URL) -> String? {
+    tags.first { $0.value == uri }?.key
+  }
+
+  public func ensureDeclarations(for discoveredTags: Set<String>, source: String?) {
+    for tag in discoveredTags.sorted() where tag.hasPrefix("_") && tags[tag] == nil {
+      tags[tag] = GedcomExtensionURI.synthesized(tag: tag, source: source)
+    }
+  }
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "TAG" : \Schema.tags,
   ]
@@ -61,7 +80,7 @@ public class Schema : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -89,12 +108,16 @@ public class Schema : RecordProtocol {
     for key in tags.keys.sorted() {
       record.children.append(Record(level: 1, tag: "TAG", value: key + " " + tags[key]!.absoluteString))
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
 
-public class HeaderPlace : RecordProtocol {
+public class HeaderPlace : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var form: [String] = []
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "FORM" : \HeaderPlace.form,
@@ -108,7 +131,7 @@ public class HeaderPlace : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -126,11 +149,15 @@ public class HeaderPlace : RecordProtocol {
       return acc + ((acc.count > 1) ? ", " : "") + token
     }
     record.children.append(Record(level: 1, tag: "FORM", value: formString))
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class HeaderSourceCorporation : RecordProtocol {
+public class HeaderSourceCorporation : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var corporation: String = ""
   public var address: AddressStructure?
   public var phone: [String] = []
@@ -156,7 +183,7 @@ public class HeaderSourceCorporation : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -190,11 +217,15 @@ public class HeaderSourceCorporation : RecordProtocol {
     for www in www {
       record.children.append(Record(level: 1, tag: "WWW", value: www.absoluteString))
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class HeaderSourceData : RecordProtocol {
+public class HeaderSourceData : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var data: String = ""
   public var date: DateTimeExact?
   public var copyright: String?
@@ -215,7 +246,7 @@ public class HeaderSourceData : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -239,11 +270,15 @@ public class HeaderSourceData : RecordProtocol {
       let copyrightRecord = Record(level: 1, tag: "COPR", value: copyright)
       record.children.append(copyrightRecord)
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class HeaderSource : RecordProtocol {
+public class HeaderSource : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var source: String = ""
   public var version: String?
   public var name: String?
@@ -266,7 +301,7 @@ public class HeaderSource : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -298,14 +333,18 @@ public class HeaderSource : RecordProtocol {
       let child = data.export()
       record.children.append(child)
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class Header : RecordProtocol {
+public class Header : RecordProtocol, GedcomExtensionContainer {
   public var gedc: Gedc
   public var schema : Schema?
   public var source: HeaderSource?
+  public var extensions: [GedcomExtensionNode] = []
   public var date: DateTimeExact?
   public var destination: String?
 
@@ -340,7 +379,7 @@ public class Header : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -406,7 +445,14 @@ public class Header : RecordProtocol {
       record.children.append(note)
     }
 
+    for node in extensions {
+      record.children.append(node.export())
+    }
+
     record.setLevel(0)
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }

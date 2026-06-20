@@ -16,7 +16,8 @@
 // limitations under the License.
 //
 
-public class PlaceTranslation : RecordProtocol {
+public class PlaceTranslation : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var place: [String] = []
   public var lang: String = ""
 
@@ -38,7 +39,7 @@ public class PlaceTranslation : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -51,11 +52,15 @@ public class PlaceTranslation : RecordProtocol {
   func export() -> Record {
     let record = Record(level: 0, tag: "TRAN", value: place.joined(separator: ", "))
     record.children += [Record(level: 1, tag: "LANG", value: lang)]
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class PlaceCoordinates : RecordProtocol {
+public class PlaceCoordinates : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var lat: Double = Double.nan
   public var lon: Double = Double.nan
 
@@ -73,7 +78,7 @@ public class PlaceCoordinates : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -105,11 +110,15 @@ public class PlaceCoordinates : RecordProtocol {
       Record(level: 1, tag: "LATI", value: "\(lat >= 0 ? "N\(lat)" : "S\(lat * -1)")"),
       Record(level: 1, tag: "LONG", value: "\(lon >= 0 ? "E\(lon)" : "W\(lon * -1)")")
     ]
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class PlaceStructure : RecordProtocol {
+public class PlaceStructure : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var place: [String] = []
   public var form: [String] = []
   public var lang: String?
@@ -145,7 +154,7 @@ public class PlaceStructure : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -191,6 +200,12 @@ public class PlaceStructure : RecordProtocol {
     }
     for note in notes {
       record.children += [note.export()]
+    }
+
+    for node in extensions {
+
+      record.children.append(node.export())
+
     }
 
     return record

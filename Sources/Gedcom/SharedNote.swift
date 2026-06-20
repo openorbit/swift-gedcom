@@ -30,7 +30,8 @@
 
  */
 
-public class SharedNote : RecordProtocol {
+public class SharedNote : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var xref: String
   public var text: String = ""
   public var mimeType: String?
@@ -68,7 +69,7 @@ public class SharedNote : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -120,6 +121,9 @@ public class SharedNote : RecordProtocol {
     }
 
     record.setLevel(0)
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }

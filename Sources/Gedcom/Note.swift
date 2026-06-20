@@ -16,7 +16,8 @@
 // limitations under the License.
 //
 
-public class Translation : RecordProtocol {
+public class Translation : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var text: String
   public var mimeType: String?
   public var lang: String?
@@ -39,7 +40,7 @@ public class Translation : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -60,11 +61,15 @@ public class Translation : RecordProtocol {
       let langRecord = Record(level: 1, tag: "LANG", value: lang)
       record.children.append(langRecord)
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class Note : RecordProtocol {
+public class Note : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var text: String = ""
   public var mimeType: String?
   public var lang: String?
@@ -91,7 +96,7 @@ public class Note : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -129,11 +134,18 @@ public class Note : RecordProtocol {
       record.children.append(citationRecord)
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
 
-public class SNoteRef : RecordProtocol {
+public class SNoteRef : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var xref: String
 
   required convenience init(record: Record) throws {

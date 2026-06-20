@@ -17,7 +17,8 @@
 //
 import Foundation
 
-public class REFN : RecordProtocol {
+public class REFN : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var refn: String = ""
   public var type: String?
 
@@ -35,7 +36,7 @@ public class REFN : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -50,11 +51,15 @@ public class REFN : RecordProtocol {
     if let type {
       record.children.append(Record(level: 1, tag: "TYPE", value: type))
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class UID : RecordProtocol {
+public class UID : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var uid: UUID
 
   init(ident: String) {
@@ -67,11 +72,15 @@ public class UID : RecordProtocol {
 
   func export() -> Record {
     let record = Record(level: 0, tag: "UID", value: uid.uuidString.lowercased())
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class EXID : RecordProtocol {
+public class EXID : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var exid: String = ""
   public var type: String?
 
@@ -90,7 +99,7 @@ public class EXID : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -105,6 +114,9 @@ public class EXID : RecordProtocol {
     let record = Record(level: 0, tag: "EXID", value: exid)
     if let type {
       record.children.append(Record(level: 1, tag: "TYPE", value: type))
+    }
+    for node in extensions {
+      record.children.append(node.export())
     }
     return record
   }

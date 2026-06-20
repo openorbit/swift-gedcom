@@ -24,7 +24,8 @@
   +1 <<NOTE_STRUCTURE>> {0:M}
 */
 
-public class DateTime : RecordProtocol {
+public class DateTime : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var date: String = ""
   public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
@@ -50,7 +51,7 @@ public class DateTime : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
       if let wkp = kp as? WritableKeyPath<DateTime, String> {
@@ -67,11 +68,15 @@ public class DateTime : RecordProtocol {
       let timeRecord = Record(level: 1, tag: "TIME", value: time)
       record.children.append(timeRecord)
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class DateTimeExact : RecordProtocol {
+public class DateTimeExact : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var date: String = ""
   public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
@@ -95,7 +100,7 @@ public class DateTimeExact : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
       if let wkp = kp as? WritableKeyPath<DateTimeExact, String> {
@@ -112,11 +117,15 @@ public class DateTimeExact : RecordProtocol {
       let timeRecord = Record(level: 1, tag: "TIME", value: time)
       record.children.append(timeRecord)
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class DateValue : RecordProtocol {
+public class DateValue : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var date: String = ""
   public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
@@ -135,7 +144,7 @@ public class DateValue : RecordProtocol {
     var mutableSelf = self
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -155,11 +164,15 @@ public class DateValue : RecordProtocol {
       let phraseRecord = Record(level: 1, tag: "PHRASE", value: phrase)
       record.children.append(phraseRecord)
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class DatePeriod : RecordProtocol {
+public class DatePeriod : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var date: String = ""
   public var parsedDate: GedcomDate? { GedcomDateParser.parse(date) }
   public var time: String?
@@ -178,7 +191,7 @@ public class DatePeriod : RecordProtocol {
     var mutableSelf = self
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -198,12 +211,16 @@ public class DatePeriod : RecordProtocol {
       let phraseRecord = Record(level: 1, tag: "PHRASE", value: phrase)
       record.children.append(phraseRecord)
     }
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
 
-public class CreationDate : RecordProtocol {
+public class CreationDate : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var date: DateTime = DateTime()
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "DATE" : \CreationDate.date,
@@ -217,7 +234,7 @@ public class CreationDate : RecordProtocol {
     var mutableSelf = self
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -231,10 +248,14 @@ public class CreationDate : RecordProtocol {
     let record = Record(level: 0, tag: "CREA")
     let exportedDate = date.export()
     record.children.append(exportedDate)
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
-public class ChangeDate : RecordProtocol {
+public class ChangeDate : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var date: DateTime = DateTime()
   public var notes: [NoteStructure] = []
 
@@ -252,7 +273,7 @@ public class ChangeDate : RecordProtocol {
     var mutableSelf = self
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -271,6 +292,9 @@ public class ChangeDate : RecordProtocol {
     for note in notes {
       let exportedNote = note.export()
       record.children.append(exportedNote)
+    }
+    for node in extensions {
+      record.children.append(node.export())
     }
     return record
   }

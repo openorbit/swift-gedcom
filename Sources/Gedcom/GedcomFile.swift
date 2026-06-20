@@ -33,6 +33,7 @@ public class GedcomFile {
   public var sharedNoteRecords: [SharedNote] = []
   public var sourceRecords: [Source] = []
   public var submitterRecords: [Submitter] = []
+  public var extensionRecords: [GedcomExtensionNode] = []
 
   public var familyRecordsMap: [String: Family] = [:]
   public var individualRecordsMap: [String: Individual] = [:]
@@ -154,6 +155,9 @@ public class GedcomFile {
     var mutableSelf = self
     for record in recordLines {
       guard let kp = Self.keys[record.line.tag] else {
+        if record.line.tag != "TRLR" {
+          extensionRecords.append(GedcomExtensionNode(record: record))
+        }
         continue
       }
       if let wkp = kp as? WritableKeyPath<GedcomFile, Header> {
@@ -198,10 +202,63 @@ public class GedcomFile {
     }
   }
 
-  public func exportContent() -> String {
-    var records: [Record] = []
+  public var extensionSchema: [String: URL] {
+    header.schema?.tags ?? [:]
+  }
 
-    records += [header.export()]
+  public func uri(forExtensionTag tag: String) -> URL? {
+    header.schema?.uri(forExtensionTag: tag)
+  }
+
+  public func extensionNodes(tag: String) -> [GedcomExtensionNode] {
+    extensionNodes(tag: tag, in: [header.export()] + exportBodyRecords())
+  }
+
+  public func extensionNodes(uri: URL) -> [GedcomExtensionNode] {
+    guard let tag = header.schema?.extensionTag(forURI: uri) else { return [] }
+    return extensionNodes(tag: tag)
+  }
+
+  public func discoveredExtensionTags() -> Set<String> {
+    extensionTags(in: [header.export()] + exportBodyRecords())
+  }
+
+  private func extensionNodes(tag: String, in records: [Record]) -> [GedcomExtensionNode] {
+    records.flatMap { extensionNodes(tag: tag, in: $0) }
+  }
+
+  private func extensionNodes(tag: String, in record: Record) -> [GedcomExtensionNode] {
+    var nodes: [GedcomExtensionNode] = record.line.tag == tag ? [GedcomExtensionNode(record: record)] : []
+    for child in record.children {
+      nodes += extensionNodes(tag: tag, in: child)
+    }
+    return nodes
+  }
+
+  private func extensionTags(in records: [Record]) -> Set<String> {
+    records.reduce(into: Set<String>()) { tags, record in
+      tags.formUnion(extensionTags(in: record))
+    }
+  }
+
+  private func extensionTags(in record: Record) -> Set<String> {
+    var tags = record.line.tag.hasPrefix("_") ? Set([record.line.tag]) : Set<String>()
+    for child in record.children {
+      tags.formUnion(extensionTags(in: child))
+    }
+    return tags
+  }
+
+  private func ensureExtensionSchemaDeclarations(for tags: Set<String>) {
+    guard !tags.isEmpty else { return }
+    if header.schema == nil {
+      header.schema = Schema()
+    }
+    header.schema?.ensureDeclarations(for: tags, source: header.source?.source)
+  }
+
+  private func exportBodyRecords() -> [Record] {
+    var records: [Record] = []
 
     for fam in familyRecords {
       records += [fam.export()]
@@ -230,6 +287,22 @@ public class GedcomFile {
     for submitter in submitterRecords {
       records += [submitter.export()]
     }
+
+    for node in extensionRecords {
+      records += [node.export()]
+    }
+
+    return records
+  }
+
+  public func exportContent() -> String {
+    let bodyRecords = exportBodyRecords()
+    ensureExtensionSchemaDeclarations(for: extensionTags(in: [header.export()] + bodyRecords))
+
+    var records: [Record] = []
+
+    records += [header.export()]
+    records += bodyRecords
 
     records += [Record(level: 0, tag: "TRLR")]
 
