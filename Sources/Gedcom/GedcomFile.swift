@@ -208,7 +208,7 @@ public class GedcomFile {
     }
   }
 
-  private func convertGedcom5RecordToGedcom7(_ record: Record) {
+  private func convertGedcom5RecordToGedcom7(_ record: Record, parentTag: String?) {
     var convertedChildren: [Record] = []
 
     for child in record.children {
@@ -222,7 +222,7 @@ public class GedcomFile {
           record.line.value?.append(child.line.value ?? "")
         }
       } else {
-        convertGedcom5RecordToGedcom7(child)
+        convertGedcom5RecordToGedcom7(child, parentTag: record.line.tag)
         convertedChildren.append(child)
       }
     }
@@ -239,6 +239,90 @@ public class GedcomFile {
       convertGedcom5NameVariationToTranslation(record)
     } else if record.line.tag == "RELA" {
       convertGedcom5RelationshipToRole(record)
+    } else {
+      convertGedcom5PayloadValueToGedcom7(record, parentTag: parentTag)
+    }
+  }
+
+  private func convertGedcom5RecordToGedcom7(_ record: Record) {
+    convertGedcom5RecordToGedcom7(record, parentTag: nil)
+  }
+
+  private func convertGedcom5PayloadValueToGedcom7(_ record: Record, parentTag: String?) {
+    switch record.line.tag {
+    case "AGE":
+      convertGedcom5AgeValue(record)
+    case "SEX":
+      convertGedcom5SexValue(record)
+    case "STAT":
+      convertGedcom5StatusValue(record)
+    case "PEDI":
+      record.line.value = record.line.value?.uppercased()
+    case "RESN":
+      record.line.value = record.line.value?
+        .components(separatedBy: ",")
+        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() }
+        .joined(separator: ", ")
+    case "TYPE" where parentTag == "NAME":
+      record.line.value = record.line.value?.uppercased()
+    default:
+      break
+    }
+  }
+
+  private func convertGedcom5AgeValue(_ record: Record) {
+    guard let value = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !value.isEmpty else {
+      return
+    }
+
+    switch value.uppercased() {
+    case "CHILD":
+      record.line.value = "< 8y"
+      appendPhrase("Child", to: record)
+    case "INFANT":
+      record.line.value = "< 1y"
+      appendPhrase("Infant", to: record)
+    case "STILLBORN":
+      record.line.value = "0y"
+      appendPhrase("Stillborn", to: record)
+    default:
+      break
+    }
+  }
+
+  private func convertGedcom5SexValue(_ record: Record) {
+    guard let value = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines),
+          let first = value.first else {
+      record.line.value = "U"
+      return
+    }
+
+    switch String(first).uppercased() {
+    case "M":
+      record.line.value = "M"
+    case "F":
+      record.line.value = "F"
+    case "X":
+      record.line.value = "X"
+    default:
+      record.line.value = "U"
+    }
+  }
+
+  private func convertGedcom5StatusValue(_ record: Record) {
+    guard let value = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !value.isEmpty else {
+      return
+    }
+
+    switch value.uppercased() {
+    case "DNS/CAN":
+      record.line.value = "DNS_CAN"
+    case "PRE-1970":
+      record.line.value = "PRE_1970"
+    default:
+      record.line.value = value.uppercased()
     }
   }
 
@@ -435,6 +519,11 @@ public class GedcomFile {
       return
     }
 
+    if let calendar = convertGedcom5CalendarEscape(value) {
+      record.line.value = calendar
+      return
+    }
+
     if let interpreted = convertGedcom5InterpretedDate(value) {
       record.line.value = interpreted.date
       appendPhrase(interpreted.phrase, to: record)
@@ -444,7 +533,22 @@ public class GedcomFile {
     if let dualYear = convertGedcom5DualYearDate(value) {
       record.line.value = dualYear.date
       appendPhrase(dualYear.phrase, to: record)
+      return
     }
+
+    if let range = convertGedcom5DateRange(value) {
+      record.line.value = range
+    }
+  }
+
+  private func convertGedcom5CalendarEscape(_ value: String) -> String? {
+    if value.hasPrefix("@#ROMAN@") {
+      return value.replacingOccurrences(of: "@#ROMAN@", with: "_ROMAN", options: [.anchored])
+    }
+    if value.hasPrefix("@#UNKNOWN@") {
+      return value.replacingOccurrences(of: "@#UNKNOWN@", with: "_UNKNOWN", options: [.anchored])
+    }
+    return nil
   }
 
   private func convertGedcom5InterpretedDate(_ value: String) -> (date: String, phrase: String)? {
@@ -499,6 +603,34 @@ public class GedcomFile {
     }
 
     return (convertedParts.joined(separator: " "), value)
+  }
+
+  private func convertGedcom5DateRange(_ value: String) -> String? {
+    let prefix = "BET "
+    guard value.hasPrefix(prefix),
+          let separatorRange = value.range(of: " AND ") else {
+      return nil
+    }
+
+    let start = value[value.index(value.startIndex, offsetBy: prefix.count)..<separatorRange.lowerBound]
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+    let end = value[separatorRange.upperBound...]
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    guard let startYear = trailingYear(in: start),
+          let endYear = trailingYear(in: end),
+          startYear > endYear else {
+      return nil
+    }
+
+    return "BET \(end) AND \(start)"
+  }
+
+  private func trailingYear(in value: String) -> Int? {
+    value
+      .split(separator: " ")
+      .last
+      .flatMap { Int($0) }
   }
 
   private func appendPhrase(_ phrase: String, to record: Record) {

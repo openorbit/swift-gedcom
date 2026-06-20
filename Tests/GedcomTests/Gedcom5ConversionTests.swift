@@ -178,6 +178,79 @@ import Foundation
         #expect(exported.contains("1 ASSO @I2@\n2 ROLE OTHER\n3 PHRASE Honorary uncle\n"))
     }
 
+    @Test func testGedcom551SimplePayloadValuesNormalizeBeforeTypedParsing() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+0 @I1@ INDI
+1 RESN confidential, privacy
+1 NAME Value /Tester/
+2 TYPE birth
+1 SEX Male
+1 BIRT
+2 AGE CHILD
+1 FAMC @F1@
+2 PEDI birth
+2 STAT challenged
+1 BAPL
+2 STAT DNS/CAN
+3 DATE 1 JAN 1900
+0 @F1@ FAM
+0 TRLR
+"""
+        let ged = try loadGedcom(content)
+        let individual = try #require(ged.individualRecords.first)
+        let name = try #require(individual.names.first)
+        let birth = try #require(individual.events.first(where: { $0.kind == .BIRT }))
+        let familyChild = try #require(individual.childOfFamilies.first)
+        let ordinance = try #require(individual.ldsDetails.first(where: { $0.kind == .BAPL }))
+
+        #expect(individual.restrictions == [.CONFIDENTIAL, .PRIVACY])
+        #expect(individual.sex == .male)
+        #expect(name.type?.kind == .BIRTH)
+        #expect(birth.age?.age == "< 8y")
+        #expect(birth.age?.phrase == "Child")
+        #expect(familyChild.pedigree?.kind == .BIRTH)
+        #expect(familyChild.status?.kind == .CHALLENGED)
+        #expect(ordinance.status?.kind == .DNS_CAN)
+
+        let exported = ged.exportContent()
+        #expect(exported.contains("1 RESN CONFIDENTIAL, PRIVACY\n"))
+        #expect(exported.contains("2 TYPE BIRTH\n"))
+        #expect(exported.contains("1 SEX M\n"))
+        #expect(exported.contains("2 AGE < 8y\n3 PHRASE Child\n"))
+        #expect(exported.contains("2 PEDI BIRTH\n2 STAT CHALLENGED\n"))
+        #expect(exported.contains("2 STAT DNS_CAN\n3 DATE 1 JAN 1900\n"))
+    }
+
+    @Test func testGedcom551DatePayloadValuesNormalizeBeforeTypedParsing() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+0 @I1@ INDI
+1 NAME Date /Payload/
+1 RESI
+2 DATE BET 1900 AND 1880
+1 EVEN
+2 TYPE Roman date
+2 DATE @#ROMAN@ 71
+0 TRLR
+"""
+        let ged = try loadGedcom(content)
+        let individual = try #require(ged.individualRecords.first)
+        let residence = try #require(individual.attributes.first(where: { $0.kind == .RESI }))
+        let event = try #require(individual.events.first(where: { $0.kind == .EVEN }))
+
+        #expect(residence.date?.date == "BET 1880 AND 1900")
+        #expect(event.date?.date == "_ROMAN 71")
+
+        let exported = ged.exportContent()
+        #expect(exported.contains("2 DATE BET 1880 AND 1900\n"))
+        #expect(exported.contains("2 DATE _ROMAN 71\n"))
+    }
+
     private func loadGedcom(_ content: String) throws -> GedcomFile {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
