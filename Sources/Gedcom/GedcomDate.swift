@@ -122,16 +122,6 @@ public enum GedcomDateParser {
             return .exact(d)
         }
         
-        // INT handling? INT <Date> (<Phrase>)
-        if parts.first == "INT" {
-             // Fallback to phrase or simple parsing?
-             // INT 1800 (Eighteen Hundred)
-             // Parsing the date part might work.
-             let dateStr = parts.dropFirst().joined(separator: " ")
-             // This is tricky without lookahead for parens.
-             // For now, treat exact date as fallback
-        }
-
         return nil
     }
     
@@ -203,15 +193,6 @@ public enum GedcomDateParser {
             if let y = Int(t) {
                 year = y
                 tokens.removeFirst()
-            } else if t.contains("/") {
-                // Dual date: 1699/00
-                // Store raw? or parse base year?
-                // SimpleDate struct stores int.
-                // Ignoring dual date nuance for `year: Int` simplification.
-                // Could verify if slash part exists.
-                if let slash = t.firstIndex(of: "/") {
-                    year = Int(String(t[..<slash]))
-                }
             }
         }
         

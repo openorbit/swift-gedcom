@@ -57,6 +57,24 @@ import Testing
         #expect(d5 == .range(start: GedcomSimpleDate(year: 1990), end: GedcomSimpleDate(year: 2000)))
     }
 
+    @Test func testAgeParsing() {
+        #expect(GedcomAgeParser.parse("35y") == GedcomAge(duration: GedcomAgeDuration(years: 35)))
+        #expect(GedcomAgeParser.parse("< 2y 3m 4w 5d") == GedcomAge(bound: .lessThan, duration: GedcomAgeDuration(years: 2, months: 3, weeks: 4, days: 5)))
+        #expect(GedcomAgeParser.parse("> 8d") == GedcomAge(bound: .greaterThan, duration: GedcomAgeDuration(days: 8)))
+        #expect(GedcomAgeParser.parse("") == GedcomAge())
+        #expect(GedcomAgeParser.parse("1y 30m") == GedcomAge(duration: GedcomAgeDuration(years: 1, months: 30)))
+        #expect(GedcomAgeParser.parse("8w 30d") == GedcomAge(duration: GedcomAgeDuration(weeks: 8, days: 30)))
+        #expect(GedcomAgeParser.parse("2m 1y") == nil)
+        #expect(GedcomAgeParser.parse("1Y") == nil)
+        #expect(GedcomAgeParser.parse("<") == nil)
+    }
+
+    @Test func testAgeRecordParsedAge() {
+        let age = Age(age: "51w 6d", phrase: "363.5 days rounded down")
+        #expect(age.parsedAge == GedcomAge(duration: GedcomAgeDuration(weeks: 51, days: 6)))
+        #expect(age.phrase == "363.5 days rounded down")
+    }
+
     /*
     @Test func testNameSlashHandling() {
          // This name has no slashes, so surname should be nil
