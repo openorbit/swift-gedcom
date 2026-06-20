@@ -19,9 +19,11 @@ import Foundation
 public class Gedc : RecordProtocol, GedcomExtensionContainer {
   public var extensions: [GedcomExtensionNode] = []
   public var vers: String = "7.0"
+  public var form: String?
 
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
     "VERS" : \Gedc.vers,
+    "FORM" : \Gedc.form,
   ]
   init() {
 
@@ -36,6 +38,8 @@ public class Gedc : RecordProtocol, GedcomExtensionContainer {
       }
 
       if let wkp = kp as? WritableKeyPath<Gedc, String> {
+        mutableSelf[keyPath: wkp] = child.line.value ?? ""
+      } else if let wkp = kp as? WritableKeyPath<Gedc, String?> {
         mutableSelf[keyPath: wkp] = child.line.value ?? ""
       }
     }
@@ -351,6 +355,8 @@ public class Header : RecordProtocol, GedcomExtensionContainer {
   public var place: HeaderPlace?
   public var copyright: String?
   public var lang: String?
+  public var characterEncoding: String?
+  public var file: String?
   public var submitter: String?
   public var note: NoteStructure?
 
@@ -365,6 +371,8 @@ public class Header : RecordProtocol, GedcomExtensionContainer {
     "SUBM" : \Header.submitter,
     "COPR" : \Header.copyright,
     "LANG" : \Header.lang,
+    "CHAR" : \Header.characterEncoding,
+    "FILE" : \Header.file,
     "PLAC" : \Header.place,
     "NOTE" : \Header.note,
     "SOTE" : \Header.note,
@@ -456,4 +464,3 @@ public class Header : RecordProtocol, GedcomExtensionContainer {
     return record
   }
 }
-
