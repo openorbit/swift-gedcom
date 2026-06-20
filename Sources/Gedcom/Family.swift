@@ -17,7 +17,8 @@
 //
 import Foundation
 
-public class LdsSpouseSealing : RecordProtocol {
+public class LdsSpouseSealing : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var date: DateValue?
   public var temple: String?
   public var place: PlaceStructure?
@@ -58,7 +59,7 @@ public class LdsSpouseSealing : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -102,12 +103,19 @@ public class LdsSpouseSealing : RecordProtocol {
       record.children += [citation.export()]
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
 
 
-public class SpouseAge : RecordProtocol {
+public class SpouseAge : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   var kind: String
   public var age: Age
 
@@ -126,7 +134,7 @@ public class SpouseAge : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -141,6 +149,12 @@ public class SpouseAge : RecordProtocol {
 
     record.children += [age.export()]
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
@@ -152,7 +166,8 @@ public enum FamilyAttributeKind : String {
   case FACT
 }
 
-public class FamilyAttribute  : RecordProtocol {
+public class FamilyAttribute : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var kind: FamilyAttributeKind
   public var text: String?
   public var type: String?
@@ -230,7 +245,7 @@ public class FamilyAttribute  : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
       if let wkp = kp as? WritableKeyPath<FamilyAttribute, String?> {
@@ -339,6 +354,12 @@ public class FamilyAttribute  : RecordProtocol {
       record.children += [Record(level: 1, tag: "UID", value: uuid.uuidString.lowercased())]
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
@@ -357,7 +378,8 @@ public enum FamilyEventKind : String {
   case EVEN
 }
 
-public class NonFamilyEventStructure : RecordProtocol {
+public class NonFamilyEventStructure : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var kind: FamilyEventKind
   public var date: DatePeriod?
   public var notes: [NoteStructure] = []
@@ -390,7 +412,7 @@ public class NonFamilyEventStructure : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -419,11 +441,18 @@ public class NonFamilyEventStructure : RecordProtocol {
       record.children += [citation.export()]
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
 
-public class FamilyEvent : RecordProtocol {
+public class FamilyEvent : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var kind: FamilyEventKind
   public var text: String?
   public var occured: Bool // Text == Y
@@ -541,7 +570,7 @@ public class FamilyEvent : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -660,12 +689,19 @@ public class FamilyEvent : RecordProtocol {
       record.children += [Record(level: 1, tag: "UID", value: uuid.uuidString.lowercased())]
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
 
-public class Family : RecordProtocol {
+public class Family : RecordProtocol, GedcomExtensionContainer {
   public var xref: String
+  public var extensions: [GedcomExtensionNode] = []
   public var restrictions: [Restriction] = []
 
   public var attributes: [FamilyAttribute] = []
@@ -742,7 +778,7 @@ public class Family : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -850,7 +886,14 @@ public class Family : RecordProtocol {
       record.children += [creationDate.export()]
     }
 
+    for node in extensions {
+      record.children.append(node.export())
+    }
+
     record.setLevel(0)
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }

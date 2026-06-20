@@ -27,7 +27,8 @@ n ADDR <Special> {1:1} g7:ADDR
 +1 CTRY <Special> {0:1} g7:CTRY
 */
 
-public class AddressStructure : RecordProtocol {
+public class AddressStructure : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var address: String
   public var adr1: String?
   public var adr2: String?
@@ -56,7 +57,7 @@ public class AddressStructure : RecordProtocol {
     var mutableSelf = self
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -88,6 +89,12 @@ public class AddressStructure : RecordProtocol {
     }
     if let country {
       record.children.append(Record(level: 1, tag: "CTRY", value: country))
+    }
+
+    for node in extensions {
+
+      record.children.append(node.export())
+
     }
 
     return record

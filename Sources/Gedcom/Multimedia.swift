@@ -15,7 +15,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-public class Crop : RecordProtocol {
+public class Crop : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var top: Int?
   public var left: Int?
   public var height: Int?
@@ -39,7 +40,7 @@ public class Crop : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -64,10 +65,17 @@ public class Crop : RecordProtocol {
       record.children.append(Record(level: 1, tag: "WIDTH", value: "\(width)"))
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
-public class MultimediaLink  : RecordProtocol {
+public class MultimediaLink : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var xref: String
   public var crop: Crop?
   public var title: String?
@@ -89,7 +97,7 @@ public class MultimediaLink  : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -111,11 +119,18 @@ public class MultimediaLink  : RecordProtocol {
       record.children.append(Record(level: 1, tag: "TITL", value: title))
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
 
-public class FileTranslation : RecordProtocol {
+public class FileTranslation : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var path: String = ""
   public var form: String = ""
 
@@ -135,7 +150,7 @@ public class FileTranslation : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -148,11 +163,15 @@ public class FileTranslation : RecordProtocol {
   func export() -> Record {
     let record = Record(level: 0, tag: "TRAN", value: path)
     record.children += [Record(level: 1, tag: "FORM", value: form)]
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }
 
-public class MultimediaFileForm : RecordProtocol {
+public class MultimediaFileForm : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var form: String = ""
   public var medium: Medium?
   nonisolated(unsafe) static let keys : [String:AnyKeyPath] = [
@@ -169,7 +188,7 @@ public class MultimediaFileForm : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -185,10 +204,17 @@ public class MultimediaFileForm : RecordProtocol {
       record.children += [medium.export()]
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
-public class MultimediaFile : RecordProtocol {
+public class MultimediaFile : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var path: String
 
   public var form: MultimediaFileForm = MultimediaFileForm(form: "")
@@ -212,7 +238,7 @@ public class MultimediaFile : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -241,10 +267,17 @@ public class MultimediaFile : RecordProtocol {
       record.children += [translation.export()]
     }
 
+    for node in extensions {
+
+      record.children.append(node.export())
+
+    }
+
     return record
   }
 }
-public class Multimedia  : RecordProtocol {
+public class Multimedia : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var xref: String
   public var restrictions: [Restriction] = []
 
@@ -278,7 +311,7 @@ public class Multimedia  : RecordProtocol {
 
     for child in record.children {
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -335,6 +368,9 @@ public class Multimedia  : RecordProtocol {
     }
 
     record.setLevel(0)
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }

@@ -17,7 +17,8 @@
 //
 import Foundation
 
-public class Submitter : RecordProtocol {
+public class Submitter : RecordProtocol, GedcomExtensionContainer {
+  public var extensions: [GedcomExtensionNode] = []
   public var xref: String = ""
   public var name: String = ""
   public var address: AddressStructure?
@@ -62,7 +63,7 @@ public class Submitter : RecordProtocol {
     for child in record.children {
 
       guard let kp = Self.keys[child.line.tag] else {
-        //  throw GedcomError.badRecord
+        extensions.append(GedcomExtensionNode(record: child))
         continue
       }
 
@@ -138,6 +139,9 @@ public class Submitter : RecordProtocol {
     }
 
     record.setLevel(0)
+    for node in extensions {
+      record.children.append(node.export())
+    }
     return record
   }
 }

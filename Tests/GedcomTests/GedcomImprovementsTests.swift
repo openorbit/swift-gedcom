@@ -1,5 +1,6 @@
 
 import Testing
+import Foundation
 @testable import Gedcom
 
 @Suite struct ReproductionTaskDefault {
@@ -73,6 +74,79 @@ import Testing
         let age = Age(age: "51w 6d", phrase: "363.5 days rounded down")
         #expect(age.parsedAge == GedcomAge(duration: GedcomAgeDuration(weeks: 51, days: 6)))
         #expect(age.phrase == "363.5 days rounded down")
+    }
+
+    @Test func testExtensionPreservationAndSchemaLookup() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 7.0
+1 SOUR Family Tree Maker
+1 SCHMA
+2 TAG _LOC https://example.com/LocationRecord
+0 @I1@ INDI
+1 NAME John /Doe/
+1 BIRT
+2 DATE 1 JAN 1900
+2 _EVENTEXT Event extension payload
+1 _LOC @L1@
+2 _NOTE Nested extension payload
+1 FOO Future standard-looking payload
+0 @L1@ _LOC
+1 NAME Paris
+0 TRLR
+"""
+        let ged = try loadGedcom(content)
+
+        #expect(ged.uri(forExtensionTag: "_LOC") == URL(string: "https://example.com/LocationRecord")!)
+        #expect(ged.individualRecords.count == 1)
+        #expect(ged.individualRecords[0].extensions.count == 2)
+        #expect(ged.individualRecords[0].extensions[0].tag == "_LOC")
+        #expect(ged.individualRecords[0].extensions[0].value == "@L1@")
+        #expect(ged.individualRecords[0].extensions[0].children[0].tag == "_NOTE")
+        #expect(ged.individualRecords[0].extensions[1].tag == "FOO")
+        #expect(ged.individualRecords[0].events.first?.extensions.first?.tag == "_EVENTEXT")
+        #expect(ged.extensionRecords.first?.xref == "@L1@")
+        #expect(ged.extensionRecords.first?.tag == "_LOC")
+        #expect(ged.extensionNodes(tag: "_NOTE").first?.value == "Nested extension payload")
+        #expect(ged.extensionNodes(tag: "_EVENTEXT").first?.value == "Event extension payload")
+
+        let exported = ged.exportContent()
+        #expect(exported.contains("2 TAG _LOC https://example.com/LocationRecord\n"))
+        #expect(exported.contains("2 TAG _NOTE https://openorbit.org/gedcom/extensions/vendor-family-tree-maker/_NOTE\n"))
+        #expect(exported.contains("2 TAG _EVENTEXT https://openorbit.org/gedcom/extensions/vendor-family-tree-maker/_EVENTEXT\n"))
+        #expect(exported.contains("2 _EVENTEXT Event extension payload\n"))
+        #expect(exported.contains("1 _LOC @L1@\n2 _NOTE Nested extension payload\n"))
+        #expect(exported.contains("1 FOO Future standard-looking payload\n"))
+        #expect(exported.contains("0 @L1@ _LOC\n1 NAME Paris\n"))
+    }
+
+    @Test func testUndeclaredExtensionUsesUnknownNamespaceWithoutHeaderSource() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 7.0
+0 @I1@ INDI
+1 _FOO Bar
+0 TRLR
+"""
+        let ged = try loadGedcom(content)
+
+        #expect(ged.header.schema == nil)
+
+        let exported = ged.exportContent()
+        #expect(exported.contains("1 SCHMA\n2 TAG _FOO https://openorbit.org/gedcom/extensions/unknown/_FOO\n"))
+        #expect(exported.contains("1 _FOO Bar\n"))
+        #expect(ged.uri(forExtensionTag: "_FOO") == URL(string: "https://openorbit.org/gedcom/extensions/unknown/_FOO")!)
+    }
+
+    private func loadGedcom(_ content: String) throws -> GedcomFile {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("ged")
+        try content.write(to: url, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: url) }
+        return try GedcomFile(withFile: url)
     }
 
     /*
