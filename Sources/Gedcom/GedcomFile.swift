@@ -89,7 +89,16 @@ public class GedcomFile {
     guard let data else {
       return nil
     }
-    return String(data: data, encoding: encoding)
+    if let decoded = String(data: data, encoding: encoding) {
+      return decoded
+    }
+    if encoding == .windowsCP1252 {
+      return decodeWindowsCP1252(data)
+    }
+    if encoding == .isoLatin1 {
+      return decodeISOLatin1(data)
+    }
+    return nil
   }
 
   private func resolveImportEncoding(preferred encoding: String.Encoding?) throws -> String.Encoding {
@@ -194,22 +203,69 @@ public class GedcomFile {
     case "UNICODE", "UTF-16", "UTF16":
       return .utf16
     case "ASCII", "US-ASCII":
-      return usableEncoding(.ascii, sample: [0x41])
+      return .ascii
     case "ANSI", "WINDOWS-1252", "CP1252":
-      return firstUsableEncoding([.windowsCP1252, .isoLatin1], sample: [0xe9])
+      return .windowsCP1252
     case "MACROMAN", "MAC-ROMAN", "MACOSROMAN":
-      return usableEncoding(.macOSRoman, sample: [0x8e])
+      return .macOSRoman
     default:
       return nil
     }
   }
 
-  private func firstUsableEncoding(_ encodings: [String.Encoding], sample: [UInt8]) -> String.Encoding? {
-    encodings.first { usableEncoding($0, sample: sample) != nil }
+  private func decodeISOLatin1(_ data: Data) -> String {
+    String(String.UnicodeScalarView(data.map { UnicodeScalar(UInt32($0))! }))
   }
 
-  private func usableEncoding(_ encoding: String.Encoding, sample: [UInt8]) -> String.Encoding? {
-    String(data: Data(sample), encoding: encoding) == nil ? nil : encoding
+  private func decodeWindowsCP1252(_ data: Data) -> String? {
+    var scalars = String.UnicodeScalarView()
+
+    for byte in data {
+      if let scalar = windowsCP1252Scalar(for: byte) {
+        scalars.append(scalar)
+      } else {
+        return nil
+      }
+    }
+
+    return String(scalars)
+  }
+
+  private func windowsCP1252Scalar(for byte: UInt8) -> UnicodeScalar? {
+    if byte < 0x80 || byte >= 0xa0 {
+      return UnicodeScalar(UInt32(byte))
+    }
+
+    switch byte {
+    case 0x80: return UnicodeScalar(0x20ac)
+    case 0x82: return UnicodeScalar(0x201a)
+    case 0x83: return UnicodeScalar(0x0192)
+    case 0x84: return UnicodeScalar(0x201e)
+    case 0x85: return UnicodeScalar(0x2026)
+    case 0x86: return UnicodeScalar(0x2020)
+    case 0x87: return UnicodeScalar(0x2021)
+    case 0x88: return UnicodeScalar(0x02c6)
+    case 0x89: return UnicodeScalar(0x2030)
+    case 0x8a: return UnicodeScalar(0x0160)
+    case 0x8b: return UnicodeScalar(0x2039)
+    case 0x8c: return UnicodeScalar(0x0152)
+    case 0x8e: return UnicodeScalar(0x017d)
+    case 0x91: return UnicodeScalar(0x2018)
+    case 0x92: return UnicodeScalar(0x2019)
+    case 0x93: return UnicodeScalar(0x201c)
+    case 0x94: return UnicodeScalar(0x201d)
+    case 0x95: return UnicodeScalar(0x2022)
+    case 0x96: return UnicodeScalar(0x2013)
+    case 0x97: return UnicodeScalar(0x2014)
+    case 0x98: return UnicodeScalar(0x02dc)
+    case 0x99: return UnicodeScalar(0x2122)
+    case 0x9a: return UnicodeScalar(0x0161)
+    case 0x9b: return UnicodeScalar(0x203a)
+    case 0x9c: return UnicodeScalar(0x0153)
+    case 0x9e: return UnicodeScalar(0x017e)
+    case 0x9f: return UnicodeScalar(0x0178)
+    default: return nil
+    }
   }
 
   func parse(encoding: String.Encoding) throws {
