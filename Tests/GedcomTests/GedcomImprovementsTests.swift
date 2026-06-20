@@ -140,6 +140,43 @@ import Foundation
         #expect(ged.uri(forExtensionTag: "_FOO") == URL(string: "https://openorbit.org/gedcom/extensions/unknown/_FOO")!)
     }
 
+    @Test func testConcIsRejectedForGedcom7Input() throws {
+        let content = """
+0 HEAD
+1 GEDC
+2 VERS 7.0
+0 @I1@ INDI
+1 NOTE First
+2 CONC second
+0 TRLR
+"""
+
+        do {
+            _ = try loadGedcom(content)
+            Issue.record("GEDCOM 7 input must not accept CONC")
+        } catch GedcomError.badRecord {
+            #expect(true)
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+        }
+    }
+
+    @Test func testCommonLineEndingsImport() throws {
+        let lines = [
+            "0 HEAD",
+            "1 GEDC",
+            "2 VERS 7.0",
+            "0 TRLR",
+            ""
+        ]
+
+        for separator in ["\n", "\r\n", "\r"] {
+            let ged = try loadGedcom(lines.joined(separator: separator))
+            #expect(ged.sourceDialect == .gedcom7(version: "7.0"))
+            #expect(ged.exportContent() == "0 HEAD\n1 GEDC\n2 VERS 7.0\n0 TRLR\n")
+        }
+    }
+
     private func loadGedcom(_ content: String) throws -> GedcomFile {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)

@@ -34,6 +34,10 @@ public class GedcomFile {
   public var sourceRecords: [Source] = []
   public var submitterRecords: [Submitter] = []
   public var extensionRecords: [GedcomExtensionNode] = []
+  public var sourceDialect: GedcomDialect = .unknown(version: nil)
+  public private(set) var sourceEncoding: String.Encoding?
+  public private(set) var sourceEncodingLabel: String?
+  public var exportDialect: GedcomDialect { .gedcom7(version: "7.0") }
 
   public var familyRecordsMap: [String: Family] = [:]
   public var individualRecordsMap: [String: Individual] = [:]
@@ -43,7 +47,11 @@ public class GedcomFile {
   public var sourceRecordsMap: [String: Source] = [:]
   public var submitterRecordsMap: [String: Submitter] = [:]
 
-  public init(withArchive path: URL, encoding: String.Encoding = .utf8) throws {
+  private var generatedMultimediaRecordIndex = 1
+  private var generatedSourceRecordIndex = 1
+  private var liftedGedcom5Records: [Record] = []
+
+  public init(withArchive path: URL, encoding: String.Encoding? = nil) throws {
     self.url = path
     self.archive = try Archive(url: path, accessMode: .read, pathEncoding: nil)
 
@@ -59,26 +67,18 @@ public class GedcomFile {
       self.data!.append(data)
     }
 
-    if data!.starts(with: [0xef, 0xbb, 0xbf]) {
-      // File starts with a BOM, drop it
-      data!.removeFirst(3)
-    }
-
-    try parse(encoding: encoding)
+    try parse(encoding: resolveImportEncoding(preferred: encoding))
+    try prepareRecordsForBuild()
     try build()
   }
 
-  public init(withFile path: URL, encoding: String.Encoding = .utf8) throws {
+  public init(withFile path: URL, encoding: String.Encoding? = nil) throws {
     self.url = path
     self.archive = nil
     self.data = try Data(contentsOf: path)
 
-    if data!.starts(with: [0xef, 0xbb, 0xbf]) {
-      // File starts with a BOM, drop it
-      data!.removeFirst(3)
-    }
-
-    try parse(encoding: encoding)
+    try parse(encoding: resolveImportEncoding(preferred: encoding))
+    try prepareRecordsForBuild()
     try build()
   }
 
@@ -91,8 +91,94 @@ public class GedcomFile {
     }
     return String(data: data, encoding: encoding)
   }
+
+  private func resolveImportEncoding(preferred encoding: String.Encoding?) throws -> String.Encoding {
+    if let encoding {
+      removeUTF8ByteOrderMarkIfNeeded(for: encoding)
+      sourceEncoding = encoding
+      sourceEncodingLabel = "explicit"
+      return encoding
+    }
+
+    guard let data else {
+      throw GedcomError.badEncoding
+    }
+
+    if data.starts(with: [0xef, 0xbb, 0xbf]) {
+      self.data?.removeFirst(3)
+      sourceEncoding = .utf8
+      sourceEncodingLabel = "UTF-8"
+      return .utf8
+    }
+
+    if data.starts(with: [0xff, 0xfe]) || data.starts(with: [0xfe, 0xff]) {
+      sourceEncoding = .utf16
+      sourceEncodingLabel = "UNICODE"
+      return .utf16
+    }
+
+    if let characterEncoding = declaredCharacterEncoding(in: data) {
+      guard let encoding = swiftEncoding(forGedcomCharacterEncoding: characterEncoding) else {
+        throw GedcomError.unsupportedEncoding(characterEncoding)
+      }
+      sourceEncoding = encoding
+      sourceEncodingLabel = characterEncoding
+      return encoding
+    }
+
+    sourceEncoding = .utf8
+    sourceEncodingLabel = "UTF-8"
+    return .utf8
+  }
+
+  private func removeUTF8ByteOrderMarkIfNeeded(for encoding: String.Encoding) {
+    guard encoding == .utf8, data?.starts(with: [0xef, 0xbb, 0xbf]) == true else {
+      return
+    }
+    data?.removeFirst(3)
+  }
+
+  private func declaredCharacterEncoding(in data: Data) -> String? {
+    let prefix = data.prefix(8192)
+    guard let headerText = String(data: prefix, encoding: .isoLatin1) else {
+      return nil
+    }
+
+    for line in headerText.split(whereSeparator: { $0 == "\n" || $0 == "\r" }) {
+      let parts = line.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
+      guard parts.count >= 3, parts[0] == "1", parts[1] == "CHAR" else {
+        continue
+      }
+      return parts[2].trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    }
+
+    return nil
+  }
+
+  private func swiftEncoding(forGedcomCharacterEncoding encoding: String) -> String.Encoding? {
+    switch encoding
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+      .uppercased()
+      .replacingOccurrences(of: "_", with: "-") {
+    case "UTF-8", "UTF8":
+      return .utf8
+    case "UNICODE", "UTF-16", "UTF16":
+      return .utf16
+    case "ASCII", "US-ASCII":
+      return .ascii
+    case "ANSI", "WINDOWS-1252", "CP1252":
+      return .windowsCP1252
+    case "MACROMAN", "MAC-ROMAN", "MACOSROMAN":
+      return .macOSRoman
+    default:
+      return nil
+    }
+  }
+
   func parse(encoding: String.Encoding) throws {
-    let gedcom = dataAsString(encoding: encoding)!
+    guard let gedcom = dataAsString(encoding: encoding) else {
+      throw GedcomError.badEncoding
+    }
     var recordStack: [Record] = []
 
     var errorOnLine: Int?
@@ -151,6 +237,516 @@ public class GedcomFile {
     "SUBM" : \GedcomFile.submitterRecords,
   ]
 
+  func prepareRecordsForBuild() throws {
+    sourceDialect = GedcomDialect.from(version: gedcomVersion(in: recordLines))
+
+    switch sourceDialect {
+    case .gedcom5:
+      convertGedcom5RecordsToGedcom7()
+    case .gedcom7, .unknown:
+      if containsTag("CONC", in: recordLines) {
+        throw GedcomError.badRecord
+      }
+    }
+  }
+
+  private func gedcomVersion(in records: [Record]) -> String? {
+    guard let header = records.first(where: { $0.line.tag == "HEAD" }),
+          let gedc = header.children.first(where: { $0.line.tag == "GEDC" }),
+          let vers = gedc.children.first(where: { $0.line.tag == "VERS" }) else {
+      return nil
+    }
+    return vers.line.value
+  }
+
+  private func containsTag(_ tag: String, in records: [Record]) -> Bool {
+    records.contains { record in
+      record.line.tag == tag || containsTag(tag, in: record.children)
+    }
+  }
+
+  private func convertGedcom5RecordsToGedcom7() {
+    generatedMultimediaRecordIndex = 1
+    generatedSourceRecordIndex = 1
+    liftedGedcom5Records = []
+
+    for record in recordLines {
+      convertGedcom5RecordToGedcom7(record)
+      if record.line.level == 0 && record.line.tag == "NOTE" {
+        record.line.tag = "SNOTE"
+      }
+    }
+
+    if !liftedGedcom5Records.isEmpty {
+      if let trailerIndex = recordLines.firstIndex(where: { $0.line.tag == "TRLR" }) {
+        recordLines.insert(contentsOf: liftedGedcom5Records, at: trailerIndex)
+      } else {
+        recordLines.append(contentsOf: liftedGedcom5Records)
+      }
+    }
+  }
+
+  private func convertGedcom5RecordToGedcom7(_ record: Record, parentTag: String?) {
+    var convertedChildren: [Record] = []
+
+    for child in record.children {
+      if child.line.tag == "CONC" || child.line.tag == "CONT" {
+        if record.line.value == nil {
+          record.line.value = ""
+        }
+        if child.line.tag == "CONT" {
+          record.line.value?.append("\n\(child.line.value ?? "")")
+        } else {
+          record.line.value?.append(child.line.value ?? "")
+        }
+      } else {
+        convertGedcom5RecordToGedcom7(child, parentTag: record.line.tag)
+        convertedChildren.append(child)
+      }
+    }
+
+    record.children = convertedChildren
+
+    if record.line.tag == "DATE" {
+      convertGedcom5DateRecordToGedcom7(record)
+    } else if record.line.tag == "OBJE" && record.line.level > 0 && !isPointerValue(record.line.value) {
+      liftGedcom5InlineMultimedia(record)
+    } else if record.line.tag == "SOUR" && parentTag != "HEAD" && record.line.level > 0 && !isPointerValue(record.line.value) {
+      liftGedcom5InlineSource(record)
+    } else if record.line.tag == "ROMN" || record.line.tag == "FONE" {
+      convertGedcom5NameVariationToTranslation(record)
+    } else if record.line.tag == "RELA" {
+      convertGedcom5RelationshipToRole(record)
+    } else if record.line.tag == "AFN" || record.line.tag == "RFN" || record.line.tag == "RIN" {
+      convertGedcom5IdentifierToExternalIdentifier(record)
+    } else if record.line.tag == "WAC" {
+      record.line.tag = "INIL"
+      convertGedcom5PayloadValueToGedcom7(record, parentTag: parentTag)
+    } else if record.line.tag == "SUBN" {
+      record.line.tag = "_SUBN"
+    } else {
+      convertGedcom5PayloadValueToGedcom7(record, parentTag: parentTag)
+    }
+  }
+
+  private func convertGedcom5IdentifierToExternalIdentifier(_ record: Record) {
+    let originalTag = record.line.tag
+    record.line.tag = "EXID"
+
+    if record.children.first(where: { $0.line.tag == "TYPE" }) == nil {
+      record.children.insert(
+        Record(level: record.line.level + 1,
+               tag: "TYPE",
+               value: "GEDCOM 5.5.1 \(originalTag)"),
+        at: 0
+      )
+    }
+  }
+
+  private func convertGedcom5RecordToGedcom7(_ record: Record) {
+    convertGedcom5RecordToGedcom7(record, parentTag: nil)
+  }
+
+  private func convertGedcom5PayloadValueToGedcom7(_ record: Record, parentTag: String?) {
+    switch record.line.tag {
+    case "AGE":
+      convertGedcom5AgeValue(record)
+    case "SEX":
+      convertGedcom5SexValue(record)
+    case "STAT":
+      convertGedcom5StatusValue(record)
+    case "PEDI":
+      record.line.value = record.line.value?.uppercased()
+    case "RESN":
+      record.line.value = record.line.value?
+        .components(separatedBy: ",")
+        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() }
+        .joined(separator: ", ")
+    case "TYPE" where parentTag == "NAME":
+      record.line.value = record.line.value?.uppercased()
+    default:
+      break
+    }
+  }
+
+  private func convertGedcom5AgeValue(_ record: Record) {
+    guard let value = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !value.isEmpty else {
+      return
+    }
+
+    switch value.uppercased() {
+    case "CHILD":
+      record.line.value = "< 8y"
+      appendPhrase("Child", to: record)
+    case "INFANT":
+      record.line.value = "< 1y"
+      appendPhrase("Infant", to: record)
+    case "STILLBORN":
+      record.line.value = "0y"
+      appendPhrase("Stillborn", to: record)
+    default:
+      break
+    }
+  }
+
+  private func convertGedcom5SexValue(_ record: Record) {
+    guard let value = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines),
+          let first = value.first else {
+      record.line.value = "U"
+      return
+    }
+
+    switch String(first).uppercased() {
+    case "M":
+      record.line.value = "M"
+    case "F":
+      record.line.value = "F"
+    case "X":
+      record.line.value = "X"
+    default:
+      record.line.value = "U"
+    }
+  }
+
+  private func convertGedcom5StatusValue(_ record: Record) {
+    guard let value = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !value.isEmpty else {
+      return
+    }
+
+    switch value.uppercased() {
+    case "DNS/CAN":
+      record.line.value = "DNS_CAN"
+    case "PRE-1970":
+      record.line.value = "PRE_1970"
+    default:
+      record.line.value = value.uppercased()
+    }
+  }
+
+  private func convertGedcom5NameVariationToTranslation(_ record: Record) {
+    let originalTag = record.line.tag
+    var convertedChildren: [Record] = []
+    var language: String?
+
+    for child in record.children {
+      if child.line.tag == "TYPE" {
+        language = gedcom7Language(forGedcom5NameVariation: child.line.value, tag: originalTag)
+      } else {
+        convertedChildren.append(child)
+      }
+    }
+
+    record.line.tag = "TRAN"
+    record.children = convertedChildren
+    record.children.insert(
+      Record(level: record.line.level + 1,
+             tag: "LANG",
+             value: language ?? defaultLanguage(forGedcom5NameVariation: originalTag)),
+      at: 0
+    )
+  }
+
+  private func gedcom7Language(forGedcom5NameVariation type: String?, tag: String) -> String {
+    guard let type else {
+      return defaultLanguage(forGedcom5NameVariation: tag)
+    }
+
+    switch type.lowercased() {
+    case "hangul":
+      return "ko-hang"
+    case "kana":
+      return "ja-hrkt"
+    case "pinyin":
+      return "und-Latn-pinyin"
+    case "romaji":
+      return "ja-Latn"
+    case "wadegiles":
+      return "zh-Latn-wadegile"
+    default:
+      return defaultLanguage(forGedcom5NameVariation: tag)
+    }
+  }
+
+  private func defaultLanguage(forGedcom5NameVariation tag: String) -> String {
+    tag == "ROMN" ? "und-Latn" : "und"
+  }
+
+  private func convertGedcom5RelationshipToRole(_ record: Record) {
+    let phrase = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    record.line.tag = "ROLE"
+    record.line.value = "OTHER"
+
+    if let phrase, !phrase.isEmpty {
+      appendPhrase(phrase, to: record)
+    }
+  }
+
+  private func liftGedcom5InlineMultimedia(_ record: Record) {
+    let xref = nextGeneratedXref(prefix: "O", existing: existingXrefs())
+    let multimediaRecord = Record(level: 0, xref: xref, tag: "OBJE")
+    var linkChildren: [Record] = []
+    var fileChildren: [Record] = []
+
+    for child in record.children {
+      switch child.line.tag {
+      case "FILE":
+        let file = clonedRecord(child, level: 1)
+        multimediaRecord.children.append(file)
+      case "FORM":
+        fileChildren.append(clonedRecord(child, level: 2))
+      case "TITL":
+        fileChildren.append(clonedRecord(child, level: 2))
+      case "CROP":
+        linkChildren.append(child)
+      default:
+        multimediaRecord.children.append(clonedRecord(child, level: 1))
+      }
+    }
+
+    if let file = multimediaRecord.children.first(where: { $0.line.tag == "FILE" }) {
+      file.children.append(contentsOf: fileChildren)
+    } else if let path = record.line.value,
+              !path.isEmpty {
+      let file = Record(level: 1, tag: "FILE", value: path)
+      file.children = fileChildren
+      multimediaRecord.children.insert(file, at: 0)
+    }
+
+    convertGedcom5MultimediaFormValues(in: multimediaRecord)
+    record.line.value = xref
+    record.children = linkChildren
+    liftedGedcom5Records.append(multimediaRecord)
+  }
+
+  private func liftGedcom5InlineSource(_ record: Record) {
+    let xref = nextGeneratedXref(prefix: "S", existing: existingXrefs())
+    let sourceRecord = Record(level: 0, xref: xref, tag: "SOUR")
+    var citationChildren: [Record] = []
+
+    if let title = record.line.value, !title.isEmpty {
+      sourceRecord.children.append(Record(level: 1, tag: "TITL", value: title))
+    }
+
+    for child in record.children {
+      switch child.line.tag {
+      case "PAGE", "DATA", "EVEN", "QUAY", "OBJE", "NOTE", "SNOTE":
+        citationChildren.append(child)
+      default:
+        sourceRecord.children.append(clonedRecord(child, level: 1))
+      }
+    }
+
+    record.line.value = xref
+    record.children = citationChildren
+    liftedGedcom5Records.append(sourceRecord)
+  }
+
+  private func convertGedcom5MultimediaFormValues(in record: Record) {
+    if record.line.tag == "FORM", let value = record.line.value {
+      record.line.value = gedcom7MediaType(forGedcom5Form: value)
+    }
+
+    for child in record.children {
+      convertGedcom5MultimediaFormValues(in: child)
+    }
+  }
+
+  private func gedcom7MediaType(forGedcom5Form form: String) -> String {
+    switch form.lowercased() {
+    case "bmp":
+      return "image/bmp"
+    case "gif":
+      return "image/gif"
+    case "jpg", "jpeg":
+      return "image/jpeg"
+    case "ole":
+      return "application/ole"
+    case "pcx":
+      return "image/vnd.zbrush.pcx"
+    case "tif", "tiff":
+      return "image/tiff"
+    case "wav":
+      return "audio/wav"
+    default:
+      return form
+    }
+  }
+
+  private func isPointerValue(_ value: String?) -> Bool {
+    guard let value else {
+      return false
+    }
+    return value.hasPrefix("@") && value.hasSuffix("@") && value.count > 2
+  }
+
+  private func existingXrefs() -> Set<String> {
+    Set(recordLines.compactMap(\.line.xref) + liftedGedcom5Records.compactMap(\.line.xref))
+  }
+
+  private func nextGeneratedXref(prefix: String, existing: Set<String>) -> String {
+    if prefix == "O" {
+      defer { generatedMultimediaRecordIndex += 1 }
+      var xref = "@O\(generatedMultimediaRecordIndex)@"
+      while existing.contains(xref) {
+        generatedMultimediaRecordIndex += 1
+        xref = "@O\(generatedMultimediaRecordIndex)@"
+      }
+      return xref
+    }
+
+    defer { generatedSourceRecordIndex += 1 }
+    var xref = "@S\(generatedSourceRecordIndex)@"
+    while existing.contains(xref) {
+      generatedSourceRecordIndex += 1
+      xref = "@S\(generatedSourceRecordIndex)@"
+    }
+    return xref
+  }
+
+  private func clonedRecord(_ record: Record, level: Int) -> Record {
+    let clone = Record(level: level, xref: record.line.xref, tag: record.line.tag, value: record.line.value)
+    clone.children = record.children.map { clonedRecord($0, level: level + 1) }
+    return clone
+  }
+
+  private func convertGedcom5DateRecordToGedcom7(_ record: Record) {
+    guard let value = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !value.isEmpty else {
+      return
+    }
+
+    if let calendar = convertGedcom5CalendarEscape(value) {
+      record.line.value = calendar
+      return
+    }
+
+    if let interpreted = convertGedcom5InterpretedDate(value) {
+      record.line.value = interpreted.date
+      appendPhrase(interpreted.phrase, to: record)
+      return
+    }
+
+    if let dualYear = convertGedcom5DualYearDate(value) {
+      record.line.value = dualYear.date
+      appendPhrase(dualYear.phrase, to: record)
+      return
+    }
+
+    if let range = convertGedcom5DateRange(value) {
+      record.line.value = range
+    }
+  }
+
+  private func convertGedcom5CalendarEscape(_ value: String) -> String? {
+    if value.hasPrefix("@#ROMAN@") {
+      return value.replacingOccurrences(of: "@#ROMAN@", with: "_ROMAN", options: [.anchored])
+    }
+    if value.hasPrefix("@#UNKNOWN@") {
+      return value.replacingOccurrences(of: "@#UNKNOWN@", with: "_UNKNOWN", options: [.anchored])
+    }
+    return nil
+  }
+
+  private func convertGedcom5InterpretedDate(_ value: String) -> (date: String, phrase: String)? {
+    let prefix = "INT "
+    guard value.hasPrefix(prefix),
+          let phraseStart = value.firstIndex(of: "("),
+          value.last == ")",
+          phraseStart > value.index(value.startIndex, offsetBy: prefix.count) else {
+      return nil
+    }
+
+    let date = value[value.index(value.startIndex, offsetBy: prefix.count)..<phraseStart]
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+    let phrase = value[value.index(after: phraseStart)..<value.index(before: value.endIndex)]
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    guard !date.isEmpty, !phrase.isEmpty else {
+      return nil
+    }
+
+    if let dualYear = convertGedcom5DualYearDate(date) {
+      return (dualYear.date, "\(phrase); original date: \(value)")
+    }
+    return (date, phrase)
+  }
+
+  private func convertGedcom5DualYearDate(_ value: String) -> (date: String, phrase: String)? {
+    let parts = value.split(separator: " ", omittingEmptySubsequences: false)
+    var convertedParts: [String] = []
+    var converted = false
+
+    for part in parts {
+      if !converted,
+         let slash = part.firstIndex(of: "/") {
+        let firstYear = part[..<slash]
+        let secondYear = part[part.index(after: slash)...]
+
+        if !firstYear.isEmpty,
+           !secondYear.isEmpty,
+           firstYear.allSatisfy(\.isNumber),
+           secondYear.allSatisfy(\.isNumber) {
+          convertedParts.append(String(firstYear))
+          converted = true
+          continue
+        }
+      }
+      convertedParts.append(String(part))
+    }
+
+    guard converted else {
+      return nil
+    }
+
+    return (convertedParts.joined(separator: " "), value)
+  }
+
+  private func convertGedcom5DateRange(_ value: String) -> String? {
+    let prefix = "BET "
+    guard value.hasPrefix(prefix),
+          let separatorRange = value.range(of: " AND ") else {
+      return nil
+    }
+
+    let start = value[value.index(value.startIndex, offsetBy: prefix.count)..<separatorRange.lowerBound]
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+    let end = value[separatorRange.upperBound...]
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    guard let startYear = trailingYear(in: start),
+          let endYear = trailingYear(in: end),
+          startYear > endYear else {
+      return nil
+    }
+
+    return "BET \(end) AND \(start)"
+  }
+
+  private func trailingYear(in value: String) -> Int? {
+    value
+      .split(separator: " ")
+      .last
+      .flatMap { Int($0) }
+  }
+
+  private func appendPhrase(_ phrase: String, to record: Record) {
+    guard !phrase.isEmpty else {
+      return
+    }
+
+    if let existingPhrase = record.children.first(where: { $0.line.tag == "PHRASE" }) {
+      if existingPhrase.line.value?.isEmpty ?? true {
+        existingPhrase.line.value = phrase
+      }
+      return
+    }
+
+    record.children.append(Record(level: record.line.level + 1, tag: "PHRASE", value: phrase))
+  }
+
   func build() throws {
     var mutableSelf = self
     for record in recordLines {
@@ -200,6 +796,7 @@ public class GedcomFile {
         }
       }
     }
+    header.gedc.vers = "7.0"
   }
 
   public var extensionSchema: [String: URL] {

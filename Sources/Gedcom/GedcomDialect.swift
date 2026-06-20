@@ -1,7 +1,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright 2024 Mattias Holm
+// Copyright 2026 Mattias Holm
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,17 +16,24 @@
 // limitations under the License.
 //
 
-public enum GedcomError : Error {
-  case missingManifest
-  case unknownVersion
-  case badLine(Int)
-  case badLevel(Int)
-  case badArchive
-  case badRecord
-  case badRestriction
-  case badNamePiece
-  case badURL
-  case badSchema
-  case badEncoding
-  case unsupportedEncoding(String)
+public enum GedcomDialect: Equatable {
+  case gedcom5(version: String)
+  case gedcom7(version: String)
+  case unknown(version: String?)
+
+  public static func from(version: String?) -> GedcomDialect {
+    guard let version, !version.isEmpty else {
+      return .unknown(version: nil)
+    }
+
+    if version.hasPrefix("5.") {
+      return .gedcom5(version: version)
+    }
+
+    if version.hasPrefix("7.") {
+      return .gedcom7(version: version)
+    }
+
+    return .unknown(version: version)
+  }
 }
