@@ -251,6 +251,44 @@ import Foundation
         #expect(exported.contains("2 DATE _ROMAN 71\n"))
     }
 
+    @Test func testGedcom551LegacyIdentifiersWacAndSubmissionPreserveAsGedcom7() throws {
+        let content = """
+0 HEAD
+1 SOUR LegacyApp
+1 GEDC
+2 VERS 5.5.1
+0 @I1@ INDI
+1 NAME Legacy /Tester/
+1 AFN AFN-123
+1 RFN RFN-456
+1 RIN RIN-789
+1 WAC
+2 STAT PRE-1970
+3 DATE 2 FEB 1900
+0 @SUBN1@ SUBN
+1 SUBM @U1@
+0 @U1@ SUBM
+1 NAME Submitter /One/
+0 TRLR
+"""
+        let ged = try loadGedcom(content)
+        let individual = try #require(ged.individualRecords.first)
+
+        #expect(individual.identifiers.count == 3)
+        #expect(individual.ldsDetails.first?.kind == .INIL)
+        #expect(individual.ldsDetails.first?.status?.kind == .PRE_1970)
+        #expect(ged.extensionRecords.first?.tag == "_SUBN")
+        #expect(ged.extensionRecords.first?.xref == "@SUBN1@")
+
+        let exported = ged.exportContent()
+        #expect(exported.contains("1 EXID AFN-123\n2 TYPE GEDCOM 5.5.1 AFN\n"))
+        #expect(exported.contains("1 EXID RFN-456\n2 TYPE GEDCOM 5.5.1 RFN\n"))
+        #expect(exported.contains("1 EXID RIN-789\n2 TYPE GEDCOM 5.5.1 RIN\n"))
+        #expect(exported.contains("1 INIL\n2 STAT PRE_1970\n3 DATE 2 FEB 1900\n"))
+        #expect(exported.contains("2 TAG _SUBN https://openorbit.org/gedcom/extensions/vendor-legacyapp/_SUBN\n"))
+        #expect(exported.contains("0 @SUBN1@ _SUBN\n1 SUBM @U1@\n"))
+    }
+
     private func loadGedcom(_ content: String) throws -> GedcomFile {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)

@@ -233,14 +233,35 @@ public class GedcomFile {
       convertGedcom5DateRecordToGedcom7(record)
     } else if record.line.tag == "OBJE" && record.line.level > 0 && !isPointerValue(record.line.value) {
       liftGedcom5InlineMultimedia(record)
-    } else if record.line.tag == "SOUR" && record.line.level > 0 && !isPointerValue(record.line.value) {
+    } else if record.line.tag == "SOUR" && parentTag != "HEAD" && record.line.level > 0 && !isPointerValue(record.line.value) {
       liftGedcom5InlineSource(record)
     } else if record.line.tag == "ROMN" || record.line.tag == "FONE" {
       convertGedcom5NameVariationToTranslation(record)
     } else if record.line.tag == "RELA" {
       convertGedcom5RelationshipToRole(record)
+    } else if record.line.tag == "AFN" || record.line.tag == "RFN" || record.line.tag == "RIN" {
+      convertGedcom5IdentifierToExternalIdentifier(record)
+    } else if record.line.tag == "WAC" {
+      record.line.tag = "INIL"
+      convertGedcom5PayloadValueToGedcom7(record, parentTag: parentTag)
+    } else if record.line.tag == "SUBN" {
+      record.line.tag = "_SUBN"
     } else {
       convertGedcom5PayloadValueToGedcom7(record, parentTag: parentTag)
+    }
+  }
+
+  private func convertGedcom5IdentifierToExternalIdentifier(_ record: Record) {
+    let originalTag = record.line.tag
+    record.line.tag = "EXID"
+
+    if record.children.first(where: { $0.line.tag == "TYPE" }) == nil {
+      record.children.insert(
+        Record(level: record.line.level + 1,
+               tag: "TYPE",
+               value: "GEDCOM 5.5.1 \(originalTag)"),
+        at: 0
+      )
     }
   }
 
