@@ -235,6 +235,69 @@ public class GedcomFile {
       liftGedcom5InlineMultimedia(record)
     } else if record.line.tag == "SOUR" && record.line.level > 0 && !isPointerValue(record.line.value) {
       liftGedcom5InlineSource(record)
+    } else if record.line.tag == "ROMN" || record.line.tag == "FONE" {
+      convertGedcom5NameVariationToTranslation(record)
+    } else if record.line.tag == "RELA" {
+      convertGedcom5RelationshipToRole(record)
+    }
+  }
+
+  private func convertGedcom5NameVariationToTranslation(_ record: Record) {
+    let originalTag = record.line.tag
+    var convertedChildren: [Record] = []
+    var language: String?
+
+    for child in record.children {
+      if child.line.tag == "TYPE" {
+        language = gedcom7Language(forGedcom5NameVariation: child.line.value, tag: originalTag)
+      } else {
+        convertedChildren.append(child)
+      }
+    }
+
+    record.line.tag = "TRAN"
+    record.children = convertedChildren
+    record.children.insert(
+      Record(level: record.line.level + 1,
+             tag: "LANG",
+             value: language ?? defaultLanguage(forGedcom5NameVariation: originalTag)),
+      at: 0
+    )
+  }
+
+  private func gedcom7Language(forGedcom5NameVariation type: String?, tag: String) -> String {
+    guard let type else {
+      return defaultLanguage(forGedcom5NameVariation: tag)
+    }
+
+    switch type.lowercased() {
+    case "hangul":
+      return "ko-hang"
+    case "kana":
+      return "ja-hrkt"
+    case "pinyin":
+      return "und-Latn-pinyin"
+    case "romaji":
+      return "ja-Latn"
+    case "wadegiles":
+      return "zh-Latn-wadegile"
+    default:
+      return defaultLanguage(forGedcom5NameVariation: tag)
+    }
+  }
+
+  private func defaultLanguage(forGedcom5NameVariation tag: String) -> String {
+    tag == "ROMN" ? "und-Latn" : "und"
+  }
+
+  private func convertGedcom5RelationshipToRole(_ record: Record) {
+    let phrase = record.line.value?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    record.line.tag = "ROLE"
+    record.line.value = "OTHER"
+
+    if let phrase, !phrase.isEmpty {
+      appendPhrase(phrase, to: record)
     }
   }
 
