@@ -134,7 +134,7 @@ public class DateValue : RecordProtocol, GedcomExtensionContainer {
     "TIME" : \DateValue.time,
     "PHRASE" : \DateValue.phrase,
   ]
-  init(date: String, time: String? = nil, phrase: String? = nil) {
+  public init(date: String, time: String? = nil, phrase: String? = nil) {
     self.date = date
     self.time = time
     self.phrase = phrase
@@ -181,7 +181,7 @@ public class DatePeriod : RecordProtocol, GedcomExtensionContainer {
     "TIME" : \DatePeriod.time,
     "PHRASE" : \DatePeriod.phrase,
   ]
-  init(date: String, time: String? = nil, phrase: String? = nil) {
+  public init(date: String, time: String? = nil, phrase: String? = nil) {
     self.date = date
     self.time = time
     self.phrase = phrase

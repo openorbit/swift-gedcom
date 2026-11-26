@@ -49,7 +49,7 @@ public class Repository : RecordProtocol, GedcomExtensionContainer {
     "CREA" : \Repository.creationDate
   ]
 
-  init(xref: String, name: String) {
+  public init(xref: String, name: String) {
     self.xref = xref
     self.name = name
   }

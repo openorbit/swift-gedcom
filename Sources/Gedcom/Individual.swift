@@ -139,7 +139,7 @@ public class IndividualAttributeStructure : RecordProtocol, GedcomExtensionConta
     "AGE" : \IndividualAttributeStructure.age,
   ]
 
-  init(kind: IndividualAttributeKind,
+  public init(kind: IndividualAttributeKind,
        text: String? = nil,
        type: String? = nil,
        age: Age? = nil,
@@ -462,7 +462,7 @@ public class IndividualEvent : RecordProtocol, GedcomExtensionContainer {
     "FAMC" : \IndividualEvent.familyChild,
   ]
 
-  init(kind: IndividualEventKind,
+  public init(kind: IndividualEventKind,
        text: String? = nil,
        occurred: Bool? = nil, // Text == Y
        type: String? = nil,
@@ -1023,7 +1023,7 @@ public class PersonalName : RecordProtocol, GedcomExtensionContainer {
     "SOUR" : \PersonalName.citations,
   ]
 
-  init(name: String, type: NameType? = nil,
+  public init(name: String, type: NameType? = nil,
        namePieces : [PersonalNamePiece] = [],
        translations : [PersonalNameTranslation] = [],
        notes: [NoteStructure] = [],
@@ -1306,7 +1306,7 @@ public class FamilyChild : RecordProtocol, GedcomExtensionContainer {
     "SNOTE" : \FamilyChild.notes,
   ]
 
-  init(xref: String,
+  public init(xref: String,
        pedigree: Pedigree? = nil,
        status: ChildStatus? = nil,
        notes: [NoteStructure] = []) {
@@ -1364,7 +1364,7 @@ public class FamilySpouse : RecordProtocol, GedcomExtensionContainer {
     "SNOTE" : \FamilySpouse.notes,
   ]
 
-  init(xref: String, notes: [NoteStructure] = [])
+  public init(xref: String, notes: [NoteStructure] = [])
   {
     self.xref = xref
     self.notes = notes
@@ -1543,7 +1543,7 @@ public class PhraseRef : RecordProtocol, GedcomExtensionContainer {
     "PHRASE" : \PhraseRef.phrase,
   ]
 
-  init(tag: String, xref: String, phrase: String? = nil) {
+  public init(tag: String, xref: String, phrase: String? = nil) {
     self.tag = tag
     self.xref = xref
     self.phrase = phrase
@@ -1695,7 +1695,7 @@ public class Individual : RecordProtocol, GedcomExtensionContainer {
 
   ]
 
-  init(xref: String) {
+  public init(xref: String) {
     self.xref = xref
   }
   required init(record: Record) throws {
