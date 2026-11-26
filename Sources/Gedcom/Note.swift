@@ -27,7 +27,7 @@ public class Translation : RecordProtocol, GedcomExtensionContainer {
     "LANG" : \Translation.lang,
   ]
 
-  init(text: String, mime: String? = nil, lang: String? = nil)
+  public init(text: String, mime: String? = nil, lang: String? = nil)
   {
     self.text = text
     self.mimeType = mime
@@ -83,7 +83,7 @@ public class Note : RecordProtocol, GedcomExtensionContainer {
     "SOUR" : \Note.citations,
  ]
 
-  init(text: String, mime: String? = nil, lang: String? = nil)
+  public init(text: String, mime: String? = nil, lang: String? = nil)
   {
     self.text = text
     self.mimeType = mime
@@ -152,7 +152,7 @@ public class SNoteRef : RecordProtocol, GedcomExtensionContainer {
     self.init(xref: record.line.value!)
   }
 
-  init(xref: String) {
+  public init(xref: String) {
     self.xref = xref
   }
 

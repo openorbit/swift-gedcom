@@ -768,7 +768,7 @@ public class Family : RecordProtocol, GedcomExtensionContainer {
   ]
 
 
-  init(xref: String) {
+  public init(xref: String) {
     self.xref = xref
   }
 

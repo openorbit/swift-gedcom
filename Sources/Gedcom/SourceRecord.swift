@@ -172,7 +172,7 @@ public class SourceCitation : RecordProtocol, GedcomExtensionContainer {
     "SNOTE" : \SourceCitation.notes,
   ]
 
-  init(xref: String, page: String? = nil,
+  public init(xref: String, page: String? = nil,
        data: SourceCitationData? = nil,
        events: [SourceEventData] = [],
        quality: Int? = nil,
@@ -507,7 +507,7 @@ public class SourceRepositoryCitation : RecordProtocol, GedcomExtensionContainer
     "CALN" : \SourceRepositoryCitation.callNumbers
   ]
 
-  init(xref: String) {
+  public init(xref: String) {
     self.xref = xref
   }
 
@@ -634,7 +634,7 @@ public class Source : RecordProtocol, GedcomExtensionContainer {
     "CREA" : \Source.creationDate
   ]
 
-  init(xref: String) {
+  public init(xref: String) {
     self.xref = xref
   }
   required init(record: Record) throws {
