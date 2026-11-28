@@ -1005,15 +1005,29 @@ public class GedcomFile {
   }
 
   public func export(archive path: URL, encoding: String.Encoding = .utf8) throws {
+    try export(archive: path, mediaFiles: [:], encoding: encoding)
+  }
+
+  public func export(archive path: URL, mediaFiles: [String: Data], encoding: String.Encoding = .utf8) throws {
     let content = exportContent()
     let data = content.data(using: encoding)!
 
+    if FileManager.default.fileExists(atPath: path.path) {
+      try FileManager.default.removeItem(at: path)
+    }
     let archive = try Archive(url: path, accessMode: .create)
 
-    try archive.addEntry(with: "gedcom.ged", type: .file, uncompressedSize: Int64(data.count), bufferSize: 4, provider: { (position, size) -> Data in
-      // This will be called until `data` is exhausted (3x in this case).
+    try archive.addEntry(with: "gedcom.ged", type: .file, uncompressedSize: Int64(data.count), bufferSize: 4096, provider: { (position, size) -> Data in
       return data.subdata(in: Data.Index(position)..<Int(position)+size)
     })
+
+    for (relativePath, fileData) in mediaFiles.sorted(by: { $0.key < $1.key }) {
+      let cleanPath = relativePath.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+      guard !cleanPath.isEmpty else { continue }
+      try archive.addEntry(with: cleanPath, type: .file, uncompressedSize: Int64(fileData.count), bufferSize: 4096, provider: { (position, size) -> Data in
+        return fileData.subdata(in: Data.Index(position)..<Int(position)+size)
+      })
+    }
   }
 
   public func export(file path: URL, encoding: String.Encoding = .utf8) throws {

@@ -69,7 +69,7 @@ public class PlaceCoordinates : RecordProtocol, GedcomExtensionContainer {
     "LONG" : \PlaceCoordinates.lon,
   ]
 
-  init(lat: Double, lon: Double) {
+  public init(lat: Double, lon: Double) {
     self.lat = lat
     self.lon = lon
   }
@@ -139,7 +139,7 @@ public class PlaceStructure : RecordProtocol, GedcomExtensionContainer {
 
   ]
 
-  init(place: [String], form: [String] = [], lang: String? = nil) {
+  public init(place: [String], form: [String] = [], lang: String? = nil) {
     self.place = place
     self.form = form
     self.lang = lang
