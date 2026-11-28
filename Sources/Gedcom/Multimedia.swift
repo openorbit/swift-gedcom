@@ -84,7 +84,7 @@ public class MultimediaLink : RecordProtocol, GedcomExtensionContainer {
     "TITL" : \MultimediaLink.title
   ]
 
-  init(xref: String, crop: Crop? = nil, title: String? = nil)
+  public init(xref: String, crop: Crop? = nil, title: String? = nil)
   {
     self.xref = xref
     self.crop = crop
@@ -178,7 +178,7 @@ public class MultimediaFileForm : RecordProtocol, GedcomExtensionContainer {
     "MEDI" : \MultimediaFileForm.medium,
   ]
 
-  init(form: String, medium: Medium? = nil) {
+  public init(form: String, medium: Medium? = nil) {
     self.form = form
     self.medium = medium
   }
@@ -227,7 +227,7 @@ public class MultimediaFile : RecordProtocol, GedcomExtensionContainer {
     "TRAN" : \MultimediaFile.translations,
   ]
 
-  init(path: String, form: MultimediaFileForm, title: String? = nil) {
+  public init(path: String, form: MultimediaFileForm, title: String? = nil) {
     self.path = path
     self.form = form
     self.title = title
@@ -302,7 +302,7 @@ public class Multimedia : RecordProtocol, GedcomExtensionContainer {
     "CREA" : \Multimedia.creationDate
   ]
 
-  init(xref: String) {
+  public init(xref: String) {
     self.xref = xref
   }
   required init(record: Record) throws {

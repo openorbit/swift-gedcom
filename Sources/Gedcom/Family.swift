@@ -507,7 +507,7 @@ public class FamilyEvent : RecordProtocol, GedcomExtensionContainer {
     "UID" : \FamilyEvent.uid,
   ]
 
-  init(kind: FamilyEventKind, occured: Bool? = nil, text: String? = nil,
+  public init(kind: FamilyEventKind, occured: Bool? = nil, text: String? = nil,
        type: String? = nil,
        husband: SpouseAge? = nil,
        wife: SpouseAge? = nil,
